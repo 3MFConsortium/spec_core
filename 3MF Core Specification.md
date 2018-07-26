@@ -46,15 +46,41 @@ The information contained in this specification is subject to change. Every effo
 
 ## Document Conventions
 
-See [the standard 3MF Document Conventions documentation](https://github.com/3MFConsortium/spec_resources/blob/master/document_conventions.md).
+Except where otherwise noted, syntax descriptions are expressed in the ABNF format as defined in RFC 4234.
+
+Glossary terms are formatted like _this_.
+
+Syntax descriptions and code are formatted as `Markdown code blocks.`
+
+Replaceable items, that is, an item intended to be replaced by a value, are formatted in _`monospace cursive`_ type.
+
+Notes are formatted as follows:
+
+>**Note:** This is a note.
 
 ## Language Notes
 
-See [the standard 3MF Language Notes documentation](https://github.com/3MFConsortium/spec_resources/blob/master/language_notes.md).
+In this specification, the words that are used to define the significance of each requirement are written in uppercase. These words are used in accordance with their definitions in RFC 2119, and their respective meanings are reproduced below:
+
+- _MUST._ This word, or the adjective "REQUIRED," means that the item is an absolute requirement of the specification.
+- _SHOULD._ This word, or the adjective "RECOMMENDED," means that there may exist valid reasons in particular circumstances to ignore this item, but the full implications should be understood and the case carefully weighed before choosing a different course.
+- _MAY._ This word, or the adjective "OPTIONAL," means that this item is truly optional. For example, one implementation may choose to include the item because a particular marketplace or scenario requires it or because it enhances the product. Another implementation may omit the same item.
 
 ## Software Conformance
 
-See [the standard 3MF Software Conformance documentation](https://github.com/3MFConsortium/spec_resources/blob/master/software_conformance.md).
+Most requirements are expressed as format or package requirements rather than implementation requirements.
+
+In order for consumers to be considered conformant, they must observe the following rules:
+
+- They MUST NOT report errors when processing conforming instances of the document format except when forced to do so by resource exhaustion.
+- They SHOULD report errors when processing non-conforming instances of the document format when doing so does not pose an undue processing or performance burden.
+
+In order for producers to be considered conformant, they must observe the following rules:
+
+- They MUST NOT generate any new, non-conforming instances of the document format.
+- They MUST NOT introduce any non-conformance when modifying an instance of the document format.
+
+Editing applications are subject to all of the above rules.
 
 # Part I. 3MF Documents
 
@@ -717,7 +743,85 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 # Appendix A. Glossary
 
-See [the standard 3MF Glossary](https://github.com/3MFConsortium/spec_resources/blob/master/glossary.md).
+**3D matrix.** A 4x4 affine matrix used for rotating, scaling, and translating an object in three-dimensional space.
+
+**3D model.** The markup that defines a model for output.
+
+**3D Model part.** The OPC part that contains a 3D model.
+
+**3D Texture part.** A file used to apply complex information to a 3D object in the 3D Model part (undefined in this spec, but available for extensions).
+
+**3MF.** The 3D Manufacturing Format described by this specification, defining one or more 3D objects intended for output to a physical form.
+
+**3MF Document.** The digital manifestation of an OPC package that contains a 3D payload that conforms with the 3MF specification.
+
+**3MF Document StartPart relationship.** The OPC relationship from the root of the package to the 3D Model part.
+
+**Assembly.** A model that contains two or more independently-defined objects that are connected or interlocked either during or after the 3D manufacturing process is complete. An assembly might be able to be reversed or the individual parts may be inseparably interlocked.
+
+**Back.** The maximum printable XZ plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
+
+**Bottom.** The minimum printable XY plane of the print area or the correspondent minimum plane of a model bounding box, once transformed to the output coordinate space.
+
+**Component.** An object that is added as an intact shape to the overall definition of another object.
+
+**Consumer.** A software, service, or device that reads in a 3MF Document.
+
+**Core properties.** The well-defined set package (OPC) properties that define metadata about the package as a whole, such as the author, the last modified time, and so on.
+
+**Digital signatures.** A mechanism that, when present, can be used to validate that a part or payload has not been tampered with or changed since the digital signature was applied.
+
+**Editor.** A software, service, or device that both reads in and writes out 3MF Documents, possibly changing the content in between.
+
+**Fill rule.** The algorithm used to determine whether any particular point is considered to be "inside" the geometry or not.
+
+**Front.** The minimum printable XZ plane of the print area or the correspondent minimum plane of a model bounding box, once transformed to the output coordinate space.
+
+**Left.** The minimum printable YZ plane of the print area or the correspondent minimum plane of a model bounding box, once transformed to the output coordinate space.
+
+**Material.** The description of a physical substance that can be used to output an object.
+
+**Material resource.** A potential resource that might be referenced by an object to describe what the object will be made of.
+
+**Mesh.** A triangular tessellation of an object's surface.
+
+**Metadata.** Ancillary information about some portion of the model, to provide more refined processing by knowledgeable producers or consumers.
+
+**Model.** The set of objects that are to be manufactured as part of a single job. This may include a single object, multiple instances of the same object, multiple different objects, or multiple objects in an assembly.
+
+**Must preserve.** A set of OPC parts that SHOULD be retained by a producer when rewriting or saving changes to this 3MF file specified by the MustPreserve relationship type.
+
+**Object resource.** A single 3D shape that could be output by a 3D manufacturing device or used as a component in another object resource.
+
+**Payload.** A complete collection of interdependent parts and relationships within a package.
+
+**PrintTicket.** The contents of a PrintTicket part. Conforms to the Print Schema Specification. It is RECOMMENDED to use the standard Print Schema Keywords for 3D Manufacturing when possible.
+
+**PrintTicket part.** The PrintTicket part provides settings used when the 3MF Document is printed.
+
+**Primary 3D payload root.** The 3D payload discovered by the 3MF Document StartPart relationship.
+
+**Producer.** A software, service, or device that writes out a 3MF Document.
+
+**Protection authority.** The owner of the protection mechanism described by the protection type. This may be the producer that originally protected the file, the consumer that defines what protection mechanism will be accepted, or a third-party protection service, such as a digital rights management service.
+
+**Protection namespace.** The XML namespace that the protection type and associated metadata are drawn from. It is declared on the \<model> element.
+
+**Protection type.** The qualified name for a protection mechanism that has been applied to the resources and textures of the 3MF Document. This could be as simple as an XOR obfuscation or as complex as a full digital rights management solution. The valid protection types are not defined in this specification and are implementation dependent.
+
+**Resource.** An object, material, or something else defined in an extension that could be used by another resource or might be necessary to build a physical 3D object according to build instructions.
+
+**Right.** The maximum printable YZ plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
+
+**Support.** Many 3D printers require scaffolding for overhanging areas in the model to keep them from collapsing or warping; this scaffolding is referred to as support.
+
+**Thumbnail.** An image that helps end-users identify the contents of the package, expressed as a JPEG or PNG image.
+
+**Thumbnail part.** The OPC part that contains the package thumbnail image.
+
+**Top.** The maximum printable XY plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
+
+**XML namespace.** A namespace declared on the \<model> element, in accordance with the XML Namespaces specification.
 
 # Appendix B.1. 3MF XSD Schema
 
@@ -1017,7 +1121,59 @@ MustPreserve http://schemas.openxmlformats.org/package/2006/relationships/mustpr
 
 # References
 
-See [the standard 3MF References](https://github.com/3MFConsortium/spec_resources/blob/master/references.md).
+**BNF of Generic URI Syntax**
+
+"BNF of Generic URI Syntax." World Wide Web Consortium. http://www.w3.org/Addressing/URL/5\_URI\_BNF.html
+
+**JPEG**
+
+Hamilton, Eric. "JPEG File Interchange Format, Version 1.02." World Wide Web Consortium. 1992. http://www.w3.org/Graphics/JPEG/jfif3.pdf
+
+**Open Packaging Conventions**
+
+Ecma International. "Office Open XML Part 2: Open Packaging Conventions." 2006. http://www.ecma-international.org
+
+**PNG**
+
+Duce, David (editor). "Portable Network Graphics (PNG) Specification," Second Edition. World Wide Web Consortium. 2003. http://www.w3.org/TR/2003/REC-PNG-20031110
+
+**Print Schema**
+
+Microsoft Corporation. "Print Schema." 2006. http://windowssdk.msdn.microsoft.com/en-us/library/default.aspx
+
+**RFC 2119**
+
+Bradner, S. "Key words for use in RFCs to Indicate Requirement Levels." The Internet Society. 1997. http://www.rfc-editor.org
+
+**RFC 3066**
+
+Alvestrand, H. "Tags for the Identification of Languages." The Internet Society. 2001. http://www.rfc-editor.org
+
+**sRGB**
+
+Anderson, Matthew, Srinivasan Chandrasekar, Ricardo Motta, and Michael Stokes. "A Standard Default Color Space for the Internet-sRGB, Version 1.10." World Wide Web Consortium. 1996. http://www.w3.org/Graphics/Color/sRGB
+
+**Unicode**
+
+The Unicode Consortium. The Unicode Standard, Version 4.0.0, defined by: _The Unicode Standard, Version 4.0_. Boston, MA: Addison-Wesley, 2003.
+
+**XML**
+
+Bray, Tim, Eve Maler, Jean Paoli, C. M. Sperlberg-McQueen, and Fran├ºois Yergeau (editors). "Extensible Markup Language (XML) 1.0 (Fourth Edition)." World Wide Web Consortium. 2006. http://www.w3.org/TR/2006/REC-xml-20060816/
+
+**XML C14N**
+
+Boyer, John. "Canonical XML Version 1.0." World Wide Web Consortium. 2001. http://www.w3.org/TR/xml-c14n.
+
+**XML Namespaces**
+
+Bray, Tim, Dave Hollander, Andrew Layman, and Richard Tobin (editors). "Namespaces in XML 1.0 (Second Edition)." World Wide Web Consortium. 2006. http://www.w3.org/TR/2006/REC-xml-names-20060816/
+
+**XML Schema**
+
+Beech, David, Murray Maloney, Noah Mendelsohn, and Henry S. Thompson (editors). "XML Schema Part 1: Structures," Second Edition. World Wide Web Consortium. 2004. http://www.w3.org/TR/2004/REC-xmlschema-1-20041028/
+
+Biron, Paul V. and Ashok Malhotra (editors). "XML Schema Part 2: Datatypes," Second Edition. World Wide Web Consortium. 2004. http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/
 
 Copyright 3MF Consortium 2018.
 
