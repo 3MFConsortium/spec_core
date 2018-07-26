@@ -96,7 +96,7 @@ This format also includes optional components that build on the minimal set of c
 Finally, the 3MF Document format implements the common package features specified by the Open Packaging Conventions specification that support digital signatures and core properties.
 
 
-## How This Specification Is Organized
+## 1.1. How This Specification Is Organized
 
 | **Chapter** | **Description** |
 | --- | --- |
@@ -111,26 +111,26 @@ Finally, the 3MF Document format implements the common package features specifie
 | Standard Namespaces & Content Types | A reference on the standard namespaces and content types for 3MF Documents. |
 
 
-## Package
+## 1.2. Package
 
 The 3MF Document format MUST use a ZIP archive for its physical model. The Open Packaging specification describes a packaging model, that is, how the package is represented internally with parts and relationships.
 
 The 3MF Document format includes a well-defined set of parts and relationships, each fulfilling a particular purpose in the document. The format also extends the package features, including digital signatures and thumbnails.
 
 
-# Parts and Relationships
+# Chapter 2. Parts and Relationships
 
 The packaging conventions described in the Open Packaging Conventions (OPC) specification can be used to carry any payload. A _payload_ is a complete collection of interdependent parts and relationships within a package. This specification defines a particular payload that contains a 3D object definition and its supporting files: the 3D payload.
 
 An OPC package that holds a 3D payload and follows the rules described in this specification is referred to as a 3MF Document. Producers and consumers of 3MF Documents can implement their own parsers and manufacturing devices based on this specification.
 
 
-## 3D Payload
+## 2.1. 3D Payload
 
 A payload that has a 3D Model root part is known as a _3D payload_. There can be more than one 3D payload in a 3MF Document, but only one primary 3D payload.
 
 
-### 3D Parts and Payload Relationships
+### 2.1.1. 3D Parts and Payload Relationships
 
 A specific relationship type is defined to identify the root of a 3D payload within a 3MF Document: the _3MF Document StartPart relationship_. The _primary 3D payload root_ is the 3D Model part that is referenced by the 3MF Document StartPart relationship to find the primary 3D payload in a package. The 3MF Document StartPart relationship MUST point to the 3D Model part that identifies the root of the 3D payload.
 
@@ -161,14 +161,14 @@ _Figure 2-1. A typical 3MF Document_
 ![figure 2-1](images/figure_2-1.png)
 
 
-### 3D Model Part
+### 2.1.2. 3D Model Part
 
 The _3D Model part_ contains definitions of one or more objects to be fabricated by 3D manufacturing processes. The 3D Model part is the only valid root of a 3D payload.
 
 A 3D Model part has two sections: a set of resource definitions that include objects and materials, as well as a set of specific items to actually build. The content type of the 3D Model part is defined in Appendix C, "Standard Namespaces and Content Types."
 
 
-### Thumbnail Part
+### 2.1.3. Thumbnail Part
 
 _Thumbnails_ are small images that represent the contents of an entire 3MF Document. Thumbnails enable external agents to view the contents of the 3MF Document easily.
 
@@ -179,14 +179,14 @@ All thumbnails in the 3MF document MUST be referenced by the thumbnail relations
 For more information about the relationship type for thumbnail parts, see section C.2, "Relationship Types."
 
 
-### PrintTicket Part
+### 2.1.4. PrintTicket Part
 
 _PrintTicket parts_ provide user intent and device configuration information to printing consumers. A PrintTicket part can be attached only to a 3D Model part and each 3D Model part MUST attach no more than one _PrintTicket_. The PrintTicket format is governed by the specific consumer environment. For example, for printing on Microsoft Windows, valid PrintTicket settings are specified in the Print Schema Keywords for 3D Manufacturing specification.
 
 If no PrintTicket is provided or the PrintTicket provided is not supported by the consumer, it is left to the consumer to apply its own defaults.
 
 
-### MustPreserve Relationship
+### 2.1.5. MustPreserve Relationship
 
 Producers MAY add custom OPC parts to a 3MF package. For example, a software vendor may include annotations about an object referenced by a unique id.
 
@@ -205,7 +205,7 @@ The following example demonstrates how to add a MustPreserve relationship:
 </Relationships>
 ```
 
-## Part Naming Recommendations
+## 2.2. Part Naming Recommendations
 
 Producers and consumers of 3MF Documents refer to parts by name and use relationship names to identify the purpose of related parts. The Open Packaging Conventions specification describes the syntax for part name. However, following these rules alone can result in a package that is difficult for users to understand. For example, a user would have to open every Relationship part to know which parts are necessary to accurately manufacture a 3MF Document.
 
@@ -221,7 +221,7 @@ It is RECOMMENDED that producers of 3MF Documents use the following part naming 
 Part names MUST use absolute paths, meaning all paths begin with "/". Part names MUST NOT be empty or lead with a period (e.g. "/3D/.png" or "/3D/").
 
 
-## 3MF Document Markup
+## 2.3. 3MF Document Markup
 
 3MF Document markup has been designed to facilitate independent development of compatible systems that produce or consume 3MF Documents.
 
@@ -231,7 +231,7 @@ The design of 3MF Document markup reflects the tradeoffs between two, sometimes 
 2. 3MF Document markup should be compact; that is, the most common primitives should have compact representations. Bloated representations compromise the performance of systems handling 3MF Documents. As byte-count increases, so does communication time. Although compression can be used to improve communication time, it cannot eliminate the performance loss caused by bloated representations.
 
 
-### Support for Versioning and Extensibility
+### 2.3.1. Support for Versioning and Extensibility
 
 3MF Document markup has been designed in anticipation of the evolution of this specification. It also allows third parties to extend the markup.
 
@@ -242,7 +242,7 @@ Extension specifications MUST include one or more targeted versions of this core
 Within this core XSD schema (see Appendix B: 3MF XSD Schema), extension points have been explicitly entered in the form of \<any> elements and \<anyAttribute> (also visible in the element diagrams further along in this specification). These are required to come from other namespaces, which SHOULD point to a way to find the appropriate specification and accompanying XSD schema.
 
 
-### XML Usage
+### 2.3.2. XML Usage
 
 All XML content of the parts defined in this specification MUST conform to the following validation rules:
 
@@ -253,36 +253,36 @@ All XML content of the parts defined in this specification MUST conform to the f
 5. XML content MUST be produced and parsed with the en-us locale, particularly with respect to values containing decimal data.
 
 
-### Markup Model
+### 2.3.3. Markup Model
 
 3MF Document markup is an XML-based markup language that uses elements, attributes, and namespaces. The schema for 3MF Document markup includes only elements and their attributes, comments, and whitespace.
 
 
-#### XML Namespaces
+#### 2.3.3.1. XML Namespaces
 
 The 3MF Document core _XML namespace_, the principal namespace used for elements and attributes in 3D Model part markup is given in Appendix C, "Standard Namespaces and Content Types". Any elements and attributes undefined in this spec must be prefaced with the namespace corresponding to the 3MF extension they belong to.
 
 As a reminder, a non-default XML namespace on an element DOES automatically apply to any attributes of that element (unless another namespace is prefixed), but DOES NOT apply to sub-elements, so they must all be individually prefixed. Any attributes falling into an anyattribute extension point MUST be prefixed with their corresponding namespace (as all such extension points specify "other" for the required namespace in the XSD schema).
 
 
-### Whitespace
+### 2.3.4. Whitespace
 
 3MF Documents allow flexible whitespace usage in markup. Wherever a single whitespace character is allowed, multiple whitespace characters MAY be used. 3MF Document markup MUST NOT use the **xml:space** attribute. Additionally, where the 3MF Document schema specifies attributes of types that allow whitespace collapsing, leading and trailing whitespace in the attribute value MAY be used along with other whitespace that relies on the whitespace collapsing behavior specified in the XML Schema Specification.
 
 >**Note:** Consult the 3MF Schema for exact whitespace allowed.
 
 
-### Language
+### 2.3.5. Language
 
 The language of the contents of a 3MF Document (typically useful for content provided in metadata) MAY be identified using the **xml:lang** attribute, the value of which is inherited by child and descendant elements. This attribute is defined in the W3C XML specification. When the language of the contents is unknown, the value "und" (undetermined) MUST be used.
 
 
-# 3D Models
+# Chapter 3. 3D Models
 
 The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable _assembly_.
 
 
-## Coordinate Space
+## 3.1. Coordinate Space
 
 Coordinates in this specification are based on a right-handed coordinate space. Producers and consumers MUST define and map the origin of the coordinate space to the bottom-front-left corner of the device's output field (such as a tray, platform, or bed), with the x-axis increasing to the right of the output field, the y-axis increasing to the back of the output field, and the z-axis increasing to the top of the output field. Producers and consumers MUST use the unit resolution of the coordinate space as specified in the \<model> element.
 
@@ -291,7 +291,7 @@ _Figure 3-1. Coordinate space_
 ![figure 3-1](images/figure_3-1.png)
 
 
-## Relative Directions and Measurement
+## 3.2. Relative Directions and Measurement
 
 Relative directions in this specification are defined as follows. The term _top_ refers to the XY plane of the coordinate space with the maximum printable Z value. The term _bottom_ refers to the minimum printable XY plane of the coordinate space, defined as the XY plane with a Z value of 0. This is typically coincident with the print bed surface. The term _left_ refers to the minimum printable YZ plane of the coordinate space, defined as the YZ plane with an X value of 0. The term _right_ refers to the YZ plane of the coordinate space with the maximum printable X value. The term _front_ refers to the minimum printable XZ plane of the coordinate space, defined as the XZ plane with a Y value of 0. The term _back_ refers to the XZ plane of the coordinate space with the maximum printable Y value.
 
@@ -300,7 +300,7 @@ These terms might also be applied to models, in which case they are defined rela
 Producers and consumers MUST interpret coordinates in relation to the coordinate space defined in this specification.
 
 
-## 3D Matrices
+## 3.3. 3D Matrices
 
 When objects need to be transformed for rotation, scaling, or translation purposes, row-major affine _3D matrices_ (4x4) are used. The matrix SHOULD NOT be singular or nearly singular.
 
@@ -311,7 +311,7 @@ Transforms are of the form, where only the first 3 column values are specified. 
 After applying all transforms to an object, the model SHOULD have positive volume and SHOULD be located in the positive octant of the coordinate space.
 
 
-## Model
+## 3.4. Model
 
 _Figure 3-2: Overview of model XML structure of 3MF_
 
@@ -336,7 +336,7 @@ The \<model> element is the root element of the 3D Model part. There MUST be exa
 Producers SHOULD NOT require extensions unless the document would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
 
 
-### Metadata
+### 3.4.1. Metadata
 
 Element **\<metadata>**
 
@@ -383,7 +383,7 @@ Producers MAY indicate that certain metadata values should be preserved using th
 Chapter 4, Appendix B.2. includes a sample 3MF supporting custom metadata.
 
 
-### Resources
+### 3.4.2. Resources
 
 Element **\<resources>**
 
@@ -398,7 +398,7 @@ An object resource represents a single 3D object that could be manufactured, but
 Resource IDs MUST be unique within the model.
 
 
-### Build Instructions
+### 3.4.3. Build Instructions
 
 Element **\<build>**
 
@@ -407,7 +407,7 @@ Element **\<build>**
 The \<build> element contains one or more items to manufacture as part of processing the job. A consumer MUST NOT output any 3D objects not referenced by an \<item> element.
 
 
-#### Item Element
+#### 3.4.3.1. Item Element
 
 Element **\<item>**
 
@@ -436,7 +436,7 @@ If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (
 >**Note:** items must not reference objects of type "other"
 
 
-# Object Resources
+# Chapter 4. Object Resources
 
 _Object resources_ describe reusable objects that may be output (by reference) or composed into more complex objects or assemblies.
 
@@ -469,7 +469,7 @@ Object thumbnails MUST have an appropriate 3D Texturethumbnail relationship to t
 Part numbers are intended as a way to keep track of objects which may have been modified during a tool chain. When editing or processing a 3MF document, these part numbers SHOULD be preserved to the greatest degree possible, duplicating them for objects split into pieces, removing them from objects that are combined, and maintaining them for objects that are modified.
 
 
-## Meshes
+## 4.1. Meshes
 
 Element **\<mesh>**
 
@@ -501,7 +501,7 @@ Objects of type "support" or "solidsupport" SHOULD only be referenced in an Obje
 Support structures (both "solidsupport" and "support" types) MAY be ignored or replaced by auto-generated support, but this is NOT RECOMMENDED.
 
 
-### Fill Rule
+### 4.1.1. Fill Rule
 
 Because meshes may overlap or self-intersect, a _fill rule_ must be specified to indicate what enclosed areas are "inside" the volume and which are "outside" the volume. The enclosed volume of a group of meshes is defined by applying the fill algorithm. Fill algorithms determine how the intersecting areas of geometric shapes are combined to form a region. A fill rule is defined identically in 2D as in 3D, so the examples here will show the 2D equivalent for simplicity of figures. Consumers MAY take advantage of this fact by applying the fill rule after slicing, thereby simplifying the algorithm by only having to operate in 2D. By convention, a 2D figure has positive area when wound counter-clockwise, so when looking along an edge, the local "outside" is to the right, equivalent to the local "outside" of a triangle being the direction of the normal.
 
@@ -512,14 +512,14 @@ _Figure 4-2. Fill using Positive algorithm_
 ![figure 4-1](images/figure_4-2.png)
 
 
-### Overlapping order
+### 4.1.2. Overlapping order
 
 Because a mesh may overlap to itself, an _overlapping order_ must be specified to indicate which properties of the overlapping surface apply.
 
 When two triangles on the mesh surface overlap each other, the properties of the overlapped area are taken from the properties of the last overlapping triangle. If no properties are defined in the last overlapped triangle, properties SHOULD NOT be applied to the overlapped area of the triangle. To avoid this, 3MF producers SHOULD NOT create overlapping triangles.
 
 
-### Vertices
+### 4.1.3. Vertices
 
 Element **\<vertices>**
 
@@ -528,7 +528,7 @@ Element **\<vertices>**
 The vertices element contains all the \<vertex> elements for this object. The vertices represent the corners of each triangle in the mesh. The order of these elements defines an implicit 0-based index that is referenced by other elements, such as the \<triangle> element. The producer SHOULD NOT include duplicate vertices unless coalescing duplicates would create non-manifold edges. Furthermore, a producer SHOULD collapse vertices that are very closely proximal with a single vertex whenever appropriate. In order to avoid integer overflows, a vertex array MUST contain less than 2^31 vertices.
 
 
-#### Vertex
+#### 4.1.3.1. Vertex
 
 Element **\<vertex>**
 
@@ -544,7 +544,7 @@ Element **\<vertex>**
 A \<vertex> element represents a point in 3-dimensional space that is referenced by a triangle in the mesh. The decimal values representing the coordinates can be recorded to arbitrary precision. Producers SHOULD NOT use more precision than the error generated in their calculations, or the anticipated resolution of their consumer. The variable-precision nature of ASCII encoding is a significant advantage over fixed-width binary formats, and helps make up the difference in storage efficiency.
 
 
-### Triangles
+### 4.1.4. Triangles
 
 Element **\<triangles>**
 
@@ -555,7 +555,7 @@ The \<triangles> element contains a set of 1 or more \<triangle> elements to des
 These limitations can be superceded by another required 3MF extension.
 
 
-#### Triangle
+#### 4.1.4.1. Triangle
 
 Element **\<triangle>**
 
@@ -583,7 +583,7 @@ If the properties defined on the triangle are from a \<basematerials> group (see
 >**Note:** The triangle orientation is affected by the sign of the determinant of the transformation as described in Section 4.1.
 
 
-## Components
+## 4.2. Components
 
 Element **\<components>**
 
@@ -598,7 +598,7 @@ If the components overlap, 3D manufacturing devices MUST use the Positive fill r
 In order to avoid integer overflows, a components element MUST contain less than 2^31 components.
 
 
-### Component
+### 4.2.1. Component
 
 Element **\<component>**
 
@@ -613,7 +613,7 @@ Element **\<component>**
 A component selects a pre-defined object resource and adds it to the current object definition, after applying the provided matrix transform. This composition of an object definition from multiple primitive components can provide a very compact file size for a quite complex model. In keeping with the use of a simple parser, producers MUST define objects prior to referencing them as components.
 
 
-# Material Resources
+# Chapter 5. Material Resources
 
 Element **\<basematerials>**
 
@@ -630,7 +630,7 @@ A \<basematerials> element is a material group that acts as a container for the 
 In order to avoid integer overflows, a material group MUST contain less than 2^31 materials.
 
 
-## Base Material
+## 5.1. Base Material
 
 Element **\<base>**
 
@@ -654,19 +654,19 @@ Base material names are intended to convey design intent and producers SHOULD av
 For specifying the color design intent for a printed part, a producer MUST specify color properties via the material and property extension or use another corresponding extension.
 
 
-### sRGB Color
+### 5.1.1. sRGB Color
 
 An sRGB color MUST be specified with a value of a 6 or 8 digit hexadecimal number, e.g. "#RRGGBB" or "#RRGGBBAA" where RR is the red channel with values from 00-FF, GG is the green channel with values from 00-FF, BB is the blue channel with values from 00-FF, and AA is the alpha channel with values from 00 (completely transparent) to FF (completely opaque, the default if not specified).
 
 >**Note:** 3MF uses sRGB as specified by the World Wide Web Consortium (http://www.w3.org/Graphics/Color/sRGB)
 
 
-# 3MF Document Package Features
+# Chapter 6. 3MF Document Package Features
 
 3MF Documents take advantage of parts defined by the Open Packaging Conventions to provide additional information about the content in the package.
 
 
-## Thumbnail
+## 6.1. Thumbnail
 
 The producer of a 3MF document MAY include a 2D _thumbnail_ image representing the contents of the 3D payload. This image may be of content type image/jpeg or image/png, following the internal file format requirements described in the following subsections.
 
@@ -677,7 +677,7 @@ http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail
 The thumbnail can be accessed and displayed by external systems, such as the operating system's file explorer, a model browser, or a print queue preview utility.
 
 
-### JPEG Images
+### 6.1.1. JPEG Images
 
 JPEG image parts MUST contain images that conform to the JPEG specification. Consumers SHOULD support JPEG images that contain APP0, APP2, APP13, and APP14 markers. Consumers MUST support JPEG images that contain the APP1 marker and interpret the EXIF color space correctly.
 
@@ -696,7 +696,7 @@ CMYK JPEG images MUST NOT be used.
 >**Note:** If both APP2 and APP13 markers are specified, the APP2 marker takes precedence.
 
 
-### PNG Images
+### 6.1.2. PNG Images
 
 PNG image parts MUST contain images that conform to the PNG specification.
 
@@ -712,12 +712,12 @@ _Table 6-2. Support for ancillary PNG chunks_
 | sBIT | MUST Ignore |
 
 
-## Core Properties
+## 6.2. Core Properties
 
 The 3MF Document format relies on the _Core Properties_ part, defined in the Open Packaging Conventions specification, to provide metadata about the creation time, modification time, author, search keywords, and other document-centric metadata. See the Open Packaging Conventions specification for additional details.
 
 
-## Digital Signatures
+## 6.3. Digital Signatures
 
 3MF Documents may contain one or more _digital signatures_. A digital signature provides a mechanism to verify that a 3MF Document has not been tampered with since it was signed. The absence of a digital signature cannot prove that a 3MF Document was never signed.
 
@@ -726,12 +726,12 @@ The Open Packaging Conventions specification provides full details of how digita
 A digital signature applied to the 3D Model part SHOULD include only the 3D Model part and any other parts referenced by it, along with the associated relationships. It MAY include the Thumbnail, Digital Signature Origin, Core Properties parts and associated relationship parts.
 
 
-### Normalization
+### 6.3.1. Normalization
 
 Before applying or verifying a digital signature on the contents of the 3D Model part, the XML therein MUST first be normalized, which is equivalent to XML canonicalization according to XML C14N requirements.
 
 
-## Protected Content
+## 6.4. Protected Content
 
 This specification does not include any content protection mechanism of its own. However, it is recognized that for some workflows (e.g. those where a 3MF Document is stored as a stand-alone file), it is important to prevent an intercepting party from accessing 3D object details as they travel from the point of production or distribution through to the point of intended consumption on an authorized device or by an authorized application or user.
 
