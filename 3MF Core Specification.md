@@ -429,7 +429,7 @@ The \<item> element identifies one object resource to be output by the 3D manufa
 
 The \<item> element may contain a \<metadatagroup> element containing one or more vendor-supplied \<metadata> elements.
 
-A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see ┬º4.2, "Components"), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
+A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see 4.2, "Components"), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
 
 If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped item. If the last item has no properties defined in the overlapped volume, properties MUST NOT be applied.
 
