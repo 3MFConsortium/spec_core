@@ -96,22 +96,7 @@ This format also includes optional components that build on the minimal set of c
 Finally, the 3MF Document format implements the common package features specified by the Open Packaging Conventions specification that support digital signatures and core properties.
 
 
-## 1.1. How This Specification Is Organized
-
-| **Chapter** | **Description** |
-| --- | --- |
-| 3MF Document Format | Introduction to the 3MF Document file format and overview of basic package requirements. |
-| Parts and Relationships | Describes the Open Packaging Convention package parts and relationships in a 3MF Document. |
-| 3D Models | Introduces the primary organization of a 3MF Document into resources and build instructions. |
-| Objects | This chapter describes how objects are defined by a triangular mesh. |
-| Materials | This chapter provides detailed information about how material resources are defined. These resources are used in turn by objects to complete a 3D object definition. |
-| Package Features | Describes the 3MF Document features provided by the Open Packaging Conventions, including thumbnails, digital signatures, and core properties and protected content. |
-| Glossary | A full summary and definition of all glossary terms introduced in this specification. |
-| XSD Schema | The schema for the 3D Model part. |
-| Standard Namespaces & Content Types | A reference on the standard namespaces and content types for 3MF Documents. |
-
-
-## 1.2. Package
+## 1.1. Package
 
 The 3MF Document format MUST use a ZIP archive for its physical model. The Open Packaging specification describes a packaging model, that is, how the package is represented internally with parts and relationships.
 
