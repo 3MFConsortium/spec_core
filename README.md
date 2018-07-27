@@ -6,4 +6,4 @@ The 3D Manufacturing Format, or 3MF, describes the set of conventions for the us
 
 A primary goal of this specification is to ensure the interoperability of independently created software and hardware systems that produce or consume 3MF content. This specification defines the formal requirements that producers and consumers must satisfy in order to achieve interoperability.
 
-See the [3MF core examples repository](https://github.com/3MFConsortium/3mf-samples/tree/master/examples/core) for 3MF sample files that include beam lattices.
+See the [3MF core examples repository](https://github.com/3MFConsortium/3mf-samples/tree/master/examples/core) for 3MF sample files.
