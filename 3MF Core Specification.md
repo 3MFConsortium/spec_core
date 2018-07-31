@@ -21,8 +21,42 @@
 THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any warranties (express, implied, or otherwise), including implied warranties of merchantability, non-infringement, fitness for a particular purpose, or title, related to the materials. The entire risk as to implementing or otherwise using the materials is assumed by the implementer and user. IN NO EVENT WILL ANY MEMBER BE LIABLE TO ANY OTHER PARTY FOR LOST PROFITS OR ANY FORM OF INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF ACTION OF ANY KIND WITH RESPECT TO THIS DELIVERABLE OR ITS GOVERNING AGREEMENT, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, AND WHETHER OR NOT THE OTHER MEMBER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## Table of Contents
-TO BE COMPLETED
 
+- [Preface](#preface)
+  * [About this Specification](#about-this-specification)
+  * [Document Conventions](#document-conventions)
+  * [Language Notes](#language-notes)
+  * [Software Conformance](#software-conformance)
+- [Part I. 3MF Documents](#part-i-3mf-documents)
+- [Chapter 1. 3MF Document Format](#chapter-1-3mf-document-format)
+  * [1.1. Package](#11-package)
+- [Chapter 2. Parts and Relationships](#chapter-2-parts-and-relationships)
+  * [2.1. 3D Payload](#21-3d-payload)
+  * [2.2. Part Naming Recommendations](#22-part-naming-recommendations)
+  * [2.3. 3MF Document Markup](#23-3mf-document-markup)
+- [Chapter 3. 3D Models](#chapter-3-3d-models)
+  * [3.1. Coordinate Space](#31-coordinate-space)
+  * [3.2. Relative Directions and Measurement](#32-relative-directions-and-measurement)
+  * [3.3. 3D Matrices](#33-3d-matrices)
+  * [3.4. Model](#34-model)
+- [Chapter 4. Object Resources](#chapter-4-object-resources)
+  * [4.1. Meshes](#41-meshes)
+  * [4.2. Components](#42-components)
+- [Chapter 5. Material Resources](#chapter-5-material-resources)
+  * [5.1. Base Material](#51-base-material)
+- [Chapter 6. 3MF Document Package Features](#chapter-6-3mf-document-package-features)
+  * [6.1. Thumbnail](#61-thumbnail)
+  * [6.2. Core Properties](#62-core-properties)
+  * [6.3. Digital Signatures](#63-digital-signatures)
+  * [6.4. Protected Content](#64-protected-content)
+- [Part II. Appendixes](#part-ii-appendixes)
+- [Appendix A. Glossary](#appendix-a-glossary)
+- [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)
+- [Appendix B.2. 3MF Metadata Example](#appendix-b2-3mf-metadata-example)
+- [Appendix C. Standard Namespaces and Content Types](#appendix-c-standard-namespaces-and-content-types)
+  * [C.1 Content Types](#c1-content-types)
+  * [C.2 Relationship Types](#c2-relationship-types)
+  * [C.3 Namespaces](#c3-namespaces)
 
 # Preface
 
