@@ -96,22 +96,7 @@ This format also includes optional components that build on the minimal set of c
 Finally, the 3MF Document format implements the common package features specified by the Open Packaging Conventions specification that support digital signatures and core properties.
 
 
-## 1.1. How This Specification Is Organized
-
-| **Chapter** | **Description** |
-| --- | --- |
-| 3MF Document Format | Introduction to the 3MF Document file format and overview of basic package requirements. |
-| Parts and Relationships | Describes the Open Packaging Convention package parts and relationships in a 3MF Document. |
-| 3D Models | Introduces the primary organization of a 3MF Document into resources and build instructions. |
-| Objects | This chapter describes how objects are defined by a triangular mesh. |
-| Materials | This chapter provides detailed information about how material resources are defined. These resources are used in turn by objects to complete a 3D object definition. |
-| Package Features | Describes the 3MF Document features provided by the Open Packaging Conventions, including thumbnails, digital signatures, and core properties and protected content. |
-| Glossary | A full summary and definition of all glossary terms introduced in this specification. |
-| XSD Schema | The schema for the 3D Model part. |
-| Standard Namespaces & Content Types | A reference on the standard namespaces and content types for 3MF Documents. |
-
-
-## 1.2. Package
+## 1.1. Package
 
 The 3MF Document format MUST use a ZIP archive for its physical model. The Open Packaging specification describes a packaging model, that is, how the package is represented internally with parts and relationships.
 
@@ -176,7 +161,7 @@ Thumbnails MAY be defined for the entire package by referencing the thumbnail fr
 
 All thumbnails in the 3MF document MUST be referenced by the thumbnail relationship.
 
-For more information about the relationship type for thumbnail parts, see section C.2, "Relationship Types."
+For more information about the relationship type for thumbnail parts, see section [C.2, Relationship Types.](#c2-relationship-types)
 
 
 ### 2.1.4. PrintTicket Part
@@ -239,7 +224,7 @@ Extensions are a critical part of 3MF, and as such, this core specification is a
 
 Extension specifications MUST include one or more targeted versions of this core specification to limit the number of possible configurations. Producers can specify certain extensions as required in a particular 3MF document, in which case consumers that do not support those extensions MUST fail to edit or manufacture that document, rather than ignoring the extension namespace.
 
-Within this core XSD schema (see Appendix B: 3MF XSD Schema), extension points have been explicitly entered in the form of \<any> elements and \<anyAttribute> (also visible in the element diagrams further along in this specification). These are required to come from other namespaces, which SHOULD point to a way to find the appropriate specification and accompanying XSD schema.
+Within this core XSD schema (see [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)), extension points have been explicitly entered in the form of \<any> elements and \<anyAttribute> (also visible in the element diagrams further along in this specification). These are required to come from other namespaces, which SHOULD point to a way to find the appropriate specification and accompanying XSD schema.
 
 
 ### 2.3.2. XML Usage
@@ -331,7 +316,7 @@ Element **\<model>**
 | requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing the document. Editors and manufacturing devices MUST NOT process the document if they do not support the required extensions. |
 | thumbnail | **ST\_UriReference** | | | Path to a root level thumbnail of type JPEG or PNG that represents a rendered image of the entire model. |
 
-The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see 6.1, "Metadata" for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items that should actually be manufactured as part of the job.
+The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see [3.4.1. Metadata](#341-metadata) for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items that should actually be manufactured as part of the job.
 
 Producers SHOULD NOT require extensions unless the document would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
 
@@ -345,7 +330,7 @@ Element **\<metadata>**
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
-| name | **xs:QName** | required | | Contains either the well-known name of the metadata defined by this specification (see Table 8-1 below) or vendor-defined metadata, which MUST be prefixed with a valid XML namespace name declared on the \<model> element. |
+| name | **xs:QName** | required | | Contains either the well-known name of the metadata defined by this specification (see Table 3-1 below) or vendor-defined metadata, which MUST be prefixed with a valid XML namespace name declared on the \<model> element. |
 | preserve | **xs:boolean** | | | A non-zero value indicates the producer wants the consumer to preserve this value when it saves a modified version of this 3MF |
 | type | **xs:string** | | | A string indicating the XML type of the data stored in the metadata value. |
 
@@ -380,7 +365,7 @@ Consumers SHOULD ignore any metadata with a name they do not recognize, typicall
 
 Producers MAY indicate that certain metadata values should be preserved using the preserve attribute. The default value is assumed to be 0 or false. When the preserve attribute is 1 or true, Consumers that modify the 3MF file SHOULD retain the original metadata value even if the data it references is modified. The metadata should be preserved through the lifetime of the element it is associated with. If an \<Item> is removed, for example, the associated metadata should be removed with it.
 
-Chapter 4, Appendix B.2. includes a sample 3MF supporting custom metadata.
+[Appendix B.2.](#appendix-b2-3mf-metadata-example) includes a sample 3MF supporting custom metadata.
 
 
 ### 3.4.2. Resources
@@ -417,7 +402,7 @@ Element **\<item>**
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
 | objectid | **ST\_ResourceID** | required | | Reference to the \<object> element with the matching id attribute value |
-| transform | **ST\_Matrix3D** | | | A matrix transform (see 3.3, "3D Matrices") applied to the item to be outputted. |
+| transform | **ST\_Matrix3D** | | | A matrix transform (see [3.3. 3D Matrices](#33-3d-matrices)) applied to the item to be outputted. |
 | partnumber | **xs:string** | | | A unique identifier for the item. SHOULD be maintained by an editor if only the transformation is changed. |
 
 ##### Elements
@@ -429,7 +414,7 @@ The \<item> element identifies one object resource to be output by the 3D manufa
 
 The \<item> element may contain a \<metadatagroup> element containing one or more vendor-supplied \<metadata> elements.
 
-A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see 4.2, "Components"), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
+A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see [4.2. Components](#42-components)), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
 
 If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped item. If the last item has no properties defined in the overlapped volume, properties MUST NOT be applied.
 
@@ -578,7 +563,7 @@ The properties applied to each vertex (p1, p2, p3) allow property gradients to b
 
 The property group is specified by the pid attribute, if different than the property group defined at the object-level. Since this is applied to the whole triangle, it implicitly forces the three properties to be from the same group, which implies they are of the same type, as defined by possible extensions to this spec.
 
-If the properties defined on the triangle are from a \<basematerials> group (see Chapter 5), they MUST NOT form gradients, as interpolation of base materials is not defined in this core specification. Therefore p1, p2 and p3 MUST be equal or unspecified. Material gradients and interpolation methods are defined in extension specifications.
+If the properties defined on the triangle are from a \<basematerials> group (see [Chapter 5](#chapter-5-material-resources)), they MUST NOT form gradients, as interpolation of base materials is not defined in this core specification. Therefore p1, p2 and p3 MUST be equal or unspecified. Material gradients and interpolation methods are defined in extension specifications.
 
 >**Note:** The triangle orientation is affected by the sign of the determinant of the transformation as described in Section 4.1.
 
@@ -608,7 +593,7 @@ Element **\<component>**
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
 | objectid | **ST\_ResourceID** | required | | References an object resource with a matching id attribute value. |
-| transform | **ST\_Matrix3D** | | | A matrix transform (see 3.3, "3D Matrices") applied to the item to be outputted. |
+| transform | **ST\_Matrix3D** | | | A matrix transform (see [3.3. 3D Matrices](#33-3d-matrices)) applied to the item to be outputted. |
 
 A component selects a pre-defined object resource and adds it to the current object definition, after applying the provided matrix transform. This composition of an object definition from multiple primitive components can provide a very compact file size for a quite complex model. In keeping with the use of a simple parser, producers MUST define objects prior to referencing them as components.
 
