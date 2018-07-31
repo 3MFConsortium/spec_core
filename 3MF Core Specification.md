@@ -881,6 +881,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:sequence>
 			<xs:element ref="metadata" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Object">
 		<xs:sequence>
@@ -905,11 +906,13 @@ A consumer that is authorized to un-protect content by reversing the above steps
 			<xs:element ref="triangles"/>
 			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Vertices">
 		<xs:sequence>
 			<xs:element ref="vertex" minOccurs="3" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Vertex">
 		<xs:attribute name="x" type="ST_Number" use="required"/>
@@ -921,6 +924,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:sequence>
 			<xs:element ref="triangle" minOccurs="1" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Triangle">
 		<xs:attribute name="v1" type="ST_ResourceIndex" use="required"/>
@@ -936,6 +940,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:sequence>
 			<xs:element ref="component" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Component">
 		<xs:attribute name="objectid" type="ST_ResourceID" use="required"/>
@@ -946,6 +951,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:attribute name="name" type="xs:QName" use="required"/>
 		<xs:attribute name="preserve" type="xs:boolean" use="optional" />
 		<xs:attribute name="type" type="xs:string" use="optional" />
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Item">
 		<xs:sequence>
