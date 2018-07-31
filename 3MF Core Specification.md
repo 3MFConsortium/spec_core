@@ -315,6 +315,7 @@ Element **\<model>**
 | xml:lang | **xs:language** | | | Specifies the default language used for the current element and any descendant elements. The language is specified according to RFC 3066. |
 | requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing the document. Editors and manufacturing devices MUST NOT process the document if they do not support the required extensions. |
 | thumbnail | **ST\_UriReference** | | | Path to a root level thumbnail of type JPEG or PNG that represents a rendered image of the entire model. |
+| @anyAttribute | | | | |
 
 The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see [3.4.1. Metadata](#341-metadata) for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items that should actually be manufactured as part of the job.
 
@@ -333,6 +334,7 @@ Element **\<metadata>**
 | name | **xs:QName** | required | | Contains either the well-known name of the metadata defined by this specification (see Table 3-1 below) or vendor-defined metadata, which MUST be prefixed with a valid XML namespace name declared on the \<model> element. |
 | preserve | **xs:boolean** | | | A non-zero value indicates the producer wants the consumer to preserve this value when it saves a modified version of this 3MF |
 | type | **xs:string** | | | A string indicating the XML type of the data stored in the metadata value. |
+| @anyAttribute | | | | |
 
 Producers of 3MF Documents SHOULD provide additional information about the document in the form of metadata under the root \<model> element.
 
@@ -404,6 +406,7 @@ Element **\<item>**
 | objectid | **ST\_ResourceID** | required | | Reference to the \<object> element with the matching id attribute value |
 | transform | **ST\_Matrix3D** | | | A matrix transform (see [3.3. 3D Matrices](#33-3d-matrices)) applied to the item to be outputted. |
 | partnumber | **xs:string** | | | A unique identifier for the item. SHOULD be maintained by an editor if only the transformation is changed. |
+| @anyAttribute | | | | |
 
 ##### Elements
 | Name | Type | Use | Default | Annotation |
@@ -439,6 +442,7 @@ Element **\<object>**
 | name | **xs:string** | | | Name of object to improve readability. |
 | pid | **ST\_ResourceID** | | | Reference to the property group element with the matching id attribute value (e.g. \<basematerials>). It is REQUIRED if pindex is specified. |
 | pindex | **ST\_ResourceIndex** | | | References a zero-based index into the properties group specified by pid. This property is used to build the object. |
+| @anyAttribute | | | | |
 
 ##### Elements
 | Name | Type | Use | Default | Annotation |
@@ -525,6 +529,7 @@ Element **\<vertex>**
 | x | **ST\_Number** | required | | The position of the vertex along the X axis. |
 | y | **ST\_Number** | required | | The position of the vertex along the Y axis. |
 | z | **ST\_Number** | required | | The position of the vertex along the Z axis. |
+| @anyAttribute | | | | |
 
 A \<vertex> element represents a point in 3-dimensional space that is referenced by a triangle in the mesh. The decimal values representing the coordinates can be recorded to arbitrary precision. Producers SHOULD NOT use more precision than the error generated in their calculations, or the anticipated resolution of their consumer. The variable-precision nature of ASCII encoding is a significant advantage over fixed-width binary formats, and helps make up the difference in storage efficiency.
 
@@ -556,6 +561,7 @@ Element **\<triangle>**
 | p2 | **ST\_ResourceIndex** | | | Overrides the object-level pindex for the second vertex of the triangle. |
 | p3 | **ST\_ResourceIndex** | | | Overrides the object-level pindex for the third vertex of the triangle. |
 | pid | **ST\_ResourceID** | | | Overrides the object-level pid for the triangle. |
+| @anyAttribute | | | | |
 
 A \<triangle> element represents a single face of the mesh. The order of the vertices (v1, v2, v3) MUST be specified in counter-clockwise order, such that the face normal of the triangle is pointing toward the outside of the object. The indices v1, v2 and v3 MUST be distinct.
 
@@ -594,6 +600,7 @@ Element **\<component>**
 | --- | --- | --- | --- | --- |
 | objectid | **ST\_ResourceID** | required | | References an object resource with a matching id attribute value. |
 | transform | **ST\_Matrix3D** | | | A matrix transform (see [3.3. 3D Matrices](#33-3d-matrices)) applied to the item to be outputted. |
+| @anyAttribute | | | | |
 
 A component selects a pre-defined object resource and adds it to the current object definition, after applying the provided matrix transform. This composition of an object definition from multiple primitive components can provide a very compact file size for a quite complex model. In keeping with the use of a simple parser, producers MUST define objects prior to referencing them as components.
 
@@ -863,6 +870,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 			<xs:element ref="base" maxOccurs="2147483647"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="ST_ResourceID" use="required"/>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Base">
 		<xs:attribute name="name" type="xs:string" use="required"/>
@@ -873,6 +881,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:sequence>
 			<xs:element ref="metadata" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Object">
 		<xs:sequence>
@@ -897,11 +906,13 @@ A consumer that is authorized to un-protect content by reversing the above steps
 			<xs:element ref="triangles"/>
 			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Vertices">
 		<xs:sequence>
 			<xs:element ref="vertex" minOccurs="3" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Vertex">
 		<xs:attribute name="x" type="ST_Number" use="required"/>
@@ -913,6 +924,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:sequence>
 			<xs:element ref="triangle" minOccurs="1" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Triangle">
 		<xs:attribute name="v1" type="ST_ResourceIndex" use="required"/>
@@ -928,6 +940,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:sequence>
 			<xs:element ref="component" maxOccurs="2147483647"/>
 		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Component">
 		<xs:attribute name="objectid" type="ST_ResourceID" use="required"/>
@@ -938,6 +951,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:attribute name="name" type="xs:QName" use="required"/>
 		<xs:attribute name="preserve" type="xs:boolean" use="optional" />
 		<xs:attribute name="type" type="xs:string" use="optional" />
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Item">
 		<xs:sequence>
