@@ -14,7 +14,7 @@
 
 | **Version** | 1.2.2 |
 | --- | --- |
-| **Status** | Draft |
+| **Status** | Published |
 
 ## Disclaimer
 
@@ -70,7 +70,7 @@ This specification describes a 3D model and containing format called the _3MF Do
 
 Understanding this specification requires working knowledge of the Extensible Markup Language (XML) and XML Namespace specifications. Full understanding might also require domain knowledge of common terms and procedures within the 3D manufacturing sector, although every effort has been made to minimize such reliance.
 
-The 3MF Consortium offers a free to use open source implementation of this specification in order to allow an easy adoption of the format in applications handling 3D content.
+The 3MF Consortium offers [a free to use open source implementation](https://github.com/3MFConsortium/lib3mf) of this specification in order to allow an easy adoption of the format in applications handling 3D content.
 
 Part I, "3MF Documents," presents the details of the primarily XML-based 3MF Document format. This section describes the XML markup that defines the composition of 3D documents and the appearance of each model within the document.
 
