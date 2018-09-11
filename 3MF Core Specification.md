@@ -50,13 +50,11 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
   * [6.3. Digital Signatures](#63-digital-signatures)
   * [6.4. Protected Content](#64-protected-content)
 - [Part II. Appendixes](#part-ii-appendixes)
-- [Appendix A. Glossary](#appendix-a-glossary)
-- [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)
-- [Appendix B.2. 3MF Metadata Example](#appendix-b2-3mf-metadata-example)
-- [Appendix C. Standard Namespaces and Content Types](#appendix-c-standard-namespaces-and-content-types)
-  * [C.1 Content Types](#c1-content-types)
-  * [C.2 Relationship Types](#c2-relationship-types)
-  * [C.3 Namespaces](#c3-namespaces)
+  * [Appendix A. Glossary](#appendix-a-glossary)
+  * [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)
+  * [Appendix B.2. 3MF Metadata Example](#appendix-b2-3mf-metadata-example)
+  * [Appendix C. Standard Namespaces and Content Types](#appendix-c-standard-namespaces-and-content-types)
+- [References](#references)
 
 # Preface
 
@@ -766,7 +764,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 # Part II. Appendixes
 
-# Appendix A. Glossary
+## Appendix A. Glossary
 
 **3D matrix.** A 4x4 affine matrix used for rotating, scaling, and translating an object in three-dimensional space.
 
@@ -848,7 +846,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **XML namespace.** A namespace declared on the \<model> element, in accordance with the XML Namespaces specification.
 
-# Appendix B.1. 3MF XSD Schema
+## Appendix B.1. 3MF XSD Schema
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1067,7 +1065,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 </xs:schema>
 ```
 
-# Appendix B.2. 3MF Metadata Example
+## Appendix B.2. 3MF Metadata Example
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1133,15 +1131,15 @@ A consumer that is authorized to un-protect content by reversing the above steps
 </model>
 ```
 
-# Appendix C. Standard Namespaces and Content Types
+## Appendix C. Standard Namespaces and Content Types
 
-## C.1 Content Types
+### C.1 Content Types
 
 3D Model application/vnd.ms-package.3dmanufacturing-3dmodel+xml
 
 PrintTicket application/vnd.ms-printing.printticket+xml
 
-## C.2 Relationship Types
+### C.2 Relationship Types
 
 StartPart http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel
 
@@ -1151,7 +1149,7 @@ PrintTicket http://schemas.microsoft.com/3dmanufacturing/2013/01/printticket
 
 MustPreserve http://schemas.openxmlformats.org/package/2006/relationships/mustpreserve
 
-## C.3 Namespaces
+### C.3 Namespaces
 
 3D Model http://schemas.microsoft.com/3dmanufacturing/core/2015/02
 
