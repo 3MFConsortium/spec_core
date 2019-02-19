@@ -34,6 +34,7 @@ sed -i 's|<a href="images/3mf_logo_50px.png"|<a|g' "$TMPFILE"
 sed -i 's|<a href="#|<a href="@|g' "$TMPFILE"
 sed -i 's|href="#|name="|g' "$TMPFILE"
 sed -i 's|<a href="@|<a href="#|g' "$TMPFILE"
+sed -i 's|<pre|<pre style="white-space: pre-wrap;"|g' "$TMPFILE"
 
 MARGIN=14
 
