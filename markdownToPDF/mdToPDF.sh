@@ -25,7 +25,6 @@
 
 mkdir ~/.grip
 echo "PASSWORD = '${GITHUB_API_KEY}'" > ~/.grip/settings.py
-cat ~/.grip/settings.py
 
 FILE="$1"
 TMPFILE="temp.html"
