@@ -483,7 +483,7 @@ Element **\<object>**
 | --- | --- | --- | --- | --- |
 | metadatagroup | **CT\_MetadataGroup** | | | An optional group of CT\_Metadata elements as specified in the Metadata section of Model. |
 
-An object resource is defined by an \<object> element. An \<object> element has attributes for the property group and specific property member that are to be applied to the entire object, except where overridden by a descendant element, such as a \<triangle> element or a component-referenced \<object> element. If this object contains any triangles with assigned materials, the object MUST specify pid and pindex, to act as default values for any triangles with unspecified properties. If no properties are assigned at all, the choice for the properties of the object is left to the consumer.
+An object resource is defined by an \<object> element. An \<object> element has attributes for the property group and specific property member that are to be applied to the entire object, except where overridden by a descendant element, such as a \<triangle> element or a component-referenced \<object> element. If this object contains any triangles with assigned properties, the object MUST specify pid and pindex, to act as default values for any triangles with unspecified properties. If no properties are assigned at all, the choice for the properties of the object is left to the consumer.
 
 The object type is ignored on objects that contain components, since the type is always overridden by descendant objects. Producers MUST NOT assign pid or pindex attributes to objects that contain components. This ensures that an object with no material will not be split into two representations with different materials due to being referenced as a component in multiple objects.
 
