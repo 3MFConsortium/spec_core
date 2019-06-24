@@ -367,16 +367,17 @@ Element **\<metadata>**
 | --- | --- | --- | --- | --- |
 | name | **xs:QName** | required | | Contains either the well-known name of the metadata defined by this specification (see Table 3-1 below) or vendor-defined metadata, which MUST be prefixed with a valid XML namespace name declared on the \<model> element. |
 | preserve | **xs:boolean** | | | A non-zero value indicates the producer wants the consumer to preserve this value when it saves a modified version of this 3MF |
-| type | **xs:string** | | | A string indicating the XML type of the data stored in the metadata value. |
+| type | **xs:string** | | | A string indicating the XML type of the payload stored in the metadata. |
+| value | **xs:string** | | | The value of this metadata, i.e. the payload stored in this metadata. |
 | @anyAttribute | | | | |
 
 Producers of 3MF Documents SHOULD provide additional information about the document in the form of metadata under the root \<model> element.
 
-Metadata associated with the \<model> MAY contain a set of well known values. Metadata in 3MF Documents without a namespace name MUST be restricted to names and values defined by this specification. If a name value is not defined in this specification, it MUST be prefixed with the namespace name of an XML namespace declaration on the \<model> element that is not drawn from the default namespace.
+Metadata associated with the \<model> MAY contain a set of well known names. Metadata in 3MF Documents without a namespace name MUST be restricted to names defined by this specification. If a name value is not defined in this specification, it MUST be prefixed with the namespace name of an XML namespace declaration on the \<model> element that is not drawn from the default namespace.
 
-The well-known metadata names and values defined by this specification include:
+The well-known metadata name values defined by this specification include:
 
-_Table 3-1. Metadata values_
+_Table 3-1. Metadata name values_
 
 | **Context** | **Name** | **Comment** |
 | --- | --- | --- |
@@ -390,8 +391,11 @@ _Table 3-1. Metadata values_
 | | ModificationDate | The date this document was last modified |
 | | Application | The name of the source application that originally created this document |
 
+The payload, i.e. the data or information conveyed by this metadata, is encoded either
+- as value of the optional `value`-attribute or
+- as the XML-value of the \<metadata>-element, if the `value`-attribute is not defined.
 
-The optional "type" attribute allows for the value to be any data. The default value for type is assumed to be "xs:string". If type is not present, The value of the \<metadata> value is assumed to be be any string. However, if type is specified, it MUST contain the name of a built-in Simple XML type representing the data contained in the value.
+The optional "type" attribute allows for the payload of this metadata to be any data type. The default value for type is assumed to be "xs:string". If type is not present, The payload of the \<metadata> is assumed to be be any string. However, if type is specified, it MUST contain the name of a built-in Simple XML type representing the payload of the metadata.
 
 Simple XML types include any built-in primitive or derived XML types specified by the "xs:anySimpleType".
 
@@ -399,7 +403,7 @@ Producers MUST NOT create multiple metadata elements with the same name. A Produ
 
 Consumers SHOULD ignore any metadata with a name they do not recognize, typically from a future version of this specification or an unrecognized producer or target consumer.
 
-Producers MAY indicate that certain metadata values should be preserved using the preserve attribute. The default value is assumed to be 0 or false. When the preserve attribute is 1 or true, Consumers that modify the 3MF file SHOULD retain the original metadata value even if the data it references is modified. The metadata should be preserved through the lifetime of the element it is associated with. If an \<Item> is removed, for example, the associated metadata should be removed with it.
+Producers MAY indicate that certain metadata should be preserved using the preserve attribute. The default value is assumed to be 0 or false. When the preserve attribute is 1 or true, Consumers that modify the 3MF file SHOULD retain the original metadata even if the data it references is modified. The metadata should be preserved through the lifetime of the element it is associated with. If an \<Item> is removed, for example, the associated metadata should be removed with it.
 
 [Appendix B.2.](#appendix-b2-3mf-metadata-example) includes a sample 3MF supporting custom metadata.
 
@@ -985,6 +989,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:attribute name="name" type="xs:QName" use="required"/>
 		<xs:attribute name="preserve" type="xs:boolean" use="optional" />
 		<xs:attribute name="type" type="xs:string" use="optional" />
+		<xs:attribute name="value" type="xs:string" use="optional" />
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Item">
