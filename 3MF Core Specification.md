@@ -1074,13 +1074,12 @@ A consumer that is authorized to un-protect content by reversing the above steps
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <model unit="millimeter" xml:lang="en-us" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:vendor1="http://www.vendorwwebsite.com/3mf/vendor13mfextension/2017/01">
-  <metadata name="Copyright">� Microsoft Corporation 2013</metadata>
+  <metadata name="Copyright">© Microsoft Corporation 2013</metadata>
   <metadata name="Application">Microsoft 3D Builder</metadata>
   <metadata name="LicenseTerms">All rights reserved</metadata>
   <metadata name="Title">Cube</metadata>
   <metadata name="Designer">Microsoft Corporation</metadata>
   <metadata name="CreationDate">2013-10-07</metadata>
-  <metadata name="ChangeHistory">2013-10-07 Initial model</metadata>
   <metadata name="ModificationDate">2014-03-27</metadata>
   <metadata name="Description">Cube</metadata>
   <metadata name="vendor1:CustomMetadata1" preserve="1">CE8A91FB-C44E-4F00-B634-BAA411465F6A</metadata>
