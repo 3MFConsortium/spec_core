@@ -14,7 +14,7 @@
 
 | **Version** | 1.2.4 |
 | --- | --- |
-| **Status** | Published |
+| **Status** | Draft |
 
 ## Disclaimer
 
@@ -172,7 +172,8 @@ _Table 2-1. 3MF Document parts_
 | Digital Signature | OPC parts that each contains a digital signature. | Digital Signature Origin | OPTIONAL |
 | Digital Signature Certificate | OPC parts that contain a digital signature certificate. | Digital Signature | OPTIONAL |
 | PrintTicket | Provides settings to be used when outputting the 3D object(s) in the 3D Model part. | 3D Model | OPTIONAL |
-| Thumbnail | Contains a small JPEG or PNG image that represents the 3D objects in the package or the package as a whole. | Package | OPTIONAL |
+| Package Thumbnail | Contains a small JPEG or PNG image that represents the 3D objects in the package or the package as a whole. | Package | OPTIONAL |
+| Object Thumbnail | Contains a small JPEG or PNG image that represents a 3D object in a 3D Model. | 3D Model | OPTIONAL |
 | 3D Texture | Contains a texture used to apply color to a 3D object in the 3D Model part (available for extensions) | 3D Model | OPTIONAL |
 | Custom Parts | OPC parts that are associated with metadata | Package | OPTIONAL |
 
@@ -188,13 +189,13 @@ The _3D Model part_ contains definitions of one or more objects to be fabricated
 A 3D Model part has two sections: a set of resource definitions that include objects and materials, as well as a set of specific items to actually build. The content type of the 3D Model part is defined in Appendix C, "Standard Namespaces and Content Types."
 
 
-### 2.1.3. Thumbnail Part
+### 2.1.3. Package Thumbnail and Object Thumbnail Part 
 
-_Thumbnails_ are small images that represent the contents of an entire 3MF Document. Thumbnails enable external agents to view the contents of the 3MF Document easily.
+_Package Thumbnails_ and _Object Thumbnails_ are small images that represent the contents of an entire 3MF Document. Thumbnails enable external agents to view the contents of the 3MF Document easily.
 
-Thumbnails MAY be defined for the entire package by referencing the thumbnail from the root model relationship file. Thumbnails MAY also be defined for individual objects by using the object thumbnail attribute. These _thumbnail parts_ MUST be in either JPEG or PNG format.
+Package Thumbnails MAY be defined for the entire package by referencing the thumbnail from the root model relationship file. Object Thumbnails MAY be defined for individual objects by using the object thumbnail attribute. These _thumbnail parts_ MUST be in either JPEG or PNG format.
 
-All thumbnails in the 3MF document MUST be referenced by the thumbnail relationship.
+All thumbnails in the 3MF document MUST be referenced via the thumbnail relationship.
 
 For more information about the relationship type for thumbnail parts, see section [C.2, Relationship Types.](#c2-relationship-types)
 
@@ -235,7 +236,7 @@ It is RECOMMENDED that producers of 3MF Documents use the following part naming 
 
 - The 3D Model part name SHOULD contain two segments, the first being "/3D/" and the second with the extension ".model" on the last segment, for example "/3D/3dModel.model".
 - The PrintTicket part name SHOULD be associated via relationship with the 3D Model part and contains three segments, using "/3D/Metadata/" as the first two segments with the extension ".xml". For example, "/3D/Metadata/Model\_PT.xml".
-- 3D Texture part names SHOULD contain three segments, using "/3D/Textures/" as the first two segments, for example "/3D/Textures/coloring.png". 3D Texture parts MUST be associated with the 3D Model part via relationship.
+- 3D Texture part names SHOULD contain three segments, using "/3D/Textures/" as the first two segments, for example "/3D/Textures/coloring.png". 3D Texture parts MUST be associated with the 3D Model part via a suitable relationship.
 - The names of any non-standard parts that are associated with the 3D payload SHOULD contain 3 segments, using "/3D/Other/" as the first two segments.
 
 Part names MUST use absolute paths, meaning all paths begin with "/". Part names MUST NOT be empty or lead with a period (e.g. "/3D/.png" or "/3D/").
@@ -471,7 +472,7 @@ Element **\<object>**
 | --- | --- | --- | --- | --- |
 | id | **ST\_ResourceID** | required | | Defines the unique identifier for this object. |
 | type | **ST\_ObjectType** | | model | Specifies the function of the object in the model. Valid values are "model", "solidsupport", "support", "surface", or "other". A consumer MAY ignore support objects if they are not needed. The consumer MAY generate its own support objects in place of the provided support objects, but this is NOT RECOMMENDED. |
-| thumbnail | **ST\_UriReference** | | | Path to a 3D Texturethumbnail of type JPEG or PNG that represents a rendered image of the object. |
+| thumbnail | **ST\_UriReference** | | | Path to an Object Thumbnail of type JPEG or PNG that represents a rendered image of the object. |
 | partnumber | **xs:string** | | | Part number, which editors SHOULD maintain during the process of modifying and deriving objects. |
 | name | **xs:string** | | | Name of object to improve readability. |
 | pid | **ST\_ResourceID** | | | Reference to the property group element with the matching id attribute value (e.g. \<basematerials>). It is REQUIRED if pindex is specified. |
@@ -487,7 +488,7 @@ An object resource is defined by an \<object> element. An \<object> element has 
 
 The object type is ignored on objects that contain components, since the type is always overridden by descendant objects. Producers MUST NOT assign pid or pindex attributes to objects that contain components. This ensures that an object with no material will not be split into two representations with different materials due to being referenced as a component in multiple objects.
 
-Object thumbnails MUST have an appropriate 3D Texturethumbnail relationship to the model part as described in section 2.1.1. Consumers MAY find additional thumbnails associated with the 3D Texture relationship, for backwards compatibility. Producers MUST store thumbnails with the thumbnail relationship in an associated thumbnail part.
+Object Thumbnails MUST have an appropriate thumbnail relationship to the model part as described in section 2.1.1. Consumers MAY find additional thumbnails associated with an object by the 3D Texture relationship, for backwards compatibility. Producers MUST store thumbnails with the thumbnail relationship in an associated object thumbnail part.
 
 Part numbers are intended as a way to keep track of objects which may have been modified during a tool chain. When editing or processing a 3MF document, these part numbers SHOULD be preserved to the greatest degree possible, duplicating them for objects split into pieces, removing them from objects that are combined, and maintaining them for objects that are modified.
 
@@ -692,11 +693,11 @@ An sRGB color MUST be specified with a value of a 6 or 8 digit hexadecimal numbe
 3MF Documents take advantage of parts defined by the Open Packaging Conventions to provide additional information about the content in the package.
 
 
-## 6.1. Thumbnail
+## 6.1. Package Thumbnail and Object Thumbnail
 
-The producer of a 3MF document MAY include a 2D _thumbnail_ image representing the contents of the 3D payload. This image may be of content type image/jpeg or image/png, following the internal file format requirements described in the following subsections.
+The producer of a 3MF document MAY include a 2D _thumbnail_ image representing the contents of the 3D payload or of specific objects within the 3D payload. This image may be of content type image/jpeg or image/png, following the internal file format requirements described in the following subsections.
 
-This thumbnail has a relationship from the package root or object parts to the thumbnail image. The relationship type MUST be:
+The package thumbnail has a relationship from the package root to the thumbnail image, object thumbnails have a relationship from the 3D Model part to the thumbnail image. The relationship type MUST be:
 
 http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail
 
@@ -749,7 +750,7 @@ The 3MF Document format relies on the _Core Properties_ part, defined in the Ope
 
 The Open Packaging Conventions specification provides full details of how digital signatures are applied in OPC packages. The Digital Signature Origin part acts as the root of the digital signature payload in the 3MF Document. Individual Digital Signature parts can be discovered via relationship from the Digital Signature Origin part. Each Digital Signature part can have either an inline digital certificate, or a reference to an external Digital Signature Certificate part in the package.
 
-A digital signature applied to the 3D Model part SHOULD include only the 3D Model part and any other parts referenced by it, along with the associated relationships. It MAY include the Thumbnail, Digital Signature Origin, Core Properties parts and associated relationship parts.
+A digital signature applied to the 3D Model part SHOULD include only the 3D Model part and any other parts referenced by it, along with the associated relationships. It MAY include the Package Thumbnail, Digital Signature Origin, Core Properties parts and associated relationship parts.
 
 
 ### 6.3.1. Normalization
@@ -775,7 +776,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **3D Model part.** The OPC part that contains a 3D model.
 
-**3D Texture part.** A file used to apply complex information to a 3D object in the 3D Model part (undefined in this spec, but available for extensions).
+**3D Texture part.** A file used to apply complex information to a 3D object in the 3D Model part (undefined in this specification, but available for extensions to this specification).
 
 **3MF.** The 3D Manufacturing Format described by this specification, defining one or more 3D objects intended for output to a physical form.
 
@@ -843,7 +844,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Thumbnail.** An image that helps end-users identify the contents of the package, expressed as a JPEG or PNG image.
 
-**Thumbnail part.** The OPC part that contains the package thumbnail image.
+**Thumbnail part.** The OPC part that contains the package thumbnail image or the object thumbnail image.
 
 **Top.** The maximum printable XY plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
 
