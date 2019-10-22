@@ -28,7 +28,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
   * [Language Notes](#language-notes)
   * [Software Conformance](#software-conformance)
 - [Part I. 3MF Documents](#part-i-3mf-documents)
-  *	[Chapter 1. 3MF Document Format](#chapter-1-3mf-document-format)
+  * [Chapter 1. 3MF Document Format](#chapter-1-3mf-document-format)
     + [1.1. Package](#11-package)
   * [Chapter 2. Parts and Relationships](#chapter-2-parts-and-relationships)
     + [2.1. 3D Payload](#21-3d-payload)
