@@ -927,6 +927,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 				<xs:element ref="mesh"/>
 				<xs:element ref="components"/>
 			</xs:choice>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="ST_ResourceID" use="required"/>
 		<xs:attribute name="type" type="ST_ObjectType" default="model"/>
