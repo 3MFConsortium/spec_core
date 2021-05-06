@@ -50,13 +50,13 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
     + [6.3. Digital Signatures](#63-digital-signatures)
     + [6.4. Protected Content](#64-protected-content)
 - [Part II. Appendixes](#part-ii-appendixes)
-- [Appendix A. Glossary](#appendix-a-glossary)
-- [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)
-- [Appendix B.2. 3MF Metadata Example](#appendix-b2-3mf-metadata-example)
-- [Appendix C. Standard Namespaces and Content Types](#appendix-c-standard-namespaces-and-content-types)
-  * [C.1 Content Types](#c1-content-types)
-  * [C.2 Relationship Types](#c2-relationship-types)
-  * [C.3 Namespaces](#c3-namespaces)
+  * [Appendix A. Glossary](#appendix-a-glossary)
+  * [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)
+  * [Appendix B.2. 3MF Metadata Example](#appendix-b2-3mf-metadata-example)
+  * [Appendix C. Standard Namespaces and Content Types](#appendix-c-standard-namespaces-and-content-types)
+    + [C.1 Content Types](#c1-content-types)
+    + [C.2 Relationship Types](#c2-relationship-types)
+    + [C.3 Namespaces](#c3-namespaces)
 
 # Preface
 
