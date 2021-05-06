@@ -458,7 +458,7 @@ A 3MF Document may include multiple objects to manufacture at the same time. The
 
 If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped item. If the last item has no properties defined in the overlapped volume, properties MUST NOT be applied.
 
->**Note:** items must not reference objects of type "other"
+>**Note:** items MUST NOT reference objects of type "other", either directly or recursively.
 
 
 # Chapter 4. Object Resources
@@ -513,7 +513,7 @@ _Figure 4-1. Consistent triangle orientation_
 
 ![figure 4-1](images/figure_4-1.png)
 
-Objects of type "support", "surface" and "other" are allowed to break these conditions. Objects of type "other" MUST NOT be referenced in the Build section.
+Objects of type "support", "surface" and "other" are allowed to break these conditions. Objects of type "other" MUST NOT be referenced in the Build section, either recursively or directly.
 
 All meshes SHOULD have:
 
@@ -1216,5 +1216,3 @@ Beech, David, Murray Maloney, Noah Mendelsohn, and Henry S. Thompson (editors). 
 Biron, Paul V. and Ashok Malhotra (editors). "XML Schema Part 2: Datatypes," Second Edition. World Wide Web Consortium. 2004. http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/
 
 Copyright 3MF Consortium 2018.
-
-
