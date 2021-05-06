@@ -45,7 +45,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
   * [Chapter 5. Material Resources](#chapter-5-material-resources)
     + [5.1. Base Material](#51-base-material)
   * [Chapter 6. 3MF Document Package Features](#chapter-6-3mf-document-package-features)
-    + [6.1. Thumbnail](#61-thumbnail)
+    + [6.1. Thumbnail](#61-package-thumbnail-and-object-thumbnail)
     + [6.2. Core Properties](#62-core-properties)
     + [6.3. Digital Signatures](#63-digital-signatures)
     + [6.4. Protected Content](#64-protected-content)
