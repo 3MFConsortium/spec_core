@@ -42,7 +42,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
   * [Chapter 4. Object Resources](#chapter-4-object-resources)
     + [4.1. Meshes](#41-meshes)
     + [4.2. Components](#42-components)
-    + [Chapter 5. Material Resources](#chapter-5-material-resources)
+  * [Chapter 5. Material Resources](#chapter-5-material-resources)
     + [5.1. Base Material](#51-base-material)
   * [Chapter 6. 3MF Document Package Features](#chapter-6-3mf-document-package-features)
     + [6.1. Thumbnail](#61-thumbnail)
