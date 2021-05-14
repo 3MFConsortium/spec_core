@@ -243,6 +243,8 @@ It is RECOMMENDED that producers of 3MF Documents use the following part naming 
 
 Part names MUST use absolute paths, meaning all paths begin with "/". Part names MUST NOT be empty or lead with a period (e.g. "/3D/.png" or "/3D/").
 
+When a part name is represented with Unicode, it SHOULD be represented with a Part URI Syntax, as described in the section 9.1.1.1 Part Name Syntax of the Open Packaging Conventions specification.
+
 
 ## 2.3. 3MF Document Markup
 
@@ -264,6 +266,7 @@ Extension specifications MUST include one or more targeted versions of this core
 
 Within this core XSD schema (see [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)), extension points have been explicitly entered in the form of \<any> elements and \<anyAttribute> (also visible in the element diagrams further along in this specification). These are required to come from other namespaces, which SHOULD point to a way to find the appropriate specification and accompanying XSD schema.
 
+Vendors MIGHT define private 3MF extensions. The specifications of private namespaces (i.e. that are not ratified by the 3MF Consortium) need to be negotiated between parties in the ecosystem.
 
 ### 2.3.2. XML Usage
 
@@ -856,11 +859,14 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
+<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
+	targetNamespace="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"
+	elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
 	<!-- Import xml: namespace -->
 	<xs:import namespace="http://www.w3.org/XML/1998/namespace"
-		schemaLocation="http://www.w3.org/2001/xml.xsd" />
-	
+		schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+
 	<xs:annotation>
 		<xs:documentation><![CDATA[
 		Schema notes:
@@ -895,7 +901,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 			<xs:element ref="object" minOccurs="0" maxOccurs="2147483647"/>
 		</xs:sequence>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
-	</xs:complexType>	
+	</xs:complexType>
 	<xs:complexType name="CT_Build">
 		<xs:sequence>
 			<xs:element ref="item" minOccurs="0" maxOccurs="2147483647"/>
@@ -981,19 +987,23 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Component">
+		<xs:sequence>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
+		</xs:sequence>
 		<xs:attribute name="objectid" type="ST_ResourceID" use="required"/>
 		<xs:attribute name="transform" type="ST_Matrix3D"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Metadata" mixed="true">
 		<xs:attribute name="name" type="xs:QName" use="required"/>
-		<xs:attribute name="preserve" type="xs:boolean" use="optional" />
-		<xs:attribute name="type" type="xs:string" use="optional" />
+		<xs:attribute name="preserve" type="xs:boolean" use="optional"/>
+		<xs:attribute name="type" type="xs:string" use="optional"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Item">
 		<xs:sequence>
 			<xs:element ref="metadatagroup" minOccurs="0" maxOccurs="1"/>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
 		</xs:sequence>
 		<xs:attribute name="objectid" type="ST_ResourceID" use="required"/>
 		<xs:attribute name="transform" type="ST_Matrix3D"/>
