@@ -334,7 +334,7 @@ Transforms are of the form, where only the first 3 column values are specified. 
 
 ![3D matrices](images/3D_matrices.png)
 
-After applying all transforms to an object, the model SHOULD be located in the positive octant of the coordinate space.
+After applying all transforms to an object, the model SHOULD have positive volume and SHOULD be located in the positive octant of the coordinate space.
 
 
 ## 3.4. Model
