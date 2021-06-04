@@ -12,9 +12,9 @@
 
 
 
-| **Version** | 1.2.3 |
+| **Version** | 1.2.4 |
 | --- | --- |
-| **Status** | Published |
+| **Status** | Draft |
 
 ## Disclaimer
 
@@ -28,35 +28,35 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
   * [Language Notes](#language-notes)
   * [Software Conformance](#software-conformance)
 - [Part I. 3MF Documents](#part-i-3mf-documents)
-- [Chapter 1. 3MF Document Format](#chapter-1-3mf-document-format)
-  * [1.1. Package](#11-package)
-- [Chapter 2. Parts and Relationships](#chapter-2-parts-and-relationships)
-  * [2.1. 3D Payload](#21-3d-payload)
-  * [2.2. Part Naming Recommendations](#22-part-naming-recommendations)
-  * [2.3. 3MF Document Markup](#23-3mf-document-markup)
-- [Chapter 3. 3D Models](#chapter-3-3d-models)
-  * [3.1. Coordinate Space](#31-coordinate-space)
-  * [3.2. Relative Directions and Measurement](#32-relative-directions-and-measurement)
-  * [3.3. 3D Matrices](#33-3d-matrices)
-  * [3.4. Model](#34-model)
-- [Chapter 4. Object Resources](#chapter-4-object-resources)
-  * [4.1. Meshes](#41-meshes)
-  * [4.2. Components](#42-components)
-- [Chapter 5. Material Resources](#chapter-5-material-resources)
-  * [5.1. Base Material](#51-base-material)
-- [Chapter 6. 3MF Document Package Features](#chapter-6-3mf-document-package-features)
-  * [6.1. Thumbnail](#61-thumbnail)
-  * [6.2. Core Properties](#62-core-properties)
-  * [6.3. Digital Signatures](#63-digital-signatures)
-  * [6.4. Protected Content](#64-protected-content)
+  * [Chapter 1. 3MF Document Format](#chapter-1-3mf-document-format)
+    + [1.1. Package](#11-package)
+  * [Chapter 2. Parts and Relationships](#chapter-2-parts-and-relationships)
+    + [2.1. 3D Payload](#21-3d-payload)
+    + [2.2. Part Naming Recommendations](#22-part-naming-recommendations)
+    + [2.3. 3MF Document Markup](#23-3mf-document-markup)
+  * [Chapter 3. 3D Models](#chapter-3-3d-models)
+    + [3.1. Coordinate Space](#31-coordinate-space)
+    + [3.2. Relative Directions and Measurement](#32-relative-directions-and-measurement)
+    + [3.3. 3D Matrices](#33-3d-matrices)
+    + [3.4. Model](#34-model)
+  * [Chapter 4. Object Resources](#chapter-4-object-resources)
+    + [4.1. Meshes](#41-meshes)
+    + [4.2. Components](#42-components)
+  * [Chapter 5. Material Resources](#chapter-5-material-resources)
+    + [5.1. Base Material](#51-base-material)
+  * [Chapter 6. 3MF Document Package Features](#chapter-6-3mf-document-package-features)
+    + [6.1. Package Thumbnail and Object Thumbnail](#61-package-thumbnail-and-object-thumbnail)
+    + [6.2. Core Properties](#62-core-properties)
+    + [6.3. Digital Signatures](#63-digital-signatures)
+    + [6.4. Protected Content](#64-protected-content)
 - [Part II. Appendixes](#part-ii-appendixes)
-- [Appendix A. Glossary](#appendix-a-glossary)
-- [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)
-- [Appendix B.2. 3MF Metadata Example](#appendix-b2-3mf-metadata-example)
-- [Appendix C. Standard Namespaces and Content Types](#appendix-c-standard-namespaces-and-content-types)
-  * [C.1 Content Types](#c1-content-types)
-  * [C.2 Relationship Types](#c2-relationship-types)
-  * [C.3 Namespaces](#c3-namespaces)
+  * [Appendix A. Glossary](#appendix-a-glossary)
+  * [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)
+  * [Appendix B.2. 3MF Metadata Example](#appendix-b2-3mf-metadata-example)
+  * [Appendix C. Standard Namespaces and Content Types](#appendix-c-standard-namespaces-and-content-types)
+    + [C.1 Content Types](#c1-content-types)
+    + [C.2 Relationship Types](#c2-relationship-types)
+    + [C.3 Namespaces](#c3-namespaces)
 
 # Preface
 
@@ -66,7 +66,7 @@ The ***3D Manufacturing Format***, or _3MF_, describes the set of conventions fo
 
 A primary goal of this specification is to ensure the interoperability of independently created software and hardware systems that produce or consume 3MF content. This specification defines the formal requirements that producers and consumers must satisfy in order to achieve interoperability.
 
-This specification describes a 3D model and containing format called the _3MF Document_. The format requirements are an extension of the packaging requirements described in the Open Packaging Conventions specification. That specification describes packaging and physical format conventions for the use of XML, Unicode, ZIP, and other technologies and specifications to organize the content and resources that make up any model. They are an integral part of the 3MF specification.
+This specification describes a 3D model and containing format called the _3MF Document_. The format requirements are an extension of the packaging requirements described in the Open Packaging Conventions (OPC) specification. That specification describes packaging and physical format conventions for the use of XML, Unicode, ZIP, and other technologies and specifications to organize the content and resources that make up any model. They are an integral part of the 3MF specification.
 
 Understanding this specification requires working knowledge of the Extensible Markup Language (XML) and XML Namespace specifications. Full understanding might also require domain knowledge of common terms and procedures within the 3D manufacturing sector, although every effort has been made to minimize such reliance.
 
@@ -132,14 +132,17 @@ Finally, the 3MF Document format implements the common package features specifie
 
 ## 1.1. Package
 
-The 3MF Document format MUST use a ZIP archive for its physical model. The Open Packaging specification describes a packaging model, that is, how the package is represented internally with parts and relationships.
+The 3MF Document format MUST use a ZIP archive for its physical model. The Open Packaging Conventions specification describes a packaging model, that is, how the package is represented internally with parts and relationships.
+
+The ZIP archive MUST follow the [.ZIP File Format Specification](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT) by PKWARE Inc.
+Files within the ZIP archive that represents a 3MF document MUST use the compression method `Deflate` ("8 - The file is Deflated") or be `stored uncompressed` ("0 - The file is stored (no compression)") in accordance with the OPC specification ("Annex C, (normative) ZIP Appnote.txt Clarifications").
 
 The 3MF Document format includes a well-defined set of parts and relationships, each fulfilling a particular purpose in the document. The format also extends the package features, including digital signatures and thumbnails.
 
 
 # Chapter 2. Parts and Relationships
 
-The packaging conventions described in the Open Packaging Conventions (OPC) specification can be used to carry any payload. A _payload_ is a complete collection of interdependent parts and relationships within a package. This specification defines a particular payload that contains a 3D object definition and its supporting files: the 3D payload.
+The packaging conventions described in the Open Packaging Conventions specification can be used to carry any payload. A _payload_ is a complete collection of interdependent parts and relationships within a package. This specification defines a particular payload that contains a 3D object definition and its supporting files: the 3D payload.
 
 An OPC package that holds a 3D payload and follows the rules described in this specification is referred to as a 3MF Document. Producers and consumers of 3MF Documents can implement their own parsers and manufacturing devices based on this specification.
 
@@ -153,7 +156,7 @@ A payload that has a 3D Model root part is known as a _3D payload_. There can be
 
 A specific relationship type is defined to identify the root of a 3D payload within a 3MF Document: the _3MF Document StartPart relationship_. The _primary 3D payload root_ is the 3D Model part that is referenced by the 3MF Document StartPart relationship to find the primary 3D payload in a package. The 3MF Document StartPart relationship MUST point to the 3D Model part that identifies the root of the 3D payload.
 
-The payload includes the full set of parts required for processing the 3D Model part. All content to be used to manufacture an object described in the 3D payload MUST be contained in the 3MF Document. The parts that can be found in a 3MF Document are listed in Table 2-1. Relationships and content types for these parts are defined in Appendix C, "Standard Namespaces and Content Types." Each part MUST use an appropriate content type specified in Appendix C or in an extension specification to 3MF (see [2.3.1. Support for Versioning and Extensibility]).
+The payload includes the full set of parts required for processing the 3D Model part. All content to be used to manufacture an object described in the 3D payload MUST be contained in the 3MF Document. The parts that can be found in a 3MF Document are listed in Table 2-1. Relationships and content types for these parts are defined in Appendix C, "Standard Namespaces and Content Types." Each part MUST use an appropriate content type specified in Appendix C or in an extension specification to 3MF (see [2.3.1. Support for Versioning and Extensibility](#231-support-for-versioning-and-extensibility).
 
 Parts included to the 3D payload are explicitly linked to the 3D payload root by relationship. 3MF Documents MUST NOT reference resources external to the 3MF Document package unless specified otherwise in an extension. For more information on relationships, see the Open Packaging Conventions specification.
 
@@ -171,7 +174,8 @@ _Table 2-1. 3MF Document parts_
 | Digital Signature | OPC parts that each contains a digital signature. | Digital Signature Origin | OPTIONAL |
 | Digital Signature Certificate | OPC parts that contain a digital signature certificate. | Digital Signature | OPTIONAL |
 | PrintTicket | Provides settings to be used when outputting the 3D object(s) in the 3D Model part. | 3D Model | OPTIONAL |
-| Thumbnail | Contains a small JPEG or PNG image that represents the 3D objects in the package or the package as a whole. | Package | OPTIONAL |
+| Package Thumbnail | Contains a small JPEG or PNG image that represents the 3D objects in the package or the package as a whole. | Package | OPTIONAL |
+| Object Thumbnail | Contains a small JPEG or PNG image that represents a 3D object in a 3D Model. | 3D Model | OPTIONAL |
 | 3D Texture | Contains a texture used to apply color to a 3D object in the 3D Model part (available for extensions) | 3D Model | OPTIONAL |
 | Custom Parts | OPC parts that are associated with metadata | Package | OPTIONAL |
 
@@ -187,13 +191,13 @@ The _3D Model part_ contains definitions of one or more objects to be fabricated
 A 3D Model part has two sections: a set of resource definitions that include objects and materials, as well as a set of specific items to actually build. The content type of the 3D Model part is defined in Appendix C, "Standard Namespaces and Content Types."
 
 
-### 2.1.3. Thumbnail Part
+### 2.1.3. Package Thumbnail and Object Thumbnail Part 
 
-_Thumbnails_ are small images that represent the contents of an entire 3MF Document. Thumbnails enable external agents to view the contents of the 3MF Document easily.
+_Package Thumbnails_ and _Object Thumbnails_ are small images that represent the contents of an entire 3MF Document. Thumbnails enable external agents to view the contents of the 3MF Document easily.
 
-Thumbnails MAY be defined for the entire package by referencing the thumbnail from the root model relationship file. Thumbnails MAY also be defined for individual objects by using the object thumbnail attribute. These _thumbnail parts_ MUST be in either JPEG or PNG format.
+Package Thumbnails MAY be defined for the entire package by referencing the thumbnail from the root model relationship file. Object Thumbnails MAY be defined for individual objects by using the object thumbnail attribute. These _thumbnail parts_ MUST be in either JPEG or PNG format.
 
-All thumbnails in the 3MF document MUST be referenced by the thumbnail relationship.
+All thumbnails in the 3MF document MUST be referenced via the thumbnail relationship.
 
 For more information about the relationship type for thumbnail parts, see section [C.2, Relationship Types.](#c2-relationship-types)
 
@@ -234,10 +238,12 @@ It is RECOMMENDED that producers of 3MF Documents use the following part naming 
 
 - The 3D Model part name SHOULD contain two segments, the first being "/3D/" and the second with the extension ".model" on the last segment, for example "/3D/3dModel.model".
 - The PrintTicket part name SHOULD be associated via relationship with the 3D Model part and contains three segments, using "/3D/Metadata/" as the first two segments with the extension ".xml". For example, "/3D/Metadata/Model\_PT.xml".
-- 3D Texture part names SHOULD contain three segments, using "/3D/Textures/" as the first two segments, for example "/3D/Textures/coloring.png". 3D Texture parts MUST be associated with the 3D Model part via relationship.
+- 3D Texture part names SHOULD contain three segments, using "/3D/Textures/" as the first two segments, for example "/3D/Textures/coloring.png". 3D Texture parts MUST be associated with the 3D Model part via a suitable relationship.
 - The names of any non-standard parts that are associated with the 3D payload SHOULD contain 3 segments, using "/3D/Other/" as the first two segments.
 
 Part names MUST use absolute paths, meaning all paths begin with "/". Part names MUST NOT be empty or lead with a period (e.g. "/3D/.png" or "/3D/").
+
+When a part name is represented with Unicode, it SHOULD be represented with a Part URI Syntax, as described in the section 9.1.1.1 Part Name Syntax of the Open Packaging Conventions specification.
 
 
 ## 2.3. 3MF Document Markup
@@ -260,6 +266,7 @@ Extension specifications MUST include one or more targeted versions of this core
 
 Within this core XSD schema (see [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)), extension points have been explicitly entered in the form of \<any> elements and \<anyAttribute> (also visible in the element diagrams further along in this specification). These are required to come from other namespaces, which SHOULD point to a way to find the appropriate specification and accompanying XSD schema.
 
+Vendors MIGHT define private 3MF extensions. The specifications of private namespaces (i.e. that are not ratified by the 3MF Consortium) need to be negotiated between parties in the ecosystem.
 
 ### 2.3.2. XML Usage
 
@@ -327,6 +334,8 @@ Transforms are of the form, where only the first 3 column values are specified. 
 
 ![3D matrices](images/3D_matrices.png)
 
+Transforms are applied to the shapes defined by objects. When applying a transformation with a negative determinant, the resultant shape MUST NOT change the sign of its volume.
+
 After applying all transforms to an object, the model SHOULD have positive volume and SHOULD be located in the positive octant of the coordinate space.
 
 
@@ -348,7 +357,6 @@ Element **\<model>**
 | unit | **ST\_Unit** | | millimeter | Specifies the unit used to interpret all vertices, locations, or measurements in the model. Valid values are micron, millimeter, centimeter, inch, foot, and meter. |
 | xml:lang | **xs:language** | | | Specifies the default language used for the current element and any descendant elements. The language is specified according to RFC 3066. |
 | requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing the document. Editors and manufacturing devices MUST NOT process the document if they do not support the required extensions. |
-| thumbnail | **ST\_UriReference** | | | Path to a root level thumbnail of type JPEG or PNG that represents a rendered image of the entire model. |
 | @anyAttribute | | | | |
 
 The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see [3.4.1. Metadata](#341-metadata) for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items that should actually be manufactured as part of the job.
@@ -455,7 +463,7 @@ A 3MF Document may include multiple objects to manufacture at the same time. The
 
 If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped item. If the last item has no properties defined in the overlapped volume, properties MUST NOT be applied.
 
->**Note:** items must not reference objects of type "other"
+>**Note:** items MUST NOT reference objects of type "other", either directly or recursively.
 
 
 # Chapter 4. Object Resources
@@ -471,7 +479,7 @@ Element **\<object>**
 | --- | --- | --- | --- | --- |
 | id | **ST\_ResourceID** | required | | Defines the unique identifier for this object. |
 | type | **ST\_ObjectType** | | model | Specifies the function of the object in the model. Valid values are "model", "solidsupport", "support", "surface", or "other". A consumer MAY ignore support objects if they are not needed. The consumer MAY generate its own support objects in place of the provided support objects, but this is NOT RECOMMENDED. |
-| thumbnail | **ST\_UriReference** | | | Path to a 3D Texturethumbnail of type JPEG or PNG that represents a rendered image of the object. |
+| thumbnail | **ST\_UriReference** | | | Path to an Object Thumbnail of type JPEG or PNG that represents a rendered image of the object. |
 | partnumber | **xs:string** | | | Part number, which editors SHOULD maintain during the process of modifying and deriving objects. |
 | name | **xs:string** | | | Name of object to improve readability. |
 | pid | **ST\_ResourceID** | | | Reference to the property group element with the matching id attribute value (e.g. \<basematerials>). It is REQUIRED if pindex is specified. |
@@ -483,11 +491,11 @@ Element **\<object>**
 | --- | --- | --- | --- | --- |
 | metadatagroup | **CT\_MetadataGroup** | | | An optional group of CT\_Metadata elements as specified in the Metadata section of Model. |
 
-An object resource is defined by an \<object> element. An \<object> element has attributes for the property group and specific property member that are to be applied to the entire object, except where overridden by a descendant element, such as a \<triangle> element or a component-referenced \<object> element. If this object contains any triangles with assigned materials, the object MUST specify pid and pindex, to act as default values for any triangles with unspecified properties. If no properties are assigned at all, the choice for the properties of the object is left to the consumer.
+An object resource is defined by an \<object> element. An \<object> element has attributes for the property group and specific property member that are to be applied to the entire object, except where overridden by a descendant element, such as a \<triangle> element or a component-referenced \<object> element. If this object contains any triangles with assigned properties, the object MUST specify pid and pindex, to act as default values for any triangles with unspecified properties. If no properties are assigned at all, the choice for the properties of the object is left to the consumer.
 
 The object type is ignored on objects that contain components, since the type is always overridden by descendant objects. Producers MUST NOT assign pid or pindex attributes to objects that contain components. This ensures that an object with no material will not be split into two representations with different materials due to being referenced as a component in multiple objects.
 
-Object thumbnails MUST have an appropriate 3D Texturethumbnail relationship to the model part as described in section 2.1.1. Consumers MAY find additional thumbnails associated with the 3D Texture relationship, for backwards compatibility. Producers MUST store thumbnails with the thumbnail relationship in an associated thumbnail part.
+Object Thumbnails MUST have an appropriate thumbnail relationship to the model part as described in section 2.1.1. Consumers MAY find additional thumbnails associated with an object by the 3D Texture relationship, for backwards compatibility. Producers MUST store thumbnails with the thumbnail relationship in an associated object thumbnail part.
 
 Part numbers are intended as a way to keep track of objects which may have been modified during a tool chain. When editing or processing a 3MF document, these part numbers SHOULD be preserved to the greatest degree possible, duplicating them for objects split into pieces, removing them from objects that are combined, and maintaining them for objects that are modified.
 
@@ -503,14 +511,14 @@ The \<mesh> element is the root of a triangular _mesh_ representation of an obje
 If the mesh is under an object of type "model" or "solidsupport", it MUST have:
 
 - Manifold Edges: Every triangle edge in the mesh shares common vertex endpoints with the edge of exactly 1 other triangle.
-- Consistent Triangle Orientation: Every pair of adjacent triangles within the mesh MUST have the same orientation of the face normal toward the exterior of the mesh, meaning that the order of declaration of the vertices on the shared edge MUST be in the opposite order. For example, if Triangle1 has vertices ABC and Triangle2 has vertices DEF and Triangle1 and Triangle2 share the AB/DE edge, then it MUST be the case that vertices A=E and vertices B=D (see figure 4-1 below). A triangle face normal (for triangle ABC, in that order) throughout this specification is defined as a unit vector in the direction of the vector cross product (B - A) x (C - A). For example, the triangles shown in figure 4-1 have normals pointing out of the page. If the applied transformation has a negative determinant, the vertex ordering of those triangles MUST be inverted in order to preserve the sign of the volume.
+- Consistent Triangle Orientation: Every pair of adjacent triangles within the mesh MUST have the same orientation of the face normal toward the exterior of the mesh, meaning that the order of declaration of the vertices on the shared edge MUST be in the opposite order. For example, if Triangle1 has vertices ABC and Triangle2 has vertices DEF and Triangle1 and Triangle2 share the AB/DE edge, then it MUST be the case that vertices A=E and vertices B=D (see figure 4-1 below). A triangle face normal (for triangle ABC, in that order) throughout this specification is defined as a unit vector in the direction of the vector cross product (B - A) x (C - A). For example, the triangles shown in figure 4-1 have normals pointing out of the mesh.
 - Outward-facing normals: All triangles MUST be oriented with normals that point away from the interior of the object. Meshes with negative volume will not be printed (or will become voids), in accordance with the Positive fill rule defined in the next section. In combination with the preceding two rules, a mesh is therefore a continuous surface without holes, gaps, open edges, or non-orientable surfaces (e.g. Klein bottle).
 
 _Figure 4-1. Consistent triangle orientation_
 
 ![figure 4-1](images/figure_4-1.png)
 
-Objects of type "support", "surface" and "other" are allowed to break these conditions. Objects of type "other" MUST NOT be referenced in the Build section.
+Objects of type "support", "surface" and "other" are allowed to break these conditions. Objects of type "other" MUST NOT be referenced in the Build section, either recursively or directly.
 
 All meshes SHOULD have:
 
@@ -692,11 +700,11 @@ An sRGB color MUST be specified with a value of a 6 or 8 digit hexadecimal numbe
 3MF Documents take advantage of parts defined by the Open Packaging Conventions to provide additional information about the content in the package.
 
 
-## 6.1. Thumbnail
+## 6.1. Package Thumbnail and Object Thumbnail
 
-The producer of a 3MF document MAY include a 2D _thumbnail_ image representing the contents of the 3D payload. This image may be of content type image/jpeg or image/png, following the internal file format requirements described in the following subsections.
+The producer of a 3MF document MAY include a 2D _thumbnail_ image representing the contents of the 3D payload or of specific objects within the 3D payload. This image may be of content type image/jpeg or image/png, following the internal file format requirements described in the following subsections.
 
-This thumbnail has a relationship from the package root or object parts to the thumbnail image. The relationship type MUST be:
+The package thumbnail has a relationship from the package root to the thumbnail image, object thumbnails have a relationship from the 3D Model part to the thumbnail image. The relationship type MUST be:
 
 http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail
 
@@ -749,7 +757,7 @@ The 3MF Document format relies on the _Core Properties_ part, defined in the Ope
 
 The Open Packaging Conventions specification provides full details of how digital signatures are applied in OPC packages. The Digital Signature Origin part acts as the root of the digital signature payload in the 3MF Document. Individual Digital Signature parts can be discovered via relationship from the Digital Signature Origin part. Each Digital Signature part can have either an inline digital certificate, or a reference to an external Digital Signature Certificate part in the package.
 
-A digital signature applied to the 3D Model part SHOULD include only the 3D Model part and any other parts referenced by it, along with the associated relationships. It MAY include the Thumbnail, Digital Signature Origin, Core Properties parts and associated relationship parts.
+A digital signature applied to the 3D Model part SHOULD include only the 3D Model part and any other parts referenced by it, along with the associated relationships. It MAY include the Package Thumbnail, Digital Signature Origin, Core Properties parts and associated relationship parts.
 
 
 ### 6.3.1. Normalization
@@ -767,7 +775,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 # Part II. Appendixes
 
-# Appendix A. Glossary
+## Appendix A. Glossary
 
 **3D matrix.** A 4x4 affine matrix used for rotating, scaling, and translating an object in three-dimensional space.
 
@@ -775,7 +783,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **3D Model part.** The OPC part that contains a 3D model.
 
-**3D Texture part.** A file used to apply complex information to a 3D object in the 3D Model part (undefined in this spec, but available for extensions).
+**3D Texture part.** A file used to apply complex information to a 3D object in the 3D Model part (undefined in this specification, but available for extensions to this specification).
 
 **3MF.** The 3D Manufacturing Format described by this specification, defining one or more 3D objects intended for output to a physical form.
 
@@ -843,21 +851,24 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Thumbnail.** An image that helps end-users identify the contents of the package, expressed as a JPEG or PNG image.
 
-**Thumbnail part.** The OPC part that contains the package thumbnail image.
+**Thumbnail part.** The OPC part that contains the package thumbnail image or the object thumbnail image.
 
 **Top.** The maximum printable XY plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
 
 **XML namespace.** A namespace declared on the \<model> element, in accordance with the XML Namespaces specification.
 
-# Appendix B.1. 3MF XSD Schema
+## Appendix B.1. 3MF XSD Schema
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
+<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
+	targetNamespace="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"
+	elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
 	<!-- Import xml: namespace -->
 	<xs:import namespace="http://www.w3.org/XML/1998/namespace"
-		schemaLocation="http://www.w3.org/2001/xml.xsd" />
-	
+		schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+
 	<xs:annotation>
 		<xs:documentation><![CDATA[
 		Schema notes:
@@ -892,7 +903,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 			<xs:element ref="object" minOccurs="0" maxOccurs="2147483647"/>
 		</xs:sequence>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
-	</xs:complexType>	
+	</xs:complexType>
 	<xs:complexType name="CT_Build">
 		<xs:sequence>
 			<xs:element ref="item" minOccurs="0" maxOccurs="2147483647"/>
@@ -924,6 +935,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 				<xs:element ref="mesh"/>
 				<xs:element ref="components"/>
 			</xs:choice>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="ST_ResourceID" use="required"/>
 		<xs:attribute name="type" type="ST_ObjectType" default="model"/>
@@ -977,19 +989,23 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Component">
+		<xs:sequence>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
+		</xs:sequence>
 		<xs:attribute name="objectid" type="ST_ResourceID" use="required"/>
 		<xs:attribute name="transform" type="ST_Matrix3D"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Metadata" mixed="true">
 		<xs:attribute name="name" type="xs:QName" use="required"/>
-		<xs:attribute name="preserve" type="xs:boolean" use="optional" />
-		<xs:attribute name="type" type="xs:string" use="optional" />
+		<xs:attribute name="preserve" type="xs:boolean" use="optional"/>
+		<xs:attribute name="type" type="xs:string" use="optional"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Item">
 		<xs:sequence>
 			<xs:element ref="metadatagroup" minOccurs="0" maxOccurs="1"/>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
 		</xs:sequence>
 		<xs:attribute name="objectid" type="ST_ResourceID" use="required"/>
 		<xs:attribute name="transform" type="ST_Matrix3D"/>
@@ -1068,18 +1084,17 @@ A consumer that is authorized to un-protect content by reversing the above steps
 </xs:schema>
 ```
 
-# Appendix B.2. 3MF Metadata Example
+## Appendix B.2. 3MF Metadata Example
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <model unit="millimeter" xml:lang="en-us" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:vendor1="http://www.vendorwwebsite.com/3mf/vendor13mfextension/2017/01">
-  <metadata name="Copyright">� Microsoft Corporation 2013</metadata>
+  <metadata name="Copyright">© Microsoft Corporation 2013</metadata>
   <metadata name="Application">Microsoft 3D Builder</metadata>
   <metadata name="LicenseTerms">All rights reserved</metadata>
   <metadata name="Title">Cube</metadata>
   <metadata name="Designer">Microsoft Corporation</metadata>
   <metadata name="CreationDate">2013-10-07</metadata>
-  <metadata name="ChangeHistory">2013-10-07 Initial model</metadata>
   <metadata name="ModificationDate">2014-03-27</metadata>
   <metadata name="Description">Cube</metadata>
   <metadata name="vendor1:CustomMetadata1" preserve="1">CE8A91FB-C44E-4F00-B634-BAA411465F6A</metadata>
@@ -1134,15 +1149,15 @@ A consumer that is authorized to un-protect content by reversing the above steps
 </model>
 ```
 
-# Appendix C. Standard Namespaces and Content Types
+## Appendix C. Standard Namespaces and Content Types
 
-## C.1 Content Types
+### C.1 Content Types
 
 3D Model application/vnd.ms-package.3dmanufacturing-3dmodel+xml
 
 PrintTicket application/vnd.ms-printing.printticket+xml
 
-## C.2 Relationship Types
+### C.2 Relationship Types
 
 StartPart http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel
 
@@ -1152,7 +1167,7 @@ PrintTicket http://schemas.microsoft.com/3dmanufacturing/2013/01/printticket
 
 MustPreserve http://schemas.openxmlformats.org/package/2006/relationships/mustpreserve
 
-## C.3 Namespaces
+### C.3 Namespaces
 
 3D Model http://schemas.microsoft.com/3dmanufacturing/core/2015/02
 
@@ -1213,5 +1228,3 @@ Beech, David, Murray Maloney, Noah Mendelsohn, and Henry S. Thompson (editors). 
 Biron, Paul V. and Ashok Malhotra (editors). "XML Schema Part 2: Datatypes," Second Edition. World Wide Web Consortium. 2004. http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/
 
 Copyright 3MF Consortium 2018.
-
-
