@@ -135,7 +135,8 @@ Finally, the 3MF Document format implements the common package features specifie
 The 3MF Document format MUST use a ZIP archive for its physical model. The Open Packaging Conventions specification describes a packaging model, that is, how the package is represented internally with parts and relationships.
 
 The ZIP archive MUST follow the [.ZIP File Format Specification](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT) by PKWARE Inc.
-Files within the ZIP archive that represents a 3MF document MUST use the compression method `Deflate` ("8 - The file is Deflated") or be `stored uncompressed` ("0 - The file is stored (no compression)") in accordance with the OPC specification ("Annex C, (normative) ZIP Appnote.txt Clarifications").
+Files within the ZIP archive that represents a 3MF document MUST use the compression method `Deflate` ("8 - The file is Deflated") or be `stored uncompressed` ("0 - The file is stored (no compression)") in accordance with the OPC specification ("Annex C, (normative) ZIP Appnote.txt Clarifications"). The consumers MUST support both the the PKWARE ZIP64:tm: extension and streaming extension. However as some older 3MF consumers are not able to consume ZIP64 files, the producers SHOULD produce plain ZIP files if the 3MF data fits and produce ZIP64 only if necessary. To support ZIP64 only if necessary in streaming mode, the producer may preallocate a custom block in the ZIP Local file header with an ID (0x9999) and overwrite it optionally with a ZIP64 extension block after finishing writing the compressed file block if the ZIP64 extension is found to be
+necessary.
 
 The 3MF Document format includes a well-defined set of parts and relationships, each fulfilling a particular purpose in the document. The format also extends the package features, including digital signatures and thumbnails.
 
