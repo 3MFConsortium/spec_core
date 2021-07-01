@@ -283,6 +283,8 @@ The 3MF Document core _XML namespace_, the principal namespace used for elements
 
 As a reminder, a non-default XML namespace on an element DOES automatically apply to any attributes of that element (unless another namespace is prefixed), but DOES NOT apply to sub-elements, so they must all be individually prefixed. Any attributes falling into an anyattribute extension point MUST be prefixed with their corresponding namespace (as all such extension points specify "other" for the required namespace in the XSD schema).
 
+A consumer or editor MUST ignore all XML nodes and attributes from namespaces it does not explicitely support.
+
 
 ### 2.3.4. Whitespace
 
@@ -348,6 +350,7 @@ Element **\<model>**
 | unit | **ST\_Unit** | | millimeter | Specifies the unit used to interpret all vertices, locations, or measurements in the model. Valid values are micron, millimeter, centimeter, inch, foot, and meter. |
 | xml:lang | **xs:language** | | | Specifies the default language used for the current element and any descendant elements. The language is specified according to RFC 3066. |
 | requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing the document. Editors and manufacturing devices MUST NOT process the document if they do not support the required extensions. |
+| recommendedextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are recommended for processing the document with its design intent. Editors and manufacturing devices SHOULD warn and inform the user if they do not support the recommended extensions and ask for input how to proceed. Required extensions SHOULD NOT be recommended at the same time. |
 | thumbnail | **ST\_UriReference** | | | Path to a root level thumbnail of type JPEG or PNG that represents a rendered image of the entire model. |
 | @anyAttribute | | | | |
 
@@ -610,17 +613,18 @@ If the properties defined on the triangle are from a \<basematerials> group (see
 
 ### 4.1.5. Trianglesets
 
-Element **\<trianglesets>**
+Element **\<t:trianglesets>**
 
 ![trianglesets](images/trianglesets.png)
 
-A _mesh node_ MAY contain a _trianglesets node_ that contains information how triangles are grouped and organized.
+A _mesh node_ MAY contain a _trianglesets node_ that contains information how triangles are grouped and organized. Trianglesets and their child nodes MUST live under the core extension namespace for Triangle Sets (*http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07*)
 
-A \<trianglesets> element acts as a container for triangleset nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
+
+A \<t:trianglesets> element acts as a container for triangleset nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
 
 ### 4.1.6. Triangle Set-Elements
 
-Element **\<triangleset>**
+Element **\<t:triangleset>**
 
 ![triangleset](images/triangleset.png)
 
@@ -641,7 +645,7 @@ A consumer MUST ignore duplicate references to the same triangle in one set. A p
 
 #### 4.1.6.1. Triangle Set References
 
-Element **\<ref>**
+Element **\<t:ref>**
 
 ![ref](images/ref.png)
 
@@ -651,6 +655,42 @@ Element **\<ref>**
 
 A \<ref> element in a triangle refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
 
+
+### 4.1.7. Mesh Mirror Transforms
+
+A producer MUST NOT use transforms with negative determinants to account for mirroring, as this would invert the normal directions of the triangle. In order to store a mesh in a mirrored form, the producer MUST store a transformed copy of the original mesh in its new form, which means with absolute transformed vertex coordinates as well as a corrected positive triangle orientation.
+
+However, if a producer wants to reference the original mesh from a transformed copy, the producer MAY use the Mirroring namespace (*http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07*) to store a reference to the original mesh id as well as the mirror transform that was used:
+
+Element **\<mesh>**
+
+![element mesh](images/element_mesh_mirrored.png)
+
+##### Attributes
+| Name | Type | Use | Default | Annotation |
+| --- | --- | --- | --- | --- |
+| m:originalmesh | **ST\_ResourceID** | optional | | Resource ID of the original mesh object |
+| m:nx | **ST\_Double** | optional | | X Coordinate of Mirror plane normal equation |
+| m:ny | **ST\_Double** | optional | | Y Coordinate of Mirror plane normal equation |
+| m:nz | **ST\_Double** | optional | | Z Coordinate of Mirror plane normal equation |
+| m:d | **ST\_Double** | optional | | Distance value of Mirror plane normal equation |
+
+Those reference attributes are optional as a group. A producer either MUST specify all of the attributes or a producer MUST NOT specify any of them. The *originalmesh* attribute MUST refer to an previous mesh object in the current 3MF model.
+
+The mirror transform shall be defined through the given *mirror plane* that is defined by the equation 
+
+*nx* * *x* + *ny* * *y* + *nz* * *z* + *d* = *0*
+
+in the local mesh coordinate system. If a mirror mesh transformation is given, the following rules MUST apply for the vertices and faces:
+- The mesh's vertex count MUST be equal to the original mesh's vertex count.
+- For each vertex in the mesh, there MUST be a corresponding vertex of the original mesh with the identical index in the vertex list. The corresponding vertex coordinate MUST be defined by mirroring on the mirror plane in the local coordinate system.
+- The mesh's triangle count MUST be equal to the original mesh's.
+- For each triangle in the mesh, there MUST be a corresponding triangle of the transformed original mesh with identical index in the triangle list. The corresponding triangle MUST have identical properties, except vertex v1 and v3 MUST be exchanged (as well as p1 and p3).
+- The trianglesets of the mesh MUST be identical to the triangle sets of the original mesh.
+
+If any of the given requirements is invalid, the actual mesh coordinates MUST take precedence and a producer MUST ignore the mirror transform.
+
+If the mirror namespace is a required extension, the producer MAY choose to not store duplicate information. If the producer chooses to do so, it MUST specify an empty triangles element, an empty vertices element and an empty trianglesets element for this mesh. In this case, any consumer MUST implicitely reconstruct the mesh data from the original mesh via the given rules.
 
 
 ## 4.2. Components
@@ -666,6 +706,8 @@ A 3D manufacturing device MUST respect the relative positions of the component o
 If the components overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped components has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped component. If the last component has no properties defined in the overlapped volume, properties MUST NOT be applied.
 
 In order to avoid integer overflows, a components element MUST contain less than 2^31 components.
+
+
 
 
 ### 4.2.1. Component
@@ -1200,6 +1242,11 @@ MustPreserve http://schemas.openxmlformats.org/package/2006/relationships/mustpr
 ## C.3 Namespaces
 
 3D Model http://schemas.microsoft.com/3dmanufacturing/core/2015/02
+
+Triangle Sets http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07
+
+Mirroring http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07
+
 
 # References
 
