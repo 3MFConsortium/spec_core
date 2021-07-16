@@ -78,7 +78,7 @@ Part II, "Appendixes," contains additional technical details and schemas too ext
 
 The information contained in this specification is subject to change. Every effort has been made to ensure its accuracy at the time of publication.
 
-This core specification is extended with additions, after version 1.2. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07" defined in version 1.3, and the prefix "mm" maps to the xml namespace "http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07". See [Appendix C.3 Namespaces](#c3-namespaces)
+This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07" and the prefix "mm" maps to the xml namespace "http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07", both defined in version 1.3. See [Appendix C.3 Namespaces](#c3-namespaces)
 
 ## Document Conventions
 
