@@ -12,7 +12,7 @@
 
 
 
-| **Version** | 1.2.4 |
+| **Version** | 1.3.0 |
 | --- | --- |
 | **Status** | Draft |
 
@@ -77,6 +77,8 @@ Part I, "3MF Documents," presents the details of the primarily XML-based 3MF Doc
 Part II, "Appendixes," contains additional technical details and schemas too extensive to include in the main body of the text as well as convenient reference information.
 
 The information contained in this specification is subject to change. Every effort has been made to ensure its accuracy at the time of publication.
+
+This core specification is extended with additions, after version 1.2. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07" defined in version 1.3, and the prefix "mm" maps to the xml namespace "http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07". See [Appendix C.3 Namespaces](#c3-namespaces)
 
 ## Document Conventions
 
@@ -622,23 +624,23 @@ If the properties defined on the triangle are from a \<basematerials> group (see
 
 Element **\<t:trianglesets>**
 
-![trianglesets](images/trianglesets.png)
+![trianglesets](images/element_trianglesets.png)
 
 A _mesh node_ MAY contain a _trianglesets node_ that contains information how triangles are grouped and organized. Trianglesets and their child nodes MUST live under the core extension namespace for Triangle Sets (*http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07*)
 
 
 A \<t:trianglesets> element acts as a container for triangleset nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
 
-### 4.1.6. Triangle Set-Elements
+### 4.1.5.1 Triangle Set-Elements
 
 Element **\<t:triangleset>**
 
-![triangleset](images/triangleset.png)
+![triangleset](images/element_triangleset.png)
 
 | Name   | Type   | Use   | Default   | Annotation |
 | --- | --- | --- | --- | --- |
-| name   | **ST\_String**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
-| identifier | **ST\_String** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
+| name   | **xs:string**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
+| identifier | **xs:token** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
 
 A _triangle set_ contains a reference list to a subset of triangles to apply grouping operations and assign properties to a list of triangles. Editing applications might use this information for internal purposes, for example color display and selection workflows.
 
@@ -650,11 +652,11 @@ A consumer MUST ignore duplicate references to the same triangle in one set. A p
 
 
 
-#### 4.1.6.1. Triangle Set References
+#### 4.1.5.2 Triangle Set References
 
 Element **\<t:ref>**
 
-![ref](images/ref.png)
+![ref](images/element_triangleset_ref.png)
 
 | Name   | Type   | Use   | Default   | Annotation |
 | --- | --- | --- | --- | --- |
@@ -663,7 +665,7 @@ Element **\<t:ref>**
 A \<ref> element in a triangle refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
 
 
-### 4.1.7. Mesh Mirror Transforms
+### 4.1.6. Mesh Mirror Transforms
 
 A producer MUST NOT use transforms with negative determinants to account for mirroring, as this would invert the normal directions of the triangle. In order to store a mesh in a mirrored form, the producer MUST store a transformed copy of the original mesh in its new form, which means with absolute transformed vertex coordinates as well as a corrected positive triangle orientation.
 
@@ -676,11 +678,11 @@ Element **\<mesh>**
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
-| m:originalmesh | **ST\_ResourceID** | optional | | Resource ID of the original mesh object |
-| m:nx | **ST\_Double** | optional | | X Coordinate of Mirror plane normal equation |
-| m:ny | **ST\_Double** | optional | | Y Coordinate of Mirror plane normal equation |
-| m:nz | **ST\_Double** | optional | | Z Coordinate of Mirror plane normal equation |
-| m:d | **ST\_Double** | optional | | Distance value of Mirror plane normal equation |
+| mm:originalmesh | **ST\_ResourceID** | optional | | Resource ID of the original mesh object |
+| mm:nx | **ST\_Number** | optional | | X Coordinate of Mirror plane normal equation |
+| mm:ny | **ST\_Number** | optional | | Y Coordinate of Mirror plane normal equation |
+| mm:nz | **ST\_Number** | optional | | Z Coordinate of Mirror plane normal equation |
+| mm:d | **ST\_Number** | optional | | Distance value of Mirror plane normal equation |
 
 Those reference attributes are optional as a group. A producer either MUST specify all of the attributes or a producer MUST NOT specify any of them. The *originalmesh* attribute MUST refer to an previous mesh object in the current 3MF model.
 
@@ -943,6 +945,8 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 ## Appendix B.1. 3MF XSD Schema
 
+### B.1.1 Core specification schema
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"
@@ -1165,6 +1169,124 @@ A consumer that is authorized to un-protect content by reversing the above steps
 	<xs:element name="component" type="CT_Component"/>
 	<xs:element name="metadata" type="CT_Metadata"/>
 	<xs:element name="item" type="CT_Item"/>
+</xs:schema>
+```
+
+### B.1.2 Triangle Set extension schema
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
+  targetNamespace="http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07"
+  elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+  <xs:annotation>
+    <xs:documentation>
+      <![CDATA[
+    Schema notes:
+ 
+    Items within this schema follow a simple naming convention of appending a prefix indicating the type of element for references:
+ 
+    Unprefixed: Element names
+    CT_: Complex types
+    ST_: Simple types
+   
+    ]]>
+    </xs:documentation>
+  </xs:annotation>
+  <!-- Complex Types -->
+  <xs:complexType name="CT_Mesh">
+    <xs:sequence>
+      <xs:element ref="trianglesets"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="CT_TriangleSets">
+    <xs:sequence>
+      <xs:element ref="triangleset" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" default="none"/>
+    <xs:attribute name="identifier" type="xs:token"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="CT_TriangleSet">
+    <xs:sequence>
+      <xs:element ref="ref" minOccurs="0" maxOccurs="1"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
+    </xs:sequence>
+    <xs:attribute name="index" type="ST_ResourceIndex" use="required" />
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="CT_Ref">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
+    </xs:sequence>
+    <xs:attribute name="index" type="ST_ResourceIndex" use="required"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <!-- Simple Types -->
+  <xs:simpleType name="ST_ResourceIndex">
+    <xs:restriction base="xs:nonNegativeInteger">
+      <xs:maxExclusive value="2147483648"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <!-- Elements -->  
+  <xs:element name="mesh" type="CT_Mesh"/>
+  <xs:element name="trianglesets" type="CT_TriangleSets"/>
+  <xs:element name="triangleset" type="CT_TriangleSet"/>
+  <xs:element name="ref" type="CT_Ref"/>
+</xs:schema>
+```
+
+### B.1.3 Mirroring extension schema
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
+  targetNamespace="http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07"
+  elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+  <xs:annotation>
+    <xs:documentation>
+      <![CDATA[
+    Schema notes:
+ 
+    Items within this schema follow a simple naming convention of appending a prefix indicating the type of element for references:
+ 
+    Unprefixed: Element names
+    CT_: Complex types
+    ST_: Simple types
+   
+    ]]>
+    </xs:documentation>
+  </xs:annotation>
+  <!-- Complex Types -->
+  <xs:complexType name="CT_Mesh">
+    <xs:attribute name="originalmesh" type="ST_ResourceID"/>
+    <xs:attribute name="nx" type="ST_Number"/>
+    <xs:attribute name="ny" type="ST_Number"/>
+    <xs:attribute name="nz" type="ST_Number"/>
+    <xs:attribute name="d" type="ST_Number"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <!-- Simple Types -->
+  <xs:simpleType name="ST_ResourceID">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:maxExclusive value="2147483648"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ST_Number">
+    <xs:restriction base="xs:double">
+      <xs:whiteSpace value="collapse"/>
+      <xs:pattern value="((\-|\+)?(([0-9]+(\.[0-9]+)?)|(\.[0-9]+))((e|E)(\-|\+)?[0-9]+)?)"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- Elements -->
+  <xs:element name="mesh" type="CT_Mesh"/>
 </xs:schema>
 ```
 
