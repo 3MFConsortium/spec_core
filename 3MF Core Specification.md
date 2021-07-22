@@ -620,7 +620,7 @@ If the properties defined on the triangle are from a \<basematerials> group (see
 >**Note:** The triangle orientation is affected by the sign of the determinant of the transformation as described in Section 4.1.
 
 
-### 4.1.5. Trianglesets
+### 4.1.5. Triangle Sets
 
 Element **\<t:trianglesets>**
 
@@ -631,7 +631,7 @@ A _mesh node_ MAY contain a _trianglesets node_ that contains information how tr
 
 A \<t:trianglesets> element acts as a container for <t:\triangleset> nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
 
-### 4.1.5.1 Triangle Set-Elements
+#### 4.1.5.1 Triangle Set Elements
 
 Element **\<t:triangleset>**
 
