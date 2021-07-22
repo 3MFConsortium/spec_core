@@ -629,7 +629,7 @@ Element **\<t:trianglesets>**
 A _mesh node_ MAY contain a _trianglesets node_ that contains information how triangles are grouped and organized. Trianglesets and their child nodes MUST live under the core extension namespace for Triangle Sets (*http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07*)
 
 
-A \<t:trianglesets> element acts as a container for triangleset nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
+A \<t:trianglesets> element acts as a container for <t:\triangleset> nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
 
 ### 4.1.5.1 Triangle Set-Elements
 
@@ -640,7 +640,7 @@ Element **\<t:triangleset>**
 | Name   | Type   | Use   | Default   | Annotation |
 | --- | --- | --- | --- | --- |
 | name   | **xs:string**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
-| identifier | **xs:token** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
+| identifier | **xs:Name** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
 
 A _triangle set_ contains a reference list to a subset of triangles to apply grouping operations and assign properties to a list of triangles. Editing applications might use this information for internal purposes, for example color display and selection workflows.
 
@@ -1207,8 +1207,6 @@ A consumer that is authorized to un-protect content by reversing the above steps
     <xs:sequence>
       <xs:element ref="triangleset" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
-    <xs:attribute name="name" type="xs:string" default="none"/>
-    <xs:attribute name="identifier" type="xs:token"/>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_TriangleSet">
@@ -1216,7 +1214,8 @@ A consumer that is authorized to un-protect content by reversing the above steps
       <xs:element ref="ref" minOccurs="0" maxOccurs="1"/>
       <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
     </xs:sequence>
-    <xs:attribute name="index" type="ST_ResourceIndex" use="required" />
+    <xs:attribute name="name" type="xs:string" default="none"/>
+    <xs:attribute name="identifier" type="xs:Name"/>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_Ref">
