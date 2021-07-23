@@ -639,8 +639,8 @@ Element **\<t:triangleset>**
 
 | Name   | Type   | Use   | Default   | Annotation |
 | --- | --- | --- | --- | --- |
-| t:name   | **xs:string**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
-| t:identifier | **xs:QName** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
+| name   | **xs:string**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
+| identifier | **xs:QName** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
 
 A _triangle set_ contains a reference list to a subset of triangles to apply grouping operations and assign properties to a list of triangles. Editing applications might use this information for internal purposes, for example color display and selection workflows.
 
@@ -660,7 +660,7 @@ Element **\<t:ref>**
 
 | Name   | Type   | Use   | Default   | Annotation |
 | --- | --- | --- | --- | --- |
-| t:index   | **ST\_ResourceIndex**   | required   |   | References an index in the mesh triangle list. |
+| index   | **ST\_ResourceIndex**   | required   |   | References an index in the mesh triangle list. |
 
 A \<ref> element in a triangle refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
 
@@ -678,11 +678,11 @@ Element **\<mesh>**
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
-| mm:originalmesh | **ST\_ResourceID** | optional | | Resource ID of the original mesh object |
-| mm:nx | **ST\_Number** | optional | | X Coordinate of Mirror plane normal equation |
-| mm:ny | **ST\_Number** | optional | | Y Coordinate of Mirror plane normal equation |
-| mm:nz | **ST\_Number** | optional | | Z Coordinate of Mirror plane normal equation |
-| mm:d | **ST\_Number** | optional | | Distance value of Mirror plane normal equation |
+| originalmesh | **ST\_ResourceID** | optional | | Resource ID of the original mesh object |
+| nx | **ST\_Number** | optional | | X Coordinate of Mirror plane normal equation |
+| ny | **ST\_Number** | optional | | Y Coordinate of Mirror plane normal equation |
+| nz | **ST\_Number** | optional | | Z Coordinate of Mirror plane normal equation |
+| d | **ST\_Number** | optional | | Distance value of Mirror plane normal equation |
 
 Those reference attributes are optional as a group. A producer either MUST specify all of the attributes or a producer MUST NOT specify any of them. The *originalmesh* attribute MUST refer to an previous mesh object in the current 3MF model.
 
