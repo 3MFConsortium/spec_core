@@ -639,8 +639,8 @@ Element **\<t:triangleset>**
 
 | Name   | Type   | Use   | Default   | Annotation |
 | --- | --- | --- | --- | --- |
-| name   | **xs:string**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
-| identifier | **xs:QName** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
+| t:name   | **xs:string**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
+| t:identifier | **xs:QName** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
 
 A _triangle set_ contains a reference list to a subset of triangles to apply grouping operations and assign properties to a list of triangles. Editing applications might use this information for internal purposes, for example color display and selection workflows.
 
@@ -660,7 +660,7 @@ Element **\<t:ref>**
 
 | Name   | Type   | Use   | Default   | Annotation |
 | --- | --- | --- | --- | --- |
-| index   | **ST\_ResourceIndex**   | required   |   | References an index in the mesh triangle list. |
+| t:index   | **ST\_ResourceIndex**   | required   |   | References an index in the mesh triangle list. |
 
 A \<ref> element in a triangle refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
 
