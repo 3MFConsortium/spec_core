@@ -629,7 +629,7 @@ Element **\<t:trianglesets>**
 A _mesh node_ MAY contain a _trianglesets node_ that contains information how triangles are grouped and organized. Trianglesets and their child nodes MUST live under the core extension namespace for Triangle Sets (*http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07*)
 
 
-A \<t:trianglesets> element acts as a container for <t:\triangleset> nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
+A \<t:trianglesets> element acts as a container for <t:triangleset> nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
 
 #### 4.1.5.1 Triangle Set Elements
 
