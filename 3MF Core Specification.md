@@ -642,14 +642,13 @@ Element **\<t:triangleset>**
 | --- | --- | --- | --- | --- |
 | name   | **xs:string**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
 | identifier | **xs:QName** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
-
 A _triangle set_ contains a reference list to a subset of triangles to apply grouping operations and assign properties to a list of triangles. Editing applications might use this information for internal purposes, for example color display and selection workflows.
 
-A triangleset is a collection of references to triangles. Since triangles do not have a specific influence on the geometrical shape, a consumer MAY ignore the information.
+A triangle set is a collection of references to triangles. Since triangle sets do not have a specific influence on the geometrical shape, a consumer MAY ignore the information.
 
 A consumer MUST ignore duplicate references to the same triangle in one set. A producer SHOULD avoid creating duplicate references to the same triangle in one set.
 
->**Note:** By purpose, a single triangle can be referenced by multiple triangle sets. There are many applications that expect a disjoint segmentation of the mesh. A producer SHOULD try to output disjoint sets if its application does not demand otherwise. If a consumer needs to convert a generic triangle set collection into a disjoint segmentation, priority SHOULD be given to the last set a triangle occurs.
+>**Note:** By purpose, a single triangle can be referenced by multiple triangle sets. There are many applications that expect a disjoint segmentation of the mesh. A producer SHOULD try to output disjoint sets if its application does not demand otherwise. If a consumer needs to convert a generic triangle set collection into a disjoint segmentation, priority SHOULD be given to the last set in which a triangle occurs.
 
 
 
@@ -663,7 +662,22 @@ Element **\<t:ref>**
 | --- | --- | --- | --- | --- |
 | index   | **ST\_ResourceIndex**   | required   |   | References an index in the mesh triangle list. |
 
-A \<ref> element in a triangle refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
+A \<ref> element in a triangle set refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
+
+
+#### 4.1.5.3 Triangle Set Reference Ranges
+
+Element **\<t:refrange>**
+
+![ref](images/element_triangleset_refrange.png)
+
+| Name   | Type   | Use   | Default   | Annotation |
+| --- | --- | --- | --- | --- |
+| startindex   | **ST\_ResourceIndex**   | required   |   | References the starting index of the reference range in the mesh triangle list. |
+| endindex   | **ST\_ResourceIndex**   | required   |   | References the end index of the reference range in the mesh triangle list. |
+
+A \<refrange> element in a triangle set refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
+The \<refrange> element inserts into the parent triangle set all triangles from the _triangles node_ with index between inclusively startindex and the endindex
 
 
 ### 4.1.6. Mesh Mirror Transforms
@@ -672,20 +686,20 @@ A producer MUST NOT use transforms with negative determinants to account for mir
 
 However, if a producer wants to reference the original mesh from a transformed copy, the producer MAY use the mirroring namespace (*http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07*) to store a reference to the original mesh id as well as the mirror plane that was used:
 
-Element **\<mesh>**
+Element **\<mirror>**
 
-![element mesh](images/element_mesh_mirrored.png)
+![element mirrormesh](images/element_mesh_mirrored.png)
 
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
-| originalmesh | **ST\_ResourceID** | optional | | Resource ID of the original mesh object |
-| nx | **ST\_Number** | optional | | X Coordinate of Mirror plane normal equation |
-| ny | **ST\_Number** | optional | | Y Coordinate of Mirror plane normal equation |
-| nz | **ST\_Number** | optional | | Z Coordinate of Mirror plane normal equation |
-| d | **ST\_Number** | optional | | Distance value of Mirror plane normal equation |
+| originalmesh | **ST\_ResourceID** | required | | Resource ID of the original mesh object |
+| nx | **ST\_Number** | required | | X Coordinate of Mirror plane normal equation |
+| ny | **ST\_Number** | required | | Y Coordinate of Mirror plane normal equation |
+| nz | **ST\_Number** | required | | Z Coordinate of Mirror plane normal equation |
+| d | **ST\_Number** | required | | Distance value of Mirror plane normal equation |
 
-Those reference attributes are optional as a group. A producer either MUST specify all of the attributes or a producer MUST NOT specify any of them. The *originalmesh* attribute MUST refer to an previous mesh object in the current 3MF model.
+The \<mirror> element is optional. The *originalmesh* attribute MUST refer to a previous mesh object in the current 3MF model. The originalmesh-attribute must not refer to a mesh that contains a \<mirrormesh> element.
 
 The mirror transform shall be defined through the given *mirror plane* that is defined by the equation 
 
@@ -700,7 +714,7 @@ in the local mesh coordinate system. If a mirror mesh transformation is given, t
 
 If any of the given requirements is invalid, the actual mesh coordinates MUST take precedence and a producer MUST ignore the mirror transform.
 
-If the mirror namespace is a required extension, the producer MAY choose to not store duplicate information. If the producer chooses to do so, it MUST specify an empty triangles element, an empty vertices element and an empty trianglesets element for this mesh. In this case, any consumer MUST implicitely reconstruct the mesh data from the original mesh via the given rules.
+If the mirror namespace is a required extension, the producer MAY choose to not store duplicate information. If the producer chooses to do so, it MUST specify an empty triangles element, an empty vertices element and an empty trianglesets element for this mesh. In this case, any consumer MUST implicitely reconstruct the mesh data from the original mesh via the given rules. For backwards compatibility producers SHOULD NOT mark the mirror namespace as a required extension.
 
 
 ## 4.2. Components
@@ -1199,20 +1213,21 @@ A consumer that is authorized to un-protect content by reversing the above steps
   <!-- Complex Types -->
   <xs:complexType name="CT_Mesh">
     <xs:sequence>
-      <xs:element ref="trianglesets"/>
+      <xs:element ref="trianglesets" minOccurs="0" maxOccurs="1"/>
       <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
     </xs:sequence>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_TriangleSets">
     <xs:sequence>
-      <xs:element ref="triangleset" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="triangleset" minOccurs="0" maxOccurs="2147483647"/>
     </xs:sequence>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_TriangleSet">
     <xs:sequence>
-      <xs:element ref="ref" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="ref" minOccurs="0" maxOccurs="2147483647"/>
+      <xs:element ref="refrange" minOccurs="0" maxOccurs="2147483647"/>
       <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" default="none"/>
@@ -1226,6 +1241,14 @@ A consumer that is authorized to un-protect content by reversing the above steps
     <xs:attribute name="index" type="ST_ResourceIndex" use="required"/>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
+  <xs:complexType name="CT_RefRange">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
+    </xs:sequence>
+    <xs:attribute name="startindex" type="ST_ResourceIndex" use="required"/>
+    <xs:attribute name="endindex" type="ST_ResourceIndex" use="required"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>  
   <!-- Simple Types -->
   <xs:simpleType name="ST_ResourceIndex">
     <xs:restriction base="xs:nonNegativeInteger">
@@ -1238,6 +1261,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
   <xs:element name="trianglesets" type="CT_TriangleSets"/>
   <xs:element name="triangleset" type="CT_TriangleSet"/>
   <xs:element name="ref" type="CT_Ref"/>
+  <xs:element name="refrange" type="CT_RefRange"/>
 </xs:schema>
 ```
 
@@ -1265,7 +1289,14 @@ A consumer that is authorized to un-protect content by reversing the above steps
     </xs:documentation>
   </xs:annotation>
   <!-- Complex Types -->
-  <xs:complexType name="CT_Mesh">
+<xs:complexType name="CT_Mesh">
+    <xs:sequence>
+      <xs:element ref="mirromesh"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="CT_MirrorMesh">
     <xs:attribute name="originalmesh" type="ST_ResourceID"/>
     <xs:attribute name="nx" type="ST_Number"/>
     <xs:attribute name="ny" type="ST_Number"/>
@@ -1287,6 +1318,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
   </xs:simpleType>
   <!-- Elements -->
   <xs:element name="mesh" type="CT_Mesh"/>
+  <xs:element name="mirromesh" type="CT_MirrorMesh"/>
 </xs:schema>
 ```
 
