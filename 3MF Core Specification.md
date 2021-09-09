@@ -49,7 +49,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
     + [6.2. Core Properties](#62-core-properties)
     + [6.3. Digital Signatures](#63-digital-signatures)
     + [6.4. Protected Content](#64-protected-content)
-- [Part II. Appendixes](#part-ii-appendixes)
+- [Part II. Appendices](#part-ii-appendices)
   * [Appendix A. Glossary](#appendix-a-glossary)
   * [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)
   * [Appendix B.2. 3MF Metadata Example](#appendix-b2-3mf-metadata-example)
@@ -74,7 +74,7 @@ The 3MF Consortium offers [a free to use open source implementation](https://git
 
 Part I, "3MF Documents," presents the details of the primarily XML-based 3MF Document format. This section describes the XML markup that defines the composition of 3D documents and the appearance of each model within the document.
 
-Part II, "Appendixes," contains additional technical details and schemas too extensive to include in the main body of the text as well as convenient reference information.
+Part II, "Appendices," contains additional technical details and schemas too extensive to include in the main body of the text as well as convenient reference information.
 
 The information contained in this specification is subject to change. Every effort has been made to ensure its accuracy at the time of publication.
 
@@ -626,7 +626,7 @@ Element **\<t:trianglesets>**
 
 ![trianglesets](images/element_trianglesets.png)
 
-A _mesh node_ MAY contain a _trianglesets node_ that contains information how triangles are grouped and organized. Trianglesets and their child nodes MUST live under the core extension namespace for Triangle Sets (*http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07*)
+A _mesh node_ MAY contain a _trianglesets node_ that contains information how triangles are grouped and organized. Trianglesets and their child nodes MUST live under the core extension namespace for Triangle Sets (*http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07*).
 
 
 A \<t:trianglesets> element acts as a container for <t:triangleset> nodes. The order of these elements forms an implicit 0-based index that MAY be referenced externally by their identifier.
@@ -662,7 +662,7 @@ Element **\<t:ref>**
 | --- | --- | --- | --- | --- |
 | index   | **ST\_ResourceIndex**   | required   |   | References an index in the mesh triangle list. |
 
-A \<ref> element in a triangle set refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
+A \<ref> element in a triangle set refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node_.
 
 
 #### 4.1.5.3 Triangle Set Reference Ranges
@@ -677,7 +677,7 @@ Element **\<t:refrange>**
 | endindex   | **ST\_ResourceIndex**   | required   |   | References the end index of the reference range in the mesh triangle list. |
 
 A \<refrange> element in a triangle set refers to the zero-based indexed \<triangle> elements that are contained in the _triangles node._
-The \<refrange> element inserts into the parent triangle set all triangles from the _triangles node_ with index between inclusively startindex and the endindex
+The \<refrange> element inserts into the parent triangle set all triangles from the _triangles node_ with index between inclusively startindex and the endindex.
 
 
 ### 4.1.6. Mesh Mirror Transforms
@@ -874,7 +874,7 @@ The Open Packaging Conventions specification provides full details of how conten
 
 A consumer that is authorized to un-protect content by reversing the above steps MUST NOT re-save the content or enable the user to save the content in an unprotected fashion (regardless of file format) without the approval (written or programmatic) of the _protection authority_ (which might or might not be the producer).
 
-# Part II. Appendixes
+# Part II. Appendices
 
 ## Appendix A. Glossary
 
@@ -995,6 +995,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:attribute name="unit" type="ST_Unit" default="millimeter"/>
 		<xs:attribute ref="xml:lang"/>
 		<xs:attribute name="requiredextensions" type="xs:string"/>
+		<xs:attribute name="recommendedextensions" type="xs:string"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Resources">
