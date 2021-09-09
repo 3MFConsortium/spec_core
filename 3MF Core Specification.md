@@ -642,6 +642,7 @@ Element **\<t:triangleset>**
 | --- | --- | --- | --- | --- |
 | name   | **xs:string**   |  | required | Human-readable name of the triangle collection. MUST not be empty. |
 | identifier | **xs:QName** |  | required | Might be used for external identification of the triangle collection data. The identifier attribute MUST be unique within the mesh and MUST not be empty. |
+
 A _triangle set_ contains a reference list to a subset of triangles to apply grouping operations and assign properties to a list of triangles. Editing applications might use this information for internal purposes, for example color display and selection workflows.
 
 A triangle set is a collection of references to triangles. Since triangle sets do not have a specific influence on the geometrical shape, a consumer MAY ignore the information.
@@ -686,9 +687,9 @@ A producer MUST NOT use transforms with negative determinants to account for mir
 
 However, if a producer wants to reference the original mesh from a transformed copy, the producer MAY use the mirroring namespace (*http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07*) to store a reference to the original mesh id as well as the mirror plane that was used:
 
-Element **\<mirror>**
+Element **\<mm:mirrormesh>**
 
-![element mirrormesh](images/element_mesh_mirrored.png)
+![element mirrormesh](images/element_mirrormesh.png)
 
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
