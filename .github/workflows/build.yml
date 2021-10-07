@@ -1,0 +1,28 @@
+# It is used to create am easily distributable and printable PDF
+# version of a specification document written in markdown (3MF-style).
+
+# (outdated) Documentation:
+#   https://github.com/3MFConsortium/spec_conventions/blob/master/generatePDFs/generatePDFs.md
+
+on: [pull_request]
+name: Build
+jobs:
+  build-linux:
+    runs-on: ubuntu-20.04
+    env:
+      SPECNAME: "3MF Core Specification"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: pip install wheel
+      - run: pip install grip
+      - run: ./markdownToPDF/install_wkhtmltopdf.sh
+      - run: ./markdownToPDF/mdToPDF.sh "$SPECNAME"
+      - name: Upload PDF
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SPECNAME }}.pdf
+          path: ${{ env.SPECNAME }}.pdf
+
+
