@@ -699,7 +699,7 @@ Element **\<mm:mirrormesh>**
 | nz | **ST\_Number** | required | | Z Coordinate of Mirror plane normal equation |
 | d | **ST\_Number** | required | | Distance value of Mirror plane normal equation |
 
-The \<mirror> element is optional. The *originalmesh* attribute MUST refer to a previous mesh object in the current 3MF model. The originalmesh-attribute must not refer to a mesh that contains a \<mirrormesh> element.
+The \<mirror> element is optional. The *originalmesh* attribute MUST refer to a previous mesh object (i.e. an object that contains a mesh-element as a child) in the current 3MF model. The originalmesh-attribute must not refer to a mesh that contains a \<mirrormesh> element.
 
 The mirror transform shall be defined through the given *mirror plane* that is defined by the equation 
 
