@@ -1231,8 +1231,8 @@ A consumer that is authorized to un-protect content by reversing the above steps
       <xs:element ref="refrange" minOccurs="0" maxOccurs="2147483647"/>
       <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
     </xs:sequence>
-    <xs:attribute name="name" type="xs:string" default="none"/>
-    <xs:attribute name="identifier" type="xs:QName"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="identifier" type="xs:QName" use="required"/>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_Ref">
