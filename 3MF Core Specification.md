@@ -188,7 +188,7 @@ _Figure 2-1. A typical 3MF Document_
 
 ### 2.1.2. 3D Model Part
 
-The _3D Model part_ contains definitions of one or more objects to be fabricated by 3D manufacturing processes. The 3D Model part is the only valid root of a 3D payload.
+The _3D Model part_ contains definitions of one or more objects that could be fabricated by 3D manufacturing processes. The 3D Model part is the only valid root of a 3D payload.
 
 A 3D Model part has two sections: a set of resource definitions that include objects and materials, as well as a set of specific items to actually build. The content type of the 3D Model part is defined in Appendix C, "Standard Namespaces and Content Types."
 
@@ -292,7 +292,7 @@ The 3MF Document core _XML namespace_, the principal namespace used for elements
 
 As a reminder, a non-default XML namespace on an element DOES automatically apply to any attributes of that element (unless another namespace is prefixed), but DOES NOT apply to sub-elements, so they must all be individually prefixed. Any attributes falling into an anyattribute extension point MUST be prefixed with their corresponding namespace (as all such extension points specify "other" for the required namespace in the XSD schema).
 
- A consumer or editor MUST ignore all XML nodes and attributes from namespaces it does not explicitely support.
+ A consumer or editor MUST ignore all XML nodes and attributes from namespaces it does not explicitly support.
 
 ### 2.3.4. Whitespace
 
@@ -308,12 +308,12 @@ The language of the contents of a 3MF Document (typically useful for content pro
 
 # Chapter 3. 3D Models
 
-The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable _assembly_.
+The _model_, in this specification, refers to the object or objects to be ultimately created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable _assembly_. A 3MF Document can be in an intermediate state in which none of the defined objects is yet ready to be manufactured, in which case no actual output object is expected.
 
 
-## 3.1. Coordinate Space
+## 3.1. Output Coordinate Space
 
-Coordinates in this specification are based on a right-handed coordinate space. Producers and consumers MUST define and map the origin of the coordinate space to the bottom-front-left corner of the device's output field (such as a tray, platform, or bed), with the x-axis increasing to the right of the output field, the y-axis increasing to the back of the output field, and the z-axis increasing to the top of the output field. Producers and consumers MUST use the unit resolution of the coordinate space as specified in the \<model> element.
+Coordinates in this specification are based on a right-handed coordinate space. Producers and consumers MUST define and map the origin of the output coordinate space (i.e. the coordinate space used to represent any item within the build element) to the bottom-front-left corner of the device's output field (such as a tray, platform, or bed), with the x-axis increasing to the right of the output field, the y-axis increasing to the back of the output field, and the z-axis increasing to the top of the output field. Producers and consumers MUST use the unit resolution of the coordinate space as specified in the \<model> element.
 
 _Figure 3-1. Coordinate space_
 
@@ -363,9 +363,9 @@ Element **\<model>**
 | recommendedextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are recommended for processing the document with its design intent. Editors and manufacturing devices SHOULD warn and inform the user if they do not support the recommended extensions and ask for input how to proceed. Required extensions MUST NOT be recommended at the same time. |
 | @anyAttribute | | | | |
 
-The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see [3.4.1. Metadata](#341-metadata) for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items that should actually be manufactured as part of the job.
+The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see [3.4.1. Metadata](#341-metadata) for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items (if any) that should actually be manufactured as part of the job.
 
-Producers SHOULD NOT require extensions unless the document would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
+Producers SHOULD NOT require extensions unless the document would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supersede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
 
 
 ### 3.4.1. Metadata
@@ -437,8 +437,7 @@ Element **\<build>**
 
 ![element build](images/element_build.png)
 
-The \<build> element contains one or more items to manufacture as part of processing the job. A consumer MUST NOT output any 3D objects not referenced by an \<item> element.
-
+The \<build> element could either be empty, in case of a 3MF Document providing only design objects, or contain one or more items to produce as part of processing the job. A consumer MUST manufacture only 3D objects which are referenced by an \<item> element. Any unreferenced object can still be processed by an editing application, which could finalize their manufacturing by referencing them in corresponding \<item> elements.
 
 #### 3.4.3.1. Item Element
 
