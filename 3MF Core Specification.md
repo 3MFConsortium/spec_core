@@ -308,7 +308,7 @@ The language of the contents of a 3MF Document (typically useful for content pro
 
 # Chapter 3. 3D Models
 
-The _model_, in this specification, refers to the object or objects to be ultimately created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable _assembly_. A 3MF Document can be in an intermediate state in which none of the defined objects is yet ready to be manufactured, in which case no actual output object is expected.
+The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable _assembly_. A 3MF Document can be in an intermediate state in which none of the defined objects is yet ready to be manufactured, in which case no actual output object is expected.
 
 
 ## 3.1. Output Coordinate Space
@@ -437,8 +437,7 @@ Element **\<build>**
 
 ![element build](images/element_build.png)
 
-The \<build> element could either be empty, in case of a 3MF Document providing only design objects, or contain one or more items to produce as part of processing the job. A consumer MUST manufacture only 3D objects which are referenced by an \<item> element. Any unreferenced object can still be processed by an editing application, which could finalize their manufacturing by referencing them in corresponding \<item> elements.
-
+The <build> element contains zero or more <item> elements to manufacture as part of processing the job. A consumer MUST NOT manufacture any 3D objects not referenced by an <item> element. Any unreferenced object can still be consumed by an editing application, which could then reference them in corresponding <item> elements when they are ready for manufacture.
 #### 3.4.3.1. Item Element
 
 Element **\<item>**
