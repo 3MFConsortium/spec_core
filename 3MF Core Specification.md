@@ -472,7 +472,7 @@ If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (
 
 # Chapter 4. Object Resources
 
-_Object resources_ describe reusable objects that may be output (by reference) or composed into more complex objects or assemblies.
+_Object resources_ describe reusable objects (shapes or assemblies) that may be output or composed into more complex objects or assemblies.
 
 Element **\<object>**
 
@@ -510,7 +510,7 @@ Element **\<mesh>**
 
 ![element mesh](images/element_mesh.png)
 
-The \<mesh> element is the root of a triangular _mesh_ representation of an object volume. It contains a set of vertices and a set of triangles.
+The \<mesh> element is the root of a triangular _mesh_ shape representation of an object volume. It contains a set of vertices and a set of triangles.
 
 If the mesh is under an object of type "model" or "solidsupport", it MUST have:
 
@@ -898,7 +898,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Bottom.** The minimum printable XY plane of the print area or the correspondent minimum plane of a model bounding box, once transformed to the output coordinate space.
 
-**Component.** An object that is added as an intact shape to the overall definition of another object.
+**Component.** An object that is added as an intact shape or assembly to the overall definition of another object.
 
 **Consumer.** A software, service, or device that reads in a 3MF Document.
 
@@ -926,7 +926,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Must preserve.** A set of OPC parts that SHOULD be retained by a producer when rewriting or saving changes to this 3MF file specified by the MustPreserve relationship type.
 
-**Object resource.** A single 3D shape that could be output by a 3D manufacturing device or used as a component in another object resource.
+**Object resource.** A single 3D shape or assembly that could be output by a 3D manufacturing device or used as a component in another object resource.
 
 **Payload.** A complete collection of interdependent parts and relationships within a package.
 
