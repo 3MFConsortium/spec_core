@@ -12,9 +12,9 @@
 
 
 
-| **Version** | 1.3.0 |
+| **Version** | 1.3.1 |
 | --- | --- |
-| **Status** | Published |
+| **Status** | Draft |
 
 ## Disclaimer
 
@@ -78,7 +78,7 @@ Part II, "Appendices," contains additional technical details and schemas too ext
 
 The information contained in this specification is subject to change. Every effort has been made to ensure its accuracy at the time of publication.
 
-This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07" and the prefix "mm" maps to the xml namespace "http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07", both defined in version 1.3. See [Appendix C.3 Namespaces](#c3-namespaces)
+This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07", defined in version 1.3. See [Appendix C.3 Namespaces](#c3-namespaces)
 
 ## Document Conventions
 
@@ -680,42 +680,6 @@ A \<refrange> element in a triangle set refers to the zero-based indexed \<trian
 The \<refrange> element inserts into the parent triangle set all triangles from the _triangles node_ with index between inclusively startindex and the endindex.
 
 
-### 4.1.6. Mesh Mirror Transforms
-
-A producer MUST NOT use transforms with negative determinants to account for mirroring, as this would invert the normal directions of the triangle. In order to store a mesh in a mirrored form, the producer MUST store a transformed copy of the original mesh in its mirrored form, which means with absolute transformed vertex coordinates as well as a corrected positive triangle orientation.
-
-However, if a producer wants to reference the original mesh from a transformed copy, the producer MAY use the mirroring namespace (*http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07*) to store a reference to the original mesh id as well as the mirror plane that was used:
-
-Element **\<mm:mirrormesh>**
-
-![element mirrormesh](images/element_mirrormesh.png)
-
-##### Attributes
-| Name | Type | Use | Default | Annotation |
-| --- | --- | --- | --- | --- |
-| originalmesh | **ST\_ResourceID** | required | | Resource ID of the original mesh object |
-| nx | **ST\_Number** | required | | X Coordinate of Mirror plane normal equation |
-| ny | **ST\_Number** | required | | Y Coordinate of Mirror plane normal equation |
-| nz | **ST\_Number** | required | | Z Coordinate of Mirror plane normal equation |
-| d | **ST\_Number** | required | | Distance value of Mirror plane normal equation |
-
-The \<mirror> element is optional. The *originalmesh* attribute MUST refer to a previous mesh object in the current 3MF model. The originalmesh-attribute must not refer to a mesh that contains a \<mirrormesh> element.
-
-The mirror transform shall be defined through the given *mirror plane* that is defined by the equation 
-
-*nx* * *x* + *ny* * *y* + *nz* * *z* + *d* = *0*
-
-in the local mesh coordinate system. If a mirror mesh transformation is given, the following rules MUST apply for the vertices and faces:
-- The mesh's vertex count MUST be equal to the original mesh's vertex count.
-- For each vertex in the mesh, there MUST be a corresponding vertex of the original mesh with the identical index in the vertex list. The corresponding vertex coordinate MUST be defined by mirroring on the mirror plane in the local coordinate system.
-- The mesh's triangle count MUST be equal to the original mesh's.
-- For each triangle in the mesh, there MUST be a corresponding triangle of the transformed original mesh with identical index in the triangle list. The corresponding triangle MUST have identical properties, except vertex v1 and v3 MUST be exchanged (as well as p1 and p3).
-- The trianglesets of the mesh MUST be identical to the triangle sets of the original mesh.
-
-If any of the given requirements is invalid, the actual mesh coordinates MUST take precedence and a producer MUST ignore the mirror transform.
-
-If the mirror namespace is a required extension, the producer MAY choose to not store duplicate information. If the producer chooses to do so, it MUST specify an empty triangles element, an empty vertices element and an empty trianglesets element for this mesh. In this case, any consumer MUST implicitely reconstruct the mesh data from the original mesh via the given rules. For backwards compatibility producers SHOULD NOT mark the mirror namespace as a required extension.
-
 
 ## 4.2. Components
 
@@ -1266,63 +1230,6 @@ A consumer that is authorized to un-protect content by reversing the above steps
 </xs:schema>
 ```
 
-### B.1.3 Mirroring extension schema
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
-  targetNamespace="http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07"
-  elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
-  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
-  <xs:annotation>
-    <xs:documentation>
-      <![CDATA[
-    Schema notes:
- 
-    Items within this schema follow a simple naming convention of appending a prefix indicating the type of element for references:
- 
-    Unprefixed: Element names
-    CT_: Complex types
-    ST_: Simple types
-   
-    ]]>
-    </xs:documentation>
-  </xs:annotation>
-  <!-- Complex Types -->
-<xs:complexType name="CT_Mesh">
-    <xs:sequence>
-      <xs:element ref="mirromesh"/>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="1"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:complexType name="CT_MirrorMesh">
-    <xs:attribute name="originalmesh" type="ST_ResourceID"/>
-    <xs:attribute name="nx" type="ST_Number"/>
-    <xs:attribute name="ny" type="ST_Number"/>
-    <xs:attribute name="nz" type="ST_Number"/>
-    <xs:attribute name="d" type="ST_Number"/>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <!-- Simple Types -->
-  <xs:simpleType name="ST_ResourceID">
-    <xs:restriction base="xs:positiveInteger">
-      <xs:maxExclusive value="2147483648"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:simpleType name="ST_Number">
-    <xs:restriction base="xs:double">
-      <xs:whiteSpace value="collapse"/>
-      <xs:pattern value="((\-|\+)?(([0-9]+(\.[0-9]+)?)|(\.[0-9]+))((e|E)(\-|\+)?[0-9]+)?)"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <!-- Elements -->
-  <xs:element name="mesh" type="CT_Mesh"/>
-  <xs:element name="mirromesh" type="CT_MirrorMesh"/>
-</xs:schema>
-```
-
 ## Appendix B.2. 3MF Metadata Example
 
 ```xml
@@ -1411,8 +1318,6 @@ MustPreserve http://schemas.openxmlformats.org/package/2006/relationships/mustpr
 3D Model http://schemas.microsoft.com/3dmanufacturing/core/2015/02
 
 Triangle Sets http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07
-
-Mirroring http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07
 
 # References
 
