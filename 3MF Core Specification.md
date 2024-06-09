@@ -30,6 +30,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
 - [Part I. 3MF Documents](#part-i-3mf-documents)
   * [Chapter 1. 3MF Document Format](#chapter-1-3mf-document-format)
     + [1.1. Package](#11-package)
+	+ [1.2. Package Naming Conventions](#12-package-naming-conventions)
   * [Chapter 2. Parts and Relationships](#chapter-2-parts-and-relationships)
     + [2.1. 3D Payload](#21-3d-payload)
     + [2.2. Part Naming Recommendations](#22-part-naming-recommendations)
@@ -151,7 +152,7 @@ Depending on the type, the producer SHOULD NOT make use of certain 3MF extension
 
 | # | Use case | File Type | Description | Generality | Excluded Extensions | 
 |-|-|-|-|-|-|
-| 1 | Model only | .model.3mf | Package contains model geometry data, not necessarily prepared for consumption on a 3D Printer. | Model geometries might be target to a specific printer resolution, but should be printable on a wide variety of printer models. | Slice, Toolpath 
+| 1 | Geometry only | .model.3mf | Package contains model geometry data, not necessarily prepared for consumption on a 3D Printer. | Model geometries might be target to a specific printer resolution, but should be printable on a wide variety of printer models. | Slice, Toolpath 
 | 2 | Build Data | .build.3mf | Package contains a prepared build file that is prepared for sending to an appropriate 3D Printer. The geometries are  in a 3D representation |  Targetted build volume is fixed, limiting the choice of Printer. Renesting and changing orientations should still be an option. | Slice, Toolpath
 | 3 | Slice Data | .slices.3mf | Package contains a sliced version of a build to be consumed for an appropriate 3D printer. | Build volume, Layer thickness and model orientation is fixed, limiting the model and configuration options of a printer. Renesting should still be an options | Boolean, BeamLattice, Implicit, Boolean
 | 4 | Toolpath | .toolpath.3mf | Package contains a specific print instructions. | The toolpath file is targetted to a specific printer with a specific configuration. The 3D Geometry is just informative and can be low resolution. | Boolean, BeamLattice, Implicit, Boolean, Slices
