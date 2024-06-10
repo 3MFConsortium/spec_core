@@ -359,13 +359,13 @@ Element **\<model>**
 | --- | --- | --- | --- | --- |
 | unit | **ST\_Unit** | | millimeter | Specifies the unit used to interpret all vertices, locations, or measurements in the model. Valid values are micron, millimeter, centimeter, inch, foot, and meter. |
 | xml:lang | **xs:language** | | | Specifies the default language used for the current element and any descendant elements. The language is specified according to RFC 3066. |
-| requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing the document. Editors and manufacturing devices MUST NOT process the document if they do not support the required extensions. |
-| recommendedextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are recommended for processing the document with its design intent. Editors and manufacturing devices SHOULD warn and inform the user if they do not support the recommended extensions and ask for input how to proceed. Required extensions MUST NOT be recommended at the same time. |
+| requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing this **model-file**. Editors and manufacturing devices MUST NOT process this **model-file** if they do not support the required extensions. |
+| recommendedextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are recommended for processing this **model-file** with its design intent. Editors and manufacturing devices SHOULD warn and inform the user if they do not support the recommended extensions and ask for input how to proceed. Required extensions MUST NOT be recommended at the same time. |
 | @anyAttribute | | | | |
 
 The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see [3.4.1. Metadata](#341-metadata) for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items that should actually be manufactured as part of the job.
 
-Producers SHOULD NOT require extensions unless the document would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
+Producers SHOULD NOT require extensions unless this **model-file** would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
 
 
 ### 3.4.1. Metadata
@@ -382,7 +382,7 @@ Element **\<metadata>**
 | type | **xs:string** | | | A string indicating the XML type of the data stored in the metadata value. |
 | @anyAttribute | | | | |
 
-Producers of 3MF Documents SHOULD provide additional information about the document in the form of metadata under the root \<model> element.
+Producers of 3MF Documents SHOULD provide additional information about this **model-file** in the form of metadata under the root \<model> element.
 
 Metadata associated with the \<model> MAY contain a set of well known values. Metadata in 3MF Documents without a namespace name MUST be restricted to names and values defined by this specification. If a name value is not defined in this specification, it MUST be prefixed with the namespace name of an XML namespace declaration on the \<model> element that is not drawn from the default namespace.
 
@@ -535,6 +535,7 @@ Objects of type "support" or "solidsupport" SHOULD only be referenced in an Obje
 
 Support structures (both "solidsupport" and "support" types) MAY be ignored or replaced by auto-generated support, but this is NOT RECOMMENDED.
 
+3MF extensions might define other types of shape representations, in addition to a triangle mesh.
 
 ### 4.1.1. Fill Rule
 
@@ -1046,7 +1047,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:attribute name="thumbnail" type="ST_UriReference"/>
 		<xs:attribute name="partnumber" type="xs:string"/>
 		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="pid" type="ST_ResourceIndex"/>
+		<xs:attribute name="pid" type="ST_ResourceID"/>
 		<xs:attribute name="pindex" type="ST_ResourceIndex"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
