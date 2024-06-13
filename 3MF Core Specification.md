@@ -465,7 +465,7 @@ The \<item> element may contain a \<metadatagroup> element containing one or mor
 
 A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see [4.2. Components](#42-components)), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
 
-Items SHOULD NOT overlap, but if they do, 3D manufacturing devices MUST unite the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped geometry is taken from the properties of the last overlapped items. If the last component element has no properties defined in the overlapped geometry, properties MUST NOT be applied.
+Items SHOULD NOT overlap, but if they do, 3D manufacturing devices MUST unite the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped geometry is taken from the properties of the last overlapped item. If the last item element has no properties defined in the overlapped geometry, properties MUST NOT be applied.
 
 **Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the build level.
 
@@ -474,7 +474,7 @@ Items SHOULD NOT overlap, but if they do, 3D manufacturing devices MUST unite th
 
 # Chapter 4. Object Resources
 
-_Object resources_ describe reusable objects that may be output or composed into more complex objects.
+_Object resources_ describe reusable objects that may be output (by reference) or composed into more complex objects.
 
 
 Element **\<object>**
@@ -513,7 +513,7 @@ Element **\<mesh>**
 
 ![element mesh](images/element_mesh.png)
 
-The \<mesh> element is the root of a triangular _mesh_ shape representation of an object volume. It contains a set of vertices and a set of triangles.
+The \<mesh> element is the root of a triangular _mesh_ representation of an object's shape. It contains a set of vertices and a set of triangles.
 
 If the mesh is under an object of type "model" or "solidsupport", it MUST have:
 
@@ -731,7 +731,7 @@ The \<components> element acts as a container for all components to be composed 
 
 A 3D manufacturing device MUST respect the relative positions of the component objects; it MUST NOT transform them relative to each other except as specified in the document.
 
-If the components overlap, 3D manufacturing devices MUST unite the final geometry. If any of the overlapped components has a property defined, the resulting property on the overlapped geometry is taken from the properties of the last overlapped component. If the last component element has no properties defined in the overlapped geometry, properties MUST NOT be applied.
+If the components overlap, 3D manufacturing devices MUST unite the final shape. If any of the overlapped components has a property defined, the resulting property on the overlapped shape is taken from the properties of the last overlapped component. If the last component element has no properties defined in the overlapped shape, properties MUST NOT be applied.
 
 >**Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the components level.
 
