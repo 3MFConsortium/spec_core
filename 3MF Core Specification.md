@@ -731,7 +731,7 @@ The \<components> element acts as a container for all components to be composed 
 
 A 3D manufacturing device MUST respect the relative positions of the component objects; it MUST NOT transform them relative to each other except as specified in the document.
 
-If the components overlap, 3D manufacturing devices MUST unite the final shape. If any of the overlapped components has a property defined, the resulting property on the overlapped shape is taken from the properties of the last overlapped component. If the last component element has no properties defined in the overlapped shape, properties MUST NOT be applied.
+If the components overlap, 3D manufacturing devices MUST unite the final shape. If any of the overlapped components has a property defined, the resulting property on the overlapped shape is taken from the properties of the last overlapped component. If the last component element dassembhas no properties defined in the overlapped shape, properties MUST NOT be applied.
 
 >**Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the components level.
 
@@ -930,11 +930,11 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Metadata.** Ancillary information about some portion of the model, to provide more refined processing by knowledgeable producers or consumers.
 
-**Model.** The set of objects that are to be manufactured as part of a single job. This may include a single object, multiple instances of the same object, multiple different objects, or multiple objects in an assembly.
+**Model.** The set of objects that are to be manufactured as part of a single job. This may include a single object, multiple instances of the same object, multiple different objects, or multiple objects in a composition.
 
 **Must preserve.** A set of OPC parts that SHOULD be retained by a producer when rewriting or saving changes to this 3MF file specified by the MustPreserve relationship type.
 
-**Object resource.** A single 3D shape or assembly that could be output by a 3D manufacturing device or used as a component in another object resource.
+**Object resource.** A single 3D object that could be output by a 3D manufacturing device or used as a component in another object resource.
 
 **Payload.** A complete collection of interdependent parts and relationships within a package.
 
