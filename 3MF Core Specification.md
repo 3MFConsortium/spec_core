@@ -127,7 +127,7 @@ This specification describes how the 3MF Document format is organized internally
 
 The 3MF Document format represents a _3D model_, or a representation of one or more physical object descriptions in a markup format. A file that implements this format includes the fundamental information necessary for a consumer to generate a physical object through additive manufacturing or basic subtractive manufacturing techniques. This includes resources such as textures that might be required to reproduce the exact desired appearance in terms of color or internal structures in terms of materials.
 
-This format also includes optional components that build on the minimal set of components required to generate a physical object. This includes the ability to specify print job control instructions, to describe _assembly_ of objects intended to be generated simultaneously in an interlocked or disjoint manner, among others.
+This format also includes optional components that build on the minimal set of components required to generate a physical object. This includes the ability to specify print job control instructions, to describe _composition_ of objects intended to be generated simultaneously in an interlocked or disjoint manner, among others.
 
 Finally, the 3MF Document format implements the common package features specified by the Open Packaging Conventions specification that support digital signatures and core properties.
 
@@ -308,7 +308,7 @@ The language of the contents of a 3MF Document (typically useful for content pro
 
 # Chapter 3. 3D Models
 
-The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable _assembly_.
+The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable composition.
 
 
 ## 3.1. Coordinate Space
@@ -465,14 +465,17 @@ The \<item> element may contain a \<metadatagroup> element containing one or mor
 
 A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see [4.2. Components](#42-components)), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
 
-If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped item. If the last item has no properties defined in the overlapped volume, properties MUST NOT be applied.
+Items SHOULD NOT overlap, but if they do, 3D manufacturing devices MUST unite the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped geometry is taken from the properties of the last overlapped items. If the last component element has no properties defined in the overlapped geometry, properties MUST NOT be applied.
+
+**Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the build level.
 
 >**Note:** items MUST NOT reference objects of type "other", either directly or recursively.
 
 
 # Chapter 4. Object Resources
 
-_Object resources_ describe reusable objects (shapes or assemblies) that may be output or composed into more complex objects or assemblies.
+_Object resources_ describe reusable objects that may be output or composed into more complex objects.
+
 
 Element **\<object>**
 
@@ -728,7 +731,9 @@ The \<components> element acts as a container for all components to be composed 
 
 A 3D manufacturing device MUST respect the relative positions of the component objects; it MUST NOT transform them relative to each other except as specified in the document.
 
-If the components overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped components has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped component. If the last component has no properties defined in the overlapped volume, properties MUST NOT be applied.
+If the components overlap, 3D manufacturing devices MUST unite the final geometry. If any of the overlapped components has a property defined, the resulting property on the overlapped geometry is taken from the properties of the last overlapped component. If the last component element has no properties defined in the overlapped geometry, properties MUST NOT be applied.
+
+>**Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the components level.
 
 In order to avoid integer overflows, a components element MUST contain less than 2^31 components.
 
@@ -893,13 +898,15 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **3MF Document StartPart relationship.** The OPC relationship from the root of the package to the 3D Model part.
 
-**Assembly.** A model that contains two or more independently-defined objects that are connected or interlocked either during or after the 3D manufacturing process is complete. An assembly might be able to be reversed or the individual parts may be inseparably interlocked.
+**Assembly.** A CAD term that could be represented by _components_.
 
 **Back.** The maximum printable XZ plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
 
 **Bottom.** The minimum printable XY plane of the print area or the correspondent minimum plane of a model bounding box, once transformed to the output coordinate space.
 
-**Component.** An object that is added as an intact shape or assembly to the overall definition of another object.
+**Components** A model that contains two or more independently-defined objects that are connected or interlocked either during or after the 3D manufacturing process is complete. A component might be able to be reversed or the individual parts may be inseparably interlocked.
+
+**Component.** An object that is added as an intact shape to the overall definition of another object.
 
 **Consumer.** A software, service, or device that reads in a 3MF Document.
 
