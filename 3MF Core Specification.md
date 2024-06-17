@@ -1400,9 +1400,9 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 ### C.1 Content Types
 
-3D Model application/vnd.ms-package.3dmanufacturing-3dmodel+xml
+3D Model part application/vnd.ms-package.3dmanufacturing-3dmodel+xml
 
-PrintTicket application/vnd.ms-printing.printticket+xml
+PrintTicket part application/vnd.ms-printing.printticket+xml
 
 ### C.2 Relationship Types
 
