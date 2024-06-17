@@ -1400,6 +1400,8 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 ### C.1 Content Types
 
+3MF Document model/3mf 
+
 3D Model part application/vnd.ms-package.3dmanufacturing-3dmodel+xml
 
 PrintTicket part application/vnd.ms-printing.printticket+xml
