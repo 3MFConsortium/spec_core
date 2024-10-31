@@ -306,6 +306,7 @@ Extensions are a critical part of 3MF, and as such, this core specification is a
 
 Extension specifications MUST include one or more targeted versions of this core specification to limit the number of possible configurations. Producers can specify certain extensions as required in a particular 3MF document, in which case consumers that do not support those extensions MUST fail to edit or manufacture that document, rather than ignoring the extension namespace.
 
+
 Within this core XSD schema (see [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)), extension points have been explicitly entered in the form of \<any> elements and \<anyAttribute> (also visible in the element diagrams further along in this specification). These are required to come from other namespaces, which SHOULD point to a way to find the appropriate specification and accompanying XSD schema.
 
 Vendors MIGHT define private 3MF extensions. The specifications of private namespaces (i.e. that are not ratified by the 3MF Consortium) need to be negotiated between parties in the ecosystem.
@@ -1453,7 +1454,6 @@ Triangle Sets http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07
 
 Mirroring http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07
 
-Binary Data http://schemas.microsoft.com/3dmanufacturing/binary/2024/06
 
 # References
 
