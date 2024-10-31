@@ -934,7 +934,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Must preserve.** A set of OPC parts that SHOULD be retained by a producer when rewriting or saving changes to this 3MF file specified by the MustPreserve relationship type.
 
-**Object resource.** A single 3D object that could be output by a 3D manufacturing device or used as a component in another object resource.
+**Object resource.** A single 3D shape that could be output by a 3D manufacturing device or used as a component in another object resource.
 
 **Payload.** A complete collection of interdependent parts and relationships within a package.
 
