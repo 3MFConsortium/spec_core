@@ -22,6 +22,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
 
 ## Table of Contents
 
+- [Change history](#change-history)
 - [Preface](#preface)
   * [About this Specification](#about-this-specification)
   * [Document Conventions](#document-conventions)
@@ -57,6 +58,20 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
     + [C.1 Content Types](#c1-content-types)
     + [C.2 Relationship Types](#c2-relationship-types)
     + [C.3 Namespaces](#c3-namespaces)
+
+# Change History
+
+| **Version** | **Changes Description** | **Date** |
+| --- | --- | --- |
+| 1.0 | First published version | 4/29/2015 |
+| 1.1 | Clarification on namespaces and meshes | 2/25/2016 |
+| 1.2 | Added must preserve, metadata group, overlapping order, and clarifications | 10/19/2017 |
+| 1.2.1 | Minor update for triangle properties | 3/1/2018 |
+| 1.2.2 | First reformatted markdown release | 8/9/2018 |
+| 1.2.3 | Clarification on content types | 3/12/2019 |
+| 1.3.0 | Added triangle sets and mirror. Clarification ambiguities | 10/7/2021 |
+| 1.4.0 | Removed deprecated mirror. Clarification on shapes and composition. Document naming conventions  |  |
+
 
 # Preface
 
