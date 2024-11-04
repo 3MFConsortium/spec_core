@@ -1,4 +1,4 @@
-﻿# ![3mf logo](images/3mf_logo_50px.png) 3D Manufacturing Format
+# ![3mf logo](images/3mf_logo_50px.png) 3D Manufacturing Format
 
 ## Core Specification & Reference Guide
 
@@ -32,7 +32,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
     + [1.1. Package](#11-package)
   * [Chapter 2. Parts and Relationships](#chapter-2-parts-and-relationships)
     + [2.1. 3D Payload](#21-3d-payload)
-    + [2.2. Part Naming Recommendations](#22-part-naming-recommendations)
+    + [2.2. Naming Conventions](#22-naming-conventions)
     + [2.3. 3MF Document Markup](#23-3mf-document-markup)
   * [Chapter 3. 3D Models](#chapter-3-3d-models)
     + [3.1. Coordinate Space](#31-coordinate-space)
@@ -141,7 +141,6 @@ Files within the ZIP archive that represents a 3MF document MUST use the compres
 
 The 3MF Document format includes a well-defined set of parts and relationships, each fulfilling a particular purpose in the document. The format also extends the package features, including digital signatures and thumbnails.
 
-
 # Chapter 2. Parts and Relationships
 
 The packaging conventions described in the Open Packaging Conventions specification can be used to carry any payload. A _payload_ is a complete collection of interdependent parts and relationships within a package. This specification defines a particular payload that contains a 3D object definition and its supporting files: the 3D payload.
@@ -230,7 +229,48 @@ The following example demonstrates how to add a MustPreserve relationship:
 </Relationships>
 ```
 
-## 2.2. Part Naming Recommendations
+## 2.2. Naming Conventions
+
+### 2.2.1 Document Naming Recommendation
+
+To better differentiate between various use cases of 3MF documents, it is RECOMMENDED that producers of 3MF Documents adopt a "double extension" naming convention. This approach will help clarify the document's primary content type and its intended purpose, enhancing both human readability and machine interpretation.
+
+The double extension SHOULD follow this structure:
+
+- **Model Data**: Files primarily containing design models SHOULD use the extension ".model.3mf", for example, `example.model.3mf`.
+- **Build Instructions**: Files that represent a complete build plate or tray of models, prepared for a specific printer, SHOULD use the extension ".build.3mf", for example, `example.build.3mf`.
+- **Project Files**: Files that contain a complete project, such as multiple models, settings, and metadata, SHOULD use the extension ".project.3mf", for example, `example.project.3mf`.
+- **Toolpath Data**: Files containing machine-specific toolpath data SHOULD use the extension ".toolpath.3mf", for example, `example.toolpath.3mf`.
+- **Slice Data**: Files representing polygonal slice data SHOULD use the extension ".slices.3mf", for example, `example.slices.3mf`.
+
+For proprietary use cases, where machine software or specific workflows require unique handling or metadata, it is RECOMMENDED that vendors use a custom extension naming convention. Vendor-specific 3MF files SHOULD follow the format `.vendor.3mf`, where "vendor" is replaced by the vendor's name or product identifier. For example, a proprietary file for a specific machine or process could be named `example.vendor.3mf`.
+
+This naming convention allows both users and systems to quickly identify the purpose and structure of a 3MF file without needing to inspect its internal contents. It also supports customization for vendor-specific needs while maintaining clarity in the overall ecosystem of 3MF file types.
+
+**Note:** This recommendation introduces additional clarity to the 3MF ecosystem, which has historically used `.3mf` as the sole extension for all file types. While this single extension remains common in the field, the adoption of a more descriptive double extension helps distinguish between the growing variety of 3MF file use cases.
+
+
+### 2.2.2 Reserved Naming Conventions
+
+To maintain consistency across the 3MF ecosystem, certain names are RESERVED for specific file types and SHOULD NOT be used for any other purpose:
+
+- `.model.3mf` – Reserved for design model data.
+- `.build.3mf` – Reserved for build instructions.
+- `.toolpath.3mf` – Reserved for toolpath data.
+- `.slices.3mf` – Reserved for polygonal slice data.
+- `.project.3mf` – Reserved for comprehensive project files.
+- `.support.3mf` – Reserved for support structure data files.
+- `.analysis.3mf` – Reserved for files containing analysis or simulation results.
+- `.calibration.3mf` – Reserved for files used in machine or process calibration.
+- `.scan.3mf` – Reserved for files containing 3D scan data or point clouds.
+- `.assembly.3mf` – Reserved for files representing assembled components or multiple parts in a build.
+- `.job.3mf` – Reserved for print job-specific data, such as settings or print queue information.
+- `.archive.3mf` – Reserved for bundled or archived 3MF documents, such as multiple related builds or projects.
+- `.other.3mf` – Reserved for non-standard or miscellaneous content not fitting into the above categories.
+
+These reserved names help ensure that the intent and structure of 3MF files remain clear and unambiguous across different software and hardware implementations.
+
+### 2.2.3 Part Naming Recommendations
 
 Producers and consumers of 3MF Documents refer to parts by name and use relationship names to identify the purpose of related parts. The Open Packaging Conventions specification describes the syntax for part name. However, following these rules alone can result in a package that is difficult for users to understand. For example, a user would have to open every Relationship part to know which parts are necessary to accurately manufacture a 3MF Document.
 
@@ -265,6 +305,7 @@ The design of 3MF Document markup reflects the tradeoffs between two, sometimes 
 Extensions are a critical part of 3MF, and as such, this core specification is as narrow as possible. Advanced features are built as extensions, using an a la carte model whereby producers can state explicitly which extensions are used (by declaring the matching XML namespace in the \<model> element) and consumers can state explicitly which extensions they support, so other tools in the chain know which parts will be ignored. Versioning is accomplished concurrently, as the namespace will be updated to reflect a version change. Therefore versioning happens independently for the core spec and for each extension, and the version of each can be determined by checking its namespace.
 
 Extension specifications MUST include one or more targeted versions of this core specification to limit the number of possible configurations. Producers can specify certain extensions as required in a particular 3MF document, in which case consumers that do not support those extensions MUST fail to edit or manufacture that document, rather than ignoring the extension namespace.
+
 
 Within this core XSD schema (see [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)), extension points have been explicitly entered in the form of \<any> elements and \<anyAttribute> (also visible in the element diagrams further along in this specification). These are required to come from other namespaces, which SHOULD point to a way to find the appropriate specification and accompanying XSD schema.
 
@@ -304,7 +345,6 @@ As a reminder, a non-default XML namespace on an element DOES automatically appl
 ### 2.3.5. Language
 
 The language of the contents of a 3MF Document (typically useful for content provided in metadata) MAY be identified using the **xml:lang** attribute, the value of which is inherited by child and descendant elements. This attribute is defined in the W3C XML specification. When the language of the contents is unknown, the value "und" (undetermined) MUST be used.
-
 
 # Chapter 3. 3D Models
 
