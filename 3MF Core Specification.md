@@ -127,7 +127,7 @@ This specification describes how the 3MF Document format is organized internally
 
 The 3MF Document format represents a _3D model_, or a representation of one or more physical object descriptions in a markup format. A file that implements this format includes the fundamental information necessary for a consumer to generate a physical object through additive manufacturing or basic subtractive manufacturing techniques. This includes resources such as textures that might be required to reproduce the exact desired appearance in terms of color or internal structures in terms of materials.
 
-This format also includes optional components that build on the minimal set of components required to generate a physical object. This includes the ability to specify print job control instructions, to describe _assembly_ of objects intended to be generated simultaneously in an interlocked or disjoint manner, among others.
+This format also includes optional components that build on the minimal set of components required to generate a physical object. This includes the ability to specify print job control instructions, to describe _composition_ of objects intended to be generated simultaneously in an interlocked or disjoint manner, among others.
 
 Finally, the 3MF Document format implements the common package features specified by the Open Packaging Conventions specification that support digital signatures and core properties.
 
@@ -308,7 +308,7 @@ The language of the contents of a 3MF Document (typically useful for content pro
 
 # Chapter 3. 3D Models
 
-The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable _assembly_.
+The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable composition.
 
 
 ## 3.1. Coordinate Space
@@ -359,13 +359,13 @@ Element **\<model>**
 | --- | --- | --- | --- | --- |
 | unit | **ST\_Unit** | | millimeter | Specifies the unit used to interpret all vertices, locations, or measurements in the model. Valid values are micron, millimeter, centimeter, inch, foot, and meter. |
 | xml:lang | **xs:language** | | | Specifies the default language used for the current element and any descendant elements. The language is specified according to RFC 3066. |
-| requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing the document. Editors and manufacturing devices MUST NOT process the document if they do not support the required extensions. |
-| recommendedextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are recommended for processing the document with its design intent. Editors and manufacturing devices SHOULD warn and inform the user if they do not support the recommended extensions and ask for input how to proceed. Required extensions MUST NOT be recommended at the same time. |
+| requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing this **model-file**. Editors and manufacturing devices MUST NOT process this **model-file** if they do not support the required extensions. |
+| recommendedextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are recommended for processing this **model-file** with its design intent. Editors and manufacturing devices SHOULD warn and inform the user if they do not support the recommended extensions and ask for input how to proceed. Required extensions MUST NOT be recommended at the same time. |
 | @anyAttribute | | | | |
 
 The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see [3.4.1. Metadata](#341-metadata) for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items that should actually be manufactured as part of the job.
 
-Producers SHOULD NOT require extensions unless the document would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
+Producers SHOULD NOT require extensions unless this **model-file** would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
 
 
 ### 3.4.1. Metadata
@@ -382,7 +382,7 @@ Element **\<metadata>**
 | type | **xs:string** | | | A string indicating the XML type of the data stored in the metadata value. |
 | @anyAttribute | | | | |
 
-Producers of 3MF Documents SHOULD provide additional information about the document in the form of metadata under the root \<model> element.
+Producers of 3MF Documents SHOULD provide additional information about this **model-file** in the form of metadata under the root \<model> element.
 
 Metadata associated with the \<model> MAY contain a set of well known values. Metadata in 3MF Documents without a namespace name MUST be restricted to names and values defined by this specification. If a name value is not defined in this specification, it MUST be prefixed with the namespace name of an XML namespace declaration on the \<model> element that is not drawn from the default namespace.
 
@@ -465,14 +465,17 @@ The \<item> element may contain a \<metadatagroup> element containing one or mor
 
 A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see [4.2. Components](#42-components)), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
 
-If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped item. If the last item has no properties defined in the overlapped volume, properties MUST NOT be applied.
+Items SHOULD NOT overlap, but if they do, 3D manufacturing devices MUST unite the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped geometry is taken from the properties of the last overlapped item. If the last item element has no properties defined in the overlapped geometry, properties MUST NOT be applied.
+
+**Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the build level.
 
 >**Note:** items MUST NOT reference objects of type "other", either directly or recursively.
 
 
 # Chapter 4. Object Resources
 
-_Object resources_ describe reusable objects that may be output (by reference) or composed into more complex objects or assemblies.
+_Object resources_ describe reusable objects that may be output (by reference) or composed into more complex objects.
+
 
 Element **\<object>**
 
@@ -510,7 +513,7 @@ Element **\<mesh>**
 
 ![element mesh](images/element_mesh.png)
 
-The \<mesh> element is the root of a triangular _mesh_ representation of an object volume. It contains a set of vertices and a set of triangles.
+The \<mesh> element is the root of a triangular _mesh_ representation of an object's shape. It contains a set of vertices and a set of triangles.
 
 If the mesh is under an object of type "model" or "solidsupport", it MUST have:
 
@@ -535,6 +538,7 @@ Objects of type "support" or "solidsupport" SHOULD only be referenced in an Obje
 
 Support structures (both "solidsupport" and "support" types) MAY be ignored or replaced by auto-generated support, but this is NOT RECOMMENDED.
 
+3MF extensions might define other types of shape representations, in addition to a triangle mesh.
 
 ### 4.1.1. Fill Rule
 
@@ -680,7 +684,6 @@ A \<refrange> element in a triangle set refers to the zero-based indexed \<trian
 The \<refrange> element inserts into the parent triangle set all triangles from the _triangles node_ with index between inclusively startindex and the endindex.
 
 
-
 ## 4.2. Components
 
 Element **\<components>**
@@ -691,7 +694,9 @@ The \<components> element acts as a container for all components to be composed 
 
 A 3D manufacturing device MUST respect the relative positions of the component objects; it MUST NOT transform them relative to each other except as specified in the document.
 
-If the components overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped components has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped component. If the last component has no properties defined in the overlapped volume, properties MUST NOT be applied.
+If the components overlap, 3D manufacturing devices MUST unite the final shape. If any of the overlapped components has a property defined, the resulting property on the overlapped shape is taken from the properties of the last overlapped component. If the last component element dassembhas no properties defined in the overlapped shape, properties MUST NOT be applied.
+
+>**Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the components level.
 
 In order to avoid integer overflows, a components element MUST contain less than 2^31 components.
 
@@ -856,11 +861,13 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **3MF Document StartPart relationship.** The OPC relationship from the root of the package to the 3D Model part.
 
-**Assembly.** A model that contains two or more independently-defined objects that are connected or interlocked either during or after the 3D manufacturing process is complete. An assembly might be able to be reversed or the individual parts may be inseparably interlocked.
+**Assembly.** A CAD term that could be represented by _components_.
 
 **Back.** The maximum printable XZ plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
 
 **Bottom.** The minimum printable XY plane of the print area or the correspondent minimum plane of a model bounding box, once transformed to the output coordinate space.
+
+**Components** A model that contains two or more independently-defined objects that are connected or interlocked either during or after the 3D manufacturing process is complete. A component might be able to be reversed or the individual parts may be inseparably interlocked.
 
 **Component.** An object that is added as an intact shape to the overall definition of another object.
 
@@ -886,7 +893,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Metadata.** Ancillary information about some portion of the model, to provide more refined processing by knowledgeable producers or consumers.
 
-**Model.** The set of objects that are to be manufactured as part of a single job. This may include a single object, multiple instances of the same object, multiple different objects, or multiple objects in an assembly.
+**Model.** The set of objects that are to be manufactured as part of a single job. This may include a single object, multiple instances of the same object, multiple different objects, or multiple objects in a composition.
 
 **Must preserve.** A set of OPC parts that SHOULD be retained by a producer when rewriting or saving changes to this 3MF file specified by the MustPreserve relationship type.
 
@@ -1010,7 +1017,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:attribute name="thumbnail" type="ST_UriReference"/>
 		<xs:attribute name="partnumber" type="xs:string"/>
 		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="pid" type="ST_ResourceIndex"/>
+		<xs:attribute name="pid" type="ST_ResourceID"/>
 		<xs:attribute name="pindex" type="ST_ResourceIndex"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
@@ -1195,8 +1202,8 @@ A consumer that is authorized to un-protect content by reversing the above steps
       <xs:element ref="refrange" minOccurs="0" maxOccurs="2147483647"/>
       <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
     </xs:sequence>
-    <xs:attribute name="name" type="xs:string" default="none"/>
-    <xs:attribute name="identifier" type="xs:QName"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="identifier" type="xs:QName" use="required"/>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_Ref">
@@ -1299,9 +1306,11 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 ### C.1 Content Types
 
-3D Model application/vnd.ms-package.3dmanufacturing-3dmodel+xml
+3MF Document model/3mf 
 
-PrintTicket application/vnd.ms-printing.printticket+xml
+3D Model part application/vnd.ms-package.3dmanufacturing-3dmodel+xml
+
+PrintTicket part application/vnd.ms-printing.printticket+xml
 
 ### C.2 Relationship Types
 
