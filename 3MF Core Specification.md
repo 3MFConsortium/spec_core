@@ -59,7 +59,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
     + [C.2 Relationship Types](#c2-relationship-types)
     + [C.3 Namespaces](#c3-namespaces)
 
-# Change History
+## Change History
 
 | **Version** | **Changes Description** | **Date** |
 | --- | --- | --- |
