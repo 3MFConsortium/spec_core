@@ -1,4 +1,4 @@
-# ![3mf logo](images/3mf_logo_50px.png) 3D Manufacturing Format
+﻿# ![3mf logo](images/3mf_logo_50px.png) 3D Manufacturing Format
 
 ## Core Specification & Reference Guide
 
@@ -63,13 +63,13 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
 
 | **Version** | **Changes Description** | **Date** |
 | --- | --- | --- |
-| 1.0 | First published version | 4/29/2015 |
-| 1.1 | Clarification on namespaces and meshes | 2/25/2016 |
-| 1.2 | Added must preserve, metadata group, overlapping order, and clarifications | 10/19/2017 |
-| 1.2.1 | Minor update for triangle properties | 3/1/2018 |
-| 1.2.2 | First reformatted markdown release | 8/9/2018 |
-| 1.2.3 | Clarification on content types | 3/12/2019 |
-| 1.3.0 | Added triangle sets and mirror. Clarification of ambiguities | 10/7/2021 |
+| 1.0 | First published version | April 29, 2015 |
+| 1.1 | Clarification on namespaces and meshes | February 25, 2016 |
+| 1.2 | Added must preserve, metadata group, overlapping order, and clarifications | October 19, 2017 |
+| 1.2.1 | Minor update for triangle properties | March 1, 2018 |
+| 1.2.2 | First reformatted markdown release | August 9, 2018 |
+| 1.2.3 | Clarification on content types | March 12, 2019 |
+| 1.3.0 | Added triangle sets and mirror. Clarification of ambiguities | Ocoboer 7, 2021 |
 | 1.4.0 | Removed deprecated mirror. Clarification on shapes and composition. Document naming conventions  |  |
 
 
