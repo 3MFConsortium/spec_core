@@ -69,7 +69,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
 | 1.2.1 | Minor update for triangle properties | 3/1/2018 |
 | 1.2.2 | First reformatted markdown release | 8/9/2018 |
 | 1.2.3 | Clarification on content types | 3/12/2019 |
-| 1.3.0 | Added triangle sets and mirror. Clarification ambiguities | 10/7/2021 |
+| 1.3.0 | Added triangle sets and mirror. Clarification of ambiguities | 10/7/2021 |
 | 1.4.0 | Removed deprecated mirror. Clarification on shapes and composition. Document naming conventions  |  |
 
 
