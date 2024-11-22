@@ -12,7 +12,7 @@ jobs:
     env:
       SPECNAME: "3MF Core Specification"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - run: pip install wheel
@@ -20,7 +20,7 @@ jobs:
       - run: ./markdownToPDF/install_wkhtmltopdf.sh
       - run: ./markdownToPDF/mdToPDF.sh "$SPECNAME"
       - name: Upload PDF
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.SPECNAME }}.pdf
           path: ${{ env.SPECNAME }}.pdf
