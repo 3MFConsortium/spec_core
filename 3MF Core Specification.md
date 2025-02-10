@@ -14,7 +14,7 @@
 
 | **Version** | 1.4.0 |
 | --- | --- |
-| **Status** | Draft |
+| **Status** | Published |
 
 ## Disclaimer
 
