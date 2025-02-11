@@ -12,7 +12,7 @@
 
 
 
-| **Version** | 1.3.0 |
+| **Version** | 1.4.0 |
 | --- | --- |
 | **Status** | Published |
 
@@ -22,6 +22,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
 
 ## Table of Contents
 
+- [Change history](#change-history)
 - [Preface](#preface)
   * [About this Specification](#about-this-specification)
   * [Document Conventions](#document-conventions)
@@ -32,7 +33,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
     + [1.1. Package](#11-package)
   * [Chapter 2. Parts and Relationships](#chapter-2-parts-and-relationships)
     + [2.1. 3D Payload](#21-3d-payload)
-    + [2.2. Part Naming Recommendations](#22-part-naming-recommendations)
+    + [2.2. Naming Conventions](#22-naming-conventions)
     + [2.3. 3MF Document Markup](#23-3mf-document-markup)
   * [Chapter 3. 3D Models](#chapter-3-3d-models)
     + [3.1. Coordinate Space](#31-coordinate-space)
@@ -58,6 +59,20 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
     + [C.2 Relationship Types](#c2-relationship-types)
     + [C.3 Namespaces](#c3-namespaces)
 
+## Change History
+
+| **Version** | **Changes Description** | **Date** |
+| --- | --- | --- |
+| 1.0 | First published version | April 29, 2015 |
+| 1.1 | Clarification on namespaces and meshes | February 25, 2016 |
+| 1.2 | Added must preserve, metadata group, overlapping order, and clarifications | October 19, 2017 |
+| 1.2.1 | Minor update for triangle properties | March 1, 2018 |
+| 1.2.2 | First reformatted markdown release | August 9, 2018 |
+| 1.2.3 | Clarification on content types | March 12, 2019 |
+| 1.3.0 | Added triangle sets and mirror. Clarification of ambiguities | October 7, 2021 |
+| 1.4.0 | Removed deprecated mirror. Clarification on shapes and composition. Document naming conventions  | February 6, 2025 |
+
+
 # Preface
 
 ## About this Specification
@@ -78,7 +93,7 @@ Part II, "Appendices," contains additional technical details and schemas too ext
 
 The information contained in this specification is subject to change. Every effort has been made to ensure its accuracy at the time of publication.
 
-This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07" and the prefix "mm" maps to the xml namespace "http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07", both defined in version 1.3. See [Appendix C.3 Namespaces](#c3-namespaces)
+This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07", defined in version 1.3. See [Appendix C.3 Namespaces](#c3-namespaces)
 
 ## Document Conventions
 
@@ -127,7 +142,7 @@ This specification describes how the 3MF Document format is organized internally
 
 The 3MF Document format represents a _3D model_, or a representation of one or more physical object descriptions in a markup format. A file that implements this format includes the fundamental information necessary for a consumer to generate a physical object through additive manufacturing or basic subtractive manufacturing techniques. This includes resources such as textures that might be required to reproduce the exact desired appearance in terms of color or internal structures in terms of materials.
 
-This format also includes optional components that build on the minimal set of components required to generate a physical object. This includes the ability to specify print job control instructions, to describe _assembly_ of objects intended to be generated simultaneously in an interlocked or disjoint manner, among others.
+This format also includes optional components that build on the minimal set of components required to generate a physical object. This includes the ability to specify print job control instructions, to describe _composition_ of objects intended to be generated simultaneously in an interlocked or disjoint manner, among others.
 
 Finally, the 3MF Document format implements the common package features specified by the Open Packaging Conventions specification that support digital signatures and core properties.
 
@@ -140,7 +155,6 @@ The ZIP archive MUST follow the [.ZIP File Format Specification](https://pkware.
 Files within the ZIP archive that represents a 3MF document MUST use the compression method `Deflate` ("8 - The file is Deflated") or be `stored uncompressed` ("0 - The file is stored (no compression)") in accordance with the OPC specification ("Annex C, (normative) ZIP Appnote.txt Clarifications"). The consumers MUST support both the PKWARE ZIP64:tm: extension and streaming extension. However as some older 3MF consumers are not able to consume ZIP64 files, the producers SHOULD produce plain ZIP files if the 3MF data fits and produce ZIP64 only if necessary. To achieve this in streaming mode, the producer may pre-allocate a custom block in the ZIP Local file header with an ID (0x9999) and overwrite it optionally with a ZIP64 extension block after finishing writing the compressed file block if the ZIP64 extension is found to be necessary.
 
 The 3MF Document format includes a well-defined set of parts and relationships, each fulfilling a particular purpose in the document. The format also extends the package features, including digital signatures and thumbnails.
-
 
 # Chapter 2. Parts and Relationships
 
@@ -230,7 +244,48 @@ The following example demonstrates how to add a MustPreserve relationship:
 </Relationships>
 ```
 
-## 2.2. Part Naming Recommendations
+## 2.2. Naming Conventions
+
+### 2.2.1 Document Naming Recommendation
+
+To better differentiate between various use cases of 3MF documents, it is RECOMMENDED that producers of 3MF Documents adopt a "double extension" naming convention. This approach will help clarify the document's primary content type and its intended purpose, enhancing both human readability and machine interpretation.
+
+The double extension SHOULD follow this structure:
+
+- **Model Data**: Files primarily containing design models SHOULD use the extension ".model.3mf", for example, `example.model.3mf`.
+- **Build Instructions**: Files that represent a complete build plate or tray of models, prepared for a specific printer, SHOULD use the extension ".build.3mf", for example, `example.build.3mf`.
+- **Project Files**: Files that contain a complete project, such as multiple models, settings, and metadata, SHOULD use the extension ".project.3mf", for example, `example.project.3mf`.
+- **Toolpath Data**: Files containing machine-specific toolpath data SHOULD use the extension ".toolpath.3mf", for example, `example.toolpath.3mf`.
+- **Slice Data**: Files representing polygonal slice data SHOULD use the extension ".slices.3mf", for example, `example.slices.3mf`.
+
+For proprietary use cases, where machine software or specific workflows require unique handling or metadata, it is RECOMMENDED that vendors use a custom extension naming convention. Vendor-specific 3MF files SHOULD follow the format `.vendor.3mf`, where "vendor" is replaced by the vendor's name or product identifier. For example, a proprietary file for a specific machine or process could be named `example.vendor.3mf`.
+
+This naming convention allows both users and systems to quickly identify the purpose and structure of a 3MF file without needing to inspect its internal contents. It also supports customization for vendor-specific needs while maintaining clarity in the overall ecosystem of 3MF file types.
+
+**Note:** This recommendation introduces additional clarity to the 3MF ecosystem, which has historically used `.3mf` as the sole extension for all file types. While this single extension remains common in the field, the adoption of a more descriptive double extension helps distinguish between the growing variety of 3MF file use cases.
+
+
+### 2.2.2 Reserved Naming Conventions
+
+To maintain consistency across the 3MF ecosystem, certain names are RESERVED for specific file types and SHOULD NOT be used for any other purpose:
+
+- `.model.3mf` – Reserved for design model data.
+- `.build.3mf` – Reserved for build instructions.
+- `.toolpath.3mf` – Reserved for toolpath data.
+- `.slices.3mf` – Reserved for polygonal slice data.
+- `.project.3mf` – Reserved for comprehensive project files.
+- `.support.3mf` – Reserved for support structure data files.
+- `.analysis.3mf` – Reserved for files containing analysis or simulation results.
+- `.calibration.3mf` – Reserved for files used in machine or process calibration.
+- `.scan.3mf` – Reserved for files containing 3D scan data or point clouds.
+- `.assembly.3mf` – Reserved for files representing assembled components or multiple parts in a build.
+- `.job.3mf` – Reserved for print job-specific data, such as settings or print queue information.
+- `.archive.3mf` – Reserved for bundled or archived 3MF documents, such as multiple related builds or projects.
+- `.other.3mf` – Reserved for non-standard or miscellaneous content not fitting into the above categories.
+
+These reserved names help ensure that the intent and structure of 3MF files remain clear and unambiguous across different software and hardware implementations.
+
+### 2.2.3 Part Naming Recommendations
 
 Producers and consumers of 3MF Documents refer to parts by name and use relationship names to identify the purpose of related parts. The Open Packaging Conventions specification describes the syntax for part name. However, following these rules alone can result in a package that is difficult for users to understand. For example, a user would have to open every Relationship part to know which parts are necessary to accurately manufacture a 3MF Document.
 
@@ -265,6 +320,7 @@ The design of 3MF Document markup reflects the tradeoffs between two, sometimes 
 Extensions are a critical part of 3MF, and as such, this core specification is as narrow as possible. Advanced features are built as extensions, using an a la carte model whereby producers can state explicitly which extensions are used (by declaring the matching XML namespace in the \<model> element) and consumers can state explicitly which extensions they support, so other tools in the chain know which parts will be ignored. Versioning is accomplished concurrently, as the namespace will be updated to reflect a version change. Therefore versioning happens independently for the core spec and for each extension, and the version of each can be determined by checking its namespace.
 
 Extension specifications MUST include one or more targeted versions of this core specification to limit the number of possible configurations. Producers can specify certain extensions as required in a particular 3MF document, in which case consumers that do not support those extensions MUST fail to edit or manufacture that document, rather than ignoring the extension namespace.
+
 
 Within this core XSD schema (see [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)), extension points have been explicitly entered in the form of \<any> elements and \<anyAttribute> (also visible in the element diagrams further along in this specification). These are required to come from other namespaces, which SHOULD point to a way to find the appropriate specification and accompanying XSD schema.
 
@@ -305,10 +361,9 @@ As a reminder, a non-default XML namespace on an element DOES automatically appl
 
 The language of the contents of a 3MF Document (typically useful for content provided in metadata) MAY be identified using the **xml:lang** attribute, the value of which is inherited by child and descendant elements. This attribute is defined in the W3C XML specification. When the language of the contents is unknown, the value "und" (undetermined) MUST be used.
 
-
 # Chapter 3. 3D Models
 
-The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable _assembly_.
+The _model_, in this specification, refers to the object or objects to be created via 3D manufacturing processes as a single operation. It might include a single object, multiple homogenous objects, multiple heterogeneous objects, an object fully enclosed in another object, or multiple objects in an interlocked and inseparable composition.
 
 
 ## 3.1. Coordinate Space
@@ -359,13 +414,13 @@ Element **\<model>**
 | --- | --- | --- | --- | --- |
 | unit | **ST\_Unit** | | millimeter | Specifies the unit used to interpret all vertices, locations, or measurements in the model. Valid values are micron, millimeter, centimeter, inch, foot, and meter. |
 | xml:lang | **xs:language** | | | Specifies the default language used for the current element and any descendant elements. The language is specified according to RFC 3066. |
-| requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing the document. Editors and manufacturing devices MUST NOT process the document if they do not support the required extensions. |
-| recommendedextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are recommended for processing the document with its design intent. Editors and manufacturing devices SHOULD warn and inform the user if they do not support the recommended extensions and ask for input how to proceed. Required extensions MUST NOT be recommended at the same time. |
+| requiredextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are required for processing this **model-file**. Editors and manufacturing devices MUST NOT process this **model-file** if they do not support the required extensions. |
+| recommendedextensions | **xs:string** | | | Space-delimited list of namespace prefixes, representing the set of extensions that are recommended for processing this **model-file** with its design intent. Editors and manufacturing devices SHOULD warn and inform the user if they do not support the recommended extensions and ask for input how to proceed. Required extensions MUST NOT be recommended at the same time. |
 | @anyAttribute | | | | |
 
 The \<model> element is the root element of the 3D Model part. There MUST be exactly one \<model> element in a 3D Model part. A model may have zero or more child metadata elements (see [3.4.1. Metadata](#341-metadata) for more information). A model must have two additional child elements: \<resources> and \<build>. The \<resources> element provides a set of definitions that can be drawn from to define a 3D object. The \<build> element provides a set of items that should actually be manufactured as part of the job.
 
-Producers SHOULD NOT require extensions unless the document would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
+Producers SHOULD NOT require extensions unless this **model-file** would lose key meaning without the extension data. Allowing consumers to ignore unsupported extensions gives a more graceful fallback. Required extensions MAY supercede the requirements of the Core specification. However, the Core specification MUST be fully supported when used with optional extensions.
 
 
 ### 3.4.1. Metadata
@@ -382,7 +437,7 @@ Element **\<metadata>**
 | type | **xs:string** | | | A string indicating the XML type of the data stored in the metadata value. |
 | @anyAttribute | | | | |
 
-Producers of 3MF Documents SHOULD provide additional information about the document in the form of metadata under the root \<model> element.
+Producers of 3MF Documents SHOULD provide additional information about this **model-file** in the form of metadata under the root \<model> element.
 
 Metadata associated with the \<model> MAY contain a set of well known values. Metadata in 3MF Documents without a namespace name MUST be restricted to names and values defined by this specification. If a name value is not defined in this specification, it MUST be prefixed with the namespace name of an XML namespace declaration on the \<model> element that is not drawn from the default namespace.
 
@@ -465,14 +520,17 @@ The \<item> element may contain a \<metadatagroup> element containing one or mor
 
 A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see [4.2. Components](#42-components)), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
 
-If the items overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped item. If the last item has no properties defined in the overlapped volume, properties MUST NOT be applied.
+Items SHOULD NOT overlap, but if they do, 3D manufacturing devices MUST unite the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped geometry is taken from the properties of the last overlapped item. If the last item element has no properties defined in the overlapped geometry, properties MUST NOT be applied.
+
+**Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the build level.
 
 >**Note:** items MUST NOT reference objects of type "other", either directly or recursively.
 
 
 # Chapter 4. Object Resources
 
-_Object resources_ describe reusable objects that may be output (by reference) or composed into more complex objects or assemblies.
+_Object resources_ describe reusable objects that may be output (by reference) or composed into more complex objects.
+
 
 Element **\<object>**
 
@@ -510,7 +568,7 @@ Element **\<mesh>**
 
 ![element mesh](images/element_mesh.png)
 
-The \<mesh> element is the root of a triangular _mesh_ representation of an object volume. It contains a set of vertices and a set of triangles.
+The \<mesh> element is the root of a triangular _mesh_ representation of an object's shape. It contains a set of vertices and a set of triangles.
 
 If the mesh is under an object of type "model" or "solidsupport", it MUST have:
 
@@ -535,6 +593,7 @@ Objects of type "support" or "solidsupport" SHOULD only be referenced in an Obje
 
 Support structures (both "solidsupport" and "support" types) MAY be ignored or replaced by auto-generated support, but this is NOT RECOMMENDED.
 
+3MF extensions might define other types of shape representations, in addition to a triangle mesh.
 
 ### 4.1.1. Fill Rule
 
@@ -680,43 +739,6 @@ A \<refrange> element in a triangle set refers to the zero-based indexed \<trian
 The \<refrange> element inserts into the parent triangle set all triangles from the _triangles node_ with index between inclusively startindex and the endindex.
 
 
-### 4.1.6. Mesh Mirror Transforms
-
-A producer MUST NOT use transforms with negative determinants to account for mirroring, as this would invert the normal directions of the triangle. In order to store a mesh in a mirrored form, the producer MUST store a transformed copy of the original mesh in its mirrored form, which means with absolute transformed vertex coordinates as well as a corrected positive triangle orientation.
-
-However, if a producer wants to reference the original mesh from a transformed copy, the producer MAY use the mirroring namespace (*http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07*) to store a reference to the original mesh id as well as the mirror plane that was used:
-
-Element **\<mm:mirrormesh>**
-
-![element mirrormesh](images/element_mirrormesh.png)
-
-##### Attributes
-| Name | Type | Use | Default | Annotation |
-| --- | --- | --- | --- | --- |
-| originalmesh | **ST\_ResourceID** | required | | Resource ID of the original mesh object |
-| nx | **ST\_Number** | required | | X Coordinate of Mirror plane normal equation |
-| ny | **ST\_Number** | required | | Y Coordinate of Mirror plane normal equation |
-| nz | **ST\_Number** | required | | Z Coordinate of Mirror plane normal equation |
-| d | **ST\_Number** | required | | Distance value of Mirror plane normal equation |
-
-The \<mirror> element is optional. The *originalmesh* attribute MUST refer to a previous mesh object in the current 3MF model. The originalmesh-attribute must not refer to a mesh that contains a \<mirrormesh> element.
-
-The mirror transform shall be defined through the given *mirror plane* that is defined by the equation 
-
-*nx* * *x* + *ny* * *y* + *nz* * *z* + *d* = *0*
-
-in the local mesh coordinate system. If a mirror mesh transformation is given, the following rules MUST apply for the vertices and faces:
-- The mesh's vertex count MUST be equal to the original mesh's vertex count.
-- For each vertex in the mesh, there MUST be a corresponding vertex of the original mesh with the identical index in the vertex list. The corresponding vertex coordinate MUST be defined by mirroring on the mirror plane in the local coordinate system.
-- The mesh's triangle count MUST be equal to the original mesh's.
-- For each triangle in the mesh, there MUST be a corresponding triangle of the transformed original mesh with identical index in the triangle list. The corresponding triangle MUST have identical properties, except vertex v1 and v3 MUST be exchanged (as well as p1 and p3).
-- The trianglesets of the mesh MUST be identical to the triangle sets of the original mesh.
-
-If any of the given requirements is invalid, the actual mesh coordinates MUST take precedence and a producer MUST ignore the mirror transform.
-
-If the mirror namespace is a required extension, the producer MAY choose to not store duplicate information. If the producer chooses to do so, it MUST specify an empty triangles element, an empty vertices element and an empty trianglesets element for this mesh. In this case, any consumer MUST implicitely reconstruct the mesh data from the original mesh via the given rules. For backwards compatibility producers SHOULD NOT mark the mirror namespace as a required extension.
-
-
 ## 4.2. Components
 
 Element **\<components>**
@@ -727,7 +749,9 @@ The \<components> element acts as a container for all components to be composed 
 
 A 3D manufacturing device MUST respect the relative positions of the component objects; it MUST NOT transform them relative to each other except as specified in the document.
 
-If the components overlap, 3D manufacturing devices MUST use the Positive fill rule (described in section 4.1.1) to resolve the ambiguity on the final geometry. If any of the overlapped components has a property defined, the resulting property on the overlapped volume is taken from the properties of the last overlapped component. If the last component has no properties defined in the overlapped volume, properties MUST NOT be applied.
+If the components overlap, 3D manufacturing devices MUST unite the final shape. If any of the overlapped components has a property defined, the resulting property on the overlapped shape is taken from the properties of the last overlapped component. If the last component element dassembhas no properties defined in the overlapped shape, properties MUST NOT be applied.
+
+>**Note:** As specified below each referenced object MUST resolve internal self-intersections before merging them in the components level.
 
 In order to avoid integer overflows, a components element MUST contain less than 2^31 components.
 
@@ -892,11 +916,13 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **3MF Document StartPart relationship.** The OPC relationship from the root of the package to the 3D Model part.
 
-**Assembly.** A model that contains two or more independently-defined objects that are connected or interlocked either during or after the 3D manufacturing process is complete. An assembly might be able to be reversed or the individual parts may be inseparably interlocked.
+**Assembly.** A CAD term that could be represented by _components_.
 
 **Back.** The maximum printable XZ plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
 
 **Bottom.** The minimum printable XY plane of the print area or the correspondent minimum plane of a model bounding box, once transformed to the output coordinate space.
+
+**Components** A model that contains two or more independently-defined objects that are connected or interlocked either during or after the 3D manufacturing process is complete. A component might be able to be reversed or the individual parts may be inseparably interlocked.
 
 **Component.** An object that is added as an intact shape to the overall definition of another object.
 
@@ -922,7 +948,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Metadata.** Ancillary information about some portion of the model, to provide more refined processing by knowledgeable producers or consumers.
 
-**Model.** The set of objects that are to be manufactured as part of a single job. This may include a single object, multiple instances of the same object, multiple different objects, or multiple objects in an assembly.
+**Model.** The set of objects that are to be manufactured as part of a single job. This may include a single object, multiple instances of the same object, multiple different objects, or multiple objects in a composition.
 
 **Must preserve.** A set of OPC parts that SHOULD be retained by a producer when rewriting or saving changes to this 3MF file specified by the MustPreserve relationship type.
 
@@ -1046,7 +1072,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:attribute name="thumbnail" type="ST_UriReference"/>
 		<xs:attribute name="partnumber" type="xs:string"/>
 		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="pid" type="ST_ResourceIndex"/>
+		<xs:attribute name="pid" type="ST_ResourceID"/>
 		<xs:attribute name="pindex" type="ST_ResourceIndex"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
@@ -1231,8 +1257,8 @@ A consumer that is authorized to un-protect content by reversing the above steps
       <xs:element ref="refrange" minOccurs="0" maxOccurs="2147483647"/>
       <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
     </xs:sequence>
-    <xs:attribute name="name" type="xs:string" default="none"/>
-    <xs:attribute name="identifier" type="xs:QName"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="identifier" type="xs:QName" use="required"/>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_Ref">
@@ -1263,63 +1289,6 @@ A consumer that is authorized to un-protect content by reversing the above steps
   <xs:element name="triangleset" type="CT_TriangleSet"/>
   <xs:element name="ref" type="CT_Ref"/>
   <xs:element name="refrange" type="CT_RefRange"/>
-</xs:schema>
-```
-
-### B.1.3 Mirroring extension schema
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
-  targetNamespace="http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07"
-  elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
-  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
-  <xs:annotation>
-    <xs:documentation>
-      <![CDATA[
-    Schema notes:
- 
-    Items within this schema follow a simple naming convention of appending a prefix indicating the type of element for references:
- 
-    Unprefixed: Element names
-    CT_: Complex types
-    ST_: Simple types
-   
-    ]]>
-    </xs:documentation>
-  </xs:annotation>
-  <!-- Complex Types -->
-<xs:complexType name="CT_Mesh">
-    <xs:sequence>
-      <xs:element ref="mirromesh"/>
-      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="1"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:complexType name="CT_MirrorMesh">
-    <xs:attribute name="originalmesh" type="ST_ResourceID"/>
-    <xs:attribute name="nx" type="ST_Number"/>
-    <xs:attribute name="ny" type="ST_Number"/>
-    <xs:attribute name="nz" type="ST_Number"/>
-    <xs:attribute name="d" type="ST_Number"/>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <!-- Simple Types -->
-  <xs:simpleType name="ST_ResourceID">
-    <xs:restriction base="xs:positiveInteger">
-      <xs:maxExclusive value="2147483648"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:simpleType name="ST_Number">
-    <xs:restriction base="xs:double">
-      <xs:whiteSpace value="collapse"/>
-      <xs:pattern value="((\-|\+)?(([0-9]+(\.[0-9]+)?)|(\.[0-9]+))((e|E)(\-|\+)?[0-9]+)?)"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <!-- Elements -->
-  <xs:element name="mesh" type="CT_Mesh"/>
-  <xs:element name="mirromesh" type="CT_MirrorMesh"/>
 </xs:schema>
 ```
 
@@ -1392,9 +1361,11 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 ### C.1 Content Types
 
-3D Model application/vnd.ms-package.3dmanufacturing-3dmodel+xml
+3MF Document model/3mf 
 
-PrintTicket application/vnd.ms-printing.printticket+xml
+3D Model part application/vnd.ms-package.3dmanufacturing-3dmodel+xml
+
+PrintTicket part application/vnd.ms-printing.printticket+xml
 
 ### C.2 Relationship Types
 
@@ -1411,8 +1382,6 @@ MustPreserve http://schemas.openxmlformats.org/package/2006/relationships/mustpr
 3D Model http://schemas.microsoft.com/3dmanufacturing/core/2015/02
 
 Triangle Sets http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07
-
-Mirroring http://schemas.microsoft.com/3dmanufacturing/mirroring/2021/07
 
 # References
 

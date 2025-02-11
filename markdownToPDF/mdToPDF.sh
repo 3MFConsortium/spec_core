@@ -23,13 +23,13 @@
 
 #!/bin/bash
 
-mkdir ~/.grip
-echo "PASSWORD = '${GITHUB_API_KEY}'" > ~/.grip/settings.py
+# mkdir ~/.grip
+# echo "PASSWORD = '${GITHUB_API_KEY}'" > ~/.grip/settings.py
 
 FILE="$1"
 TMPFILE="temp.html"
 
-grip "$FILE.md" --export "$FILE.html"
+/home/runner/.local/bin/grip "$FILE.md" --export "$FILE.html"
 sed "s|readme boxed-group clearfix announce instapaper_body md||g" "$FILE.html" > "$TMPFILE"
 sed -i "s|.md$||g" "$TMPFILE"
 sed -i 's|<a href="images/3mf_logo_50px.png"|<a|g' "$TMPFILE"
@@ -40,6 +40,8 @@ sed -i 's|<a href="@|<a href="#|g' "$TMPFILE"
 sed -i 's|<pre|<code style="white-space: pre-wrap; page-break-inside: avoid !important; display: block;"|g' "$TMPFILE"
 sed -i 's|</pre|</code|g' "$TMPFILE"
 sed -i "/Page tweaks/ a 	* {		font-size: large;	}" "$TMPFILE"
+sed -i 's|margin-top: 64px;|margin-top: 64px; margin-right: 21px;|g' "$TMPFILE"
+sed -i 's|margin-bottom: 21px;|margin-bottom: 21px; margin-left: 21px;|g' "$TMPFILE"
 
 MARGIN=14
 
