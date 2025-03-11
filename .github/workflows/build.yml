@@ -4,7 +4,7 @@
 # (outdated) Documentation:
 #   https://github.com/3MFConsortium/spec_conventions/blob/master/generatePDFs/generatePDFs.md
 
-on: [pull_request]
+on: [pull_request, workflow_dispatch]
 name: Build
 jobs:
   build-linux:
