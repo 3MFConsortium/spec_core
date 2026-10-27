@@ -35,6 +35,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
     + [2.1. 3D Payload](#21-3d-payload)
     + [2.2. Naming Conventions](#22-naming-conventions)
     + [2.3. 3MF Document Markup](#23-3mf-document-markup)
+    + [2.4. Binary Encoding](#24-binary-encoding)
   * [Chapter 3. 3D Models](#chapter-3-3d-models)
     + [3.1. Coordinate Space](#31-coordinate-space)
     + [3.2. Relative Directions and Measurement](#32-relative-directions-and-measurement)
@@ -93,7 +94,7 @@ Part II, "Appendices," contains additional technical details and schemas too ext
 
 The information contained in this specification is subject to change. Every effort has been made to ensure its accuracy at the time of publication.
 
-This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07", defined in version 1.3. See [Appendix C.3 Namespaces](#c3-namespaces)
+This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07", defined in version 1.3. The prefix "bin" maps to the xml namespace "http://schemas.microsoft.com/3dmanufacturing/corebinary/2023/05" of the optional binary encoding (see [2.4. Binary Encoding](#24-binary-encoding)). See [Appendix C.3 Namespaces](#c3-namespaces)
 
 ## Document Conventions
 
@@ -193,6 +194,9 @@ _Table 2-1. 3MF Document parts_
 | Package Thumbnail | Contains a small JPEG or PNG image that represents the 3D objects in the package or the package as a whole. | Package | OPTIONAL |
 | Object Thumbnail | Contains a small JPEG or PNG image that represents a 3D object in a 3D Model. | 3D Model | OPTIONAL |
 | 3D Texture | Contains a texture used to apply color to a 3D object in the 3D Model part (available for extensions) | 3D Model | OPTIONAL |
+| Binary Index | Describes the chunks and binary arrays of a binary data part (see [2.4. Binary Encoding](#24-binary-encoding)). | 3D Model | OPTIONAL |
+| Binary Data | Contains binary encoded arrays referenced by a binary index part (see [2.4. Binary Encoding](#24-binary-encoding)). | Binary Index | OPTIONAL |
+| Binary Dictionary | Contains a trained dictionary for the compression of binary data parts (see [2.4.2.5. Trained Dictionaries](#2425-trained-dictionaries)). | Binary Index | OPTIONAL |
 | Custom Parts | OPC parts that are associated with metadata | Package | OPTIONAL |
 
 _Figure 2-1. A typical 3MF Document_
@@ -296,6 +300,7 @@ It is RECOMMENDED that producers of 3MF Documents use the following part naming 
 - The 3D Model part name SHOULD contain two segments, the first being "/3D/" and the second with the extension ".model" on the last segment, for example "/3D/3dModel.model".
 - The PrintTicket part name SHOULD be associated via relationship with the 3D Model part and contains three segments, using "/3D/Metadata/" as the first two segments with the extension ".xml". For example, "/3D/Metadata/Model\_PT.xml".
 - 3D Texture part names SHOULD contain three segments, using "/3D/Textures/" as the first two segments, for example "/3D/Textures/coloring.png". 3D Texture parts MUST be associated with the 3D Model part via a suitable relationship.
+- Binary index part and binary data part names SHOULD contain three segments, using "/3D/Binary/" as the first two segments. Binary index parts SHOULD use the extension ".binindex", binary data parts SHOULD use the extension ".bin" and binary dictionary parts SHOULD use the extension ".bindict", for example "/3D/Binary/mesh.binindex", "/3D/Binary/mesh.bin" and "/3D/Binary/shared.bindict".
 - The names of any non-standard parts that are associated with the 3D payload SHOULD contain 3 segments, using "/3D/Other/" as the first two segments.
 
 Part names MUST use absolute paths, meaning all paths begin with "/". Part names MUST NOT be empty or lead with a period (e.g. "/3D/.png" or "/3D/").
@@ -360,6 +365,435 @@ As a reminder, a non-default XML namespace on an element DOES automatically appl
 ### 2.3.5. Language
 
 The language of the contents of a 3MF Document (typically useful for content provided in metadata) MAY be identified using the **xml:lang** attribute, the value of which is inherited by child and descendant elements. This attribute is defined in the W3C XML specification. When the language of the contents is unknown, the value "und" (undetermined) MUST be used.
+
+## 2.4. Binary Encoding
+
+While the ASCII XML encoding offers extensibility and human readability, certain use cases benefit from a more compact, binary representation of data. Large datasets, such as vertex positions or triangle indices, are particularly easier to handle when stored in fixed-size arrays on disk.
+
+The _3MF Binary Extension_ is an OPTIONAL addition to the Core Specification that allows to store array data (float or integer) similar to a thumbnail image or 2D Texture in a referenced external part in the 3MF OPC Package. All XML elements MUST be prefixed with their according namespace, which is *http://schemas.microsoft.com/3dmanufacturing/corebinary/2023/05* for the Core Specification. Throughout this specification, the prefix "bin" is used for this namespace. In order to make use of this mechanism in a 3MF Extension, each extension specification MUST define its own binary extension namespace, derived from its original namespace in a similar form (for example *http://schemas.microsoft.com/3dmanufacturing/beamlatticebinary/YYYY/MM* for the Beam Lattice Extension).
+
+>Any 3MF Model that contains any binary extension element MUST have the core binary extension marked as required, as well as any referenced derived binary extension.
+
+This means that the namespace prefix of the core binary extension MUST be listed in the requiredextensions attribute of the \<model> element of every 3D Model part that contains a binary extension element. A consumer that does not support the binary extension therefore MUST fail to edit or manufacture the document as described in [2.3.1. Support for Versioning and Extensibility](#231-support-for-versioning-and-extensibility), instead of misinterpreting a mesh without vertices or triangles. Producers and consumers MAY choose not to support binary encoding at all. A producer that does not use binary extension elements MUST NOT mark the binary extension as required.
+
+The use of binary data in general should be used only deliberately and with care. Therefore it MUST follow the following guidelines:
+
+- Using a binary array element MUST only change the actual encoding on disk and not the underlying XML data model. This means that it MUST be possible at any time to losslessly convert a binary encoded 3MF file into a uniquely defined ASCII specification element. Equally, any standard ASCII 3MF file can be converted into a binary 3MF package with only syntactical understanding of its content.
+- In the latter case very small deviations MAY occur through floating point quantization. See [2.4.1. Array Encoding and Quantization](#241-array-encoding-and-quantization) for the details.
+- Any 3MF specification MUST explicitly allow the use of binary encoding for specific XML elements, including instructions and guardrails how to interpret them uniquely in their context. They MUST NOT be used for any other elements in the 3MF Model. This Core Specification allows binary encoding for the \<vertices> element (see [4.1.3.2. Binary Vertex Array](#4132-binary-vertex-array)) and the \<triangles> element (see [4.1.4.2. Binary Triangle Array](#4142-binary-triangle-array)).
+
+Binary encoding reduces human readability and excludes consumers that do not implement this extension. Producers SHOULD therefore only use it where the ASCII representation is a measurable bottleneck for file size, loading or writing time, as is typically the case for meshes with a large number of vertices and triangles.
+
+>**Note:** Only a Producer has the full contextual information on how to choose an encoding strategy, and there are many valid options to choose from. This document therefore only prescribes how a Consumer MUST Decode binary data uniquely into the right form. A Producer MUST ensure that any consumer will interpret its encoding correctly by this mechanism.
+
+### 2.4.1. Array Encoding and Quantization
+
+Efficiently storing large arrays of values in a binary form is its own science. There are many domain-specific ways to encode for example mesh connectivity data, all with their advantages and associated costs. The 3MF Binary Extension tries to follow a compromise between implementation complexity, performance and file size.
+
+A _binary array_ is a sequence of N values of a single _array type_. This specification defines the following six array types, which are identified by the type attribute of the \<bin:array> element (see [2.4.3. Binary Index Part and OPC Structure](#243-binary-index-part-and-opc-structure)):
+
+| **Array type** | **Section** | **Decoded value** | **Byte length** | **Exact** | **Typical use** |
+| --- | --- | --- | --- | --- | --- |
+| int32 | 2.4.1.1 | Integer | 4 · N | yes | Indices without locality |
+| int32delta | 2.4.1.2 | Integer | 4 · N | yes | Indices with locality, e.g. triangle indices of a sorted mesh. Compresses well when subsequent values are close. |
+| float32 | 2.4.1.3 | Number | 4 · N | yes | Coordinates that are already single precision |
+| float32quantized | 2.4.1.4 | Number | 12 + 4 · N | no | Coordinates with a known value range and target resolution |
+| float32quantizeddelta | 2.4.1.5 | Number | 12 + 4 · N | no | As above, for spatially coherent data. Compresses best after a generic compression method. |
+| float64 | 2.4.1.6 | Number | 8 · N | yes | Coordinates that require double precision |
+
+The following rules apply to all array types:
+
+- All multi-byte integer values MUST be stored in little endian byte order. Signed integers use two's complement representation.
+- All floating point values MUST be stored in IEEE 754 binary32 (4 bytes) or binary64 (8 bytes) format in little endian byte order.
+- Decoded floating point values MUST be finite. NaN, positive infinity and negative infinity MUST NOT occur, as they cannot be represented by the **ST\_Number** type of the equivalent ASCII element.
+- Integer array types MUST only be referenced by attributes of integer type (for example **ST\_ResourceIndex** or **ST\_ResourceID**). Floating point array types MUST only be referenced by attributes of type **ST\_Number**.
+
+The _decoded value_ of an array element is the value that is assigned to the attribute of the equivalent ASCII element. For integer array types, it is the exact integer. For floating point array types, it is the IEEE 754 binary64 number that results from the computation described in the respective section. All computations MUST be performed in IEEE 754 binary64 arithmetic with round-to-nearest-ties-to-even, in exactly the order given by the formula, and without fused multiply-add operations. A binary32 value is converted to binary64 exactly. This guarantees that every consumer decodes bit-identical values.
+
+When converting a binary array into its equivalent ASCII elements, a producer MUST write each decoded floating point value as a decimal string that parses back to the identical binary64 value (for example the shortest round-trip representation). The conversion from binary to ASCII is therefore lossless.
+
+#### 2.4.1.1 Raw Integer Array
+
+The _Raw Integer_ option (array type "int32") is to store signed 32 bit integer values raw in little endian. Here is a example with 7 values and consuming 28 bytes:
+
+| **Value 1** | **Value 2** | **Value 3** | **Value 4** | **Value 5** | **Value 6** | **Value 7** |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1008 | 1100 | 1101 | 1105 | 1098 | 51202 | 51100 |
+
+This corresponds to the following hexadecimal data:
+
+_F0 03 00 00 4C 04 00 00 4D 04 00 00 51 04 00 00 4A 04 00 00 02 C8 00 00 9C C7 00 00_
+
+#### 2.4.1.2 Delta Integer Array
+
+The _Delta Integer_ option (array type "int32delta") stores the first 32 bit integer value raw (in little endian) and then subsequent delta values to the preceding value (signed 32 bit integers in little endian). The decoded values MUST be computed by:
+
+_value<sub>1</sub> = base_
+
+_value<sub>i</sub> = value<sub>i-1</sub> + delta<sub>i</sub>_ for i = 2, ..., N
+
+If the delta values exceed the capacity of a signed 32bit integer, 32bit signed integer arithmetic with overflow MUST be applied to carry the information. This means that the sum is computed modulo 2<sup>32</sup> and the result is interpreted as signed 32 bit integer in two's complement. In this case, for example _2.000.000.000 + 1.294.967.296_ would result in _-1.000.000.000_.
+
+Here is the above example with 7 values and consuming 28 bytes:
+
+| **Base Value** | **Delta 2** | **Delta 3** | **Delta 4** | **Delta 5** | **Delta 6** | **Delta 7** |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1008 | +92 | +1 | +4 | -7 | +50104 | -102 |
+
+This corresponds to the following hexadecimal data:
+
+_F0 03 00 00 5C 00 00 00 01 00 00 00 04 00 00 00 F9 FF FF FF B8 C3 00 00 9A FF FF FF_
+
+#### 2.4.1.3 Raw Float Array
+
+The _Raw Float_ option (array type "float32") is to store 32 bit values raw (in IEEE 754 binary32, little endian). Here is a example with 7 values and consuming 28 bytes:
+
+| **Value 1** | **Value 2** | **Value 3** | **Value 4** | **Value 5** | **Value 6** | **Value 7** |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1008.5 | 1100.1 | 1101.24 | 1105.23 | 1098.9 | 51202.1 | 51100.0 |
+
+This corresponds to the following hexadecimal data:
+
+_00 20 7C 44 33 83 89 44 AE A7 89 44 5C 27 8A 44 CD 5C 89 44 1A 02 48 47 00 9C 47 47_
+
+>**Note:** The decoded value is the binary32 number closest to the original decimal value, for example 1100.0999755859375 for 1100.1. A producer that requires the exact decimal values of an ASCII document SHOULD NOT use this array type for values that are not representable in binary32.
+
+#### 2.4.1.4 Quantized Float Array
+
+The _Quantized Float_ option (array type "float32quantized") is to scale 32 bit float values to a fixed interval and round them to the nearest 32 bit (unsigned) integer. Those integers are stored in little endian together with the interval information in the stream in the following order:
+
+- _Minimum_ as IEEE 754 binary32 float in little endian (4 bytes)
+- _Maximum_ as IEEE 754 binary32 float in little endian (4 bytes)
+- _QuantizationSteps_ as unsigned 32 bit integer in little endian (4 bytes)
+- Each quantized value as unsigned 32 bit integer in little endian (N times 4 bytes)
+
+_Minimum_ and _Maximum_ MUST be finite and _Minimum_ MUST be less than or equal to _Maximum_. _QuantizationSteps_ MUST be greater than 0. Every quantized value MUST be less than or equal to _QuantizationSteps_, unless it is equal to the leave-out value of the array (see [2.4.4.1. Leave-Out Values](#2441-leave-out-values)).
+
+This process comes of course with a loss of accuracy. The actual raw values MUST be computed by:
+
+_value = Minimum + (quantizedvalue / QuantizationSteps) * (Maximum - Minimum)_
+
+Here is the above example with the first 5 values, consuming 32 bytes:
+
+| **Minimum** | **Maximum** | **QuSteps** | **Value 1** | **Value 2** | **Value 3** | **Value 4** | **Value 5** |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1000.0 | 2000.0 | 10000 | 85 | 1001 | 1012 | 1052 | 989 |
+
+This corresponds to the following hexadecimal data:
+
+_00 00 7A 44 00 00 FA 44 10 27 00 00 55 00 00 00 E9 03 00 00 F4 03 00 00 1C 04 00 00 DD 03 00 00_
+
+The decoded values are 1008.5, 1100.1, 1101.2, 1105.2 and 1098.9.
+
+>**Note:** If a producer rounds to the nearest quantized value, the deviation of a decoded value from its original value does not exceed half a quantization step, (_Maximum_ - _Minimum_) / (2 · _QuantizationSteps_), plus floating point rounding. In the example above, this is 0.05. A producer is responsible for choosing the interval and the number of steps to fit its accuracy requirements, for example a step size of 1 micron.
+
+#### 2.4.1.5 Quantized Delta Float Array
+
+The _Quantized Delta Float_ option (array type "float32quantizeddelta") takes the quantized case further and stores only the first quantized value as unsigned int32 value, while all subsequent values are stored as signed int32 delta to the preceding quantized value. The header consisting of _Minimum_, _Maximum_ and _QuantizationSteps_ is identical to [2.4.1.4. Quantized Float Array](#2414-quantized-float-array) and the same constraints apply.
+
+The quantized values MUST be computed with exact integer arithmetic by:
+
+_quantizedvalue<sub>1</sub> = base_
+
+_quantizedvalue<sub>i</sub> = quantizedvalue<sub>i-1</sub> + delta<sub>i</sub>_ for i = 2, ..., N
+
+Every quantized value MUST be in the range from 0 to _QuantizationSteps_, unless it is equal to the leave-out value of the array. This process comes of course with the same loss of accuracy. The actual raw values MUST be then computed by:
+
+_value<sub>i</sub> = Minimum + (quantizedvalue<sub>i</sub> / QuantizationSteps) * (Maximum - Minimum)_
+
+Here is the above example with the first 5 values, consuming 32 bytes:
+
+| **Minimum** | **Maximum** | **QuSteps** | **Base Value** | **Delta 2** | **Delta 3** | **Delta 4** | **Delta 5** |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1000.0 | 2000.0 | 10000 | 85 | +916 | +11 | +40 | -63 |
+
+This corresponds to the following hexadecimal data:
+
+_00 00 7A 44 00 00 FA 44 10 27 00 00 55 00 00 00 94 03 00 00 0B 00 00 00 28 00 00 00 C1 FF FF FF_
+
+The decoded values are identical to the example in 2.4.1.4.
+
+#### 2.4.1.6 Raw Double Array
+
+The _Raw Double_ option (array type "float64") is to store 64 bit values raw (in IEEE 754 binary64, little endian). It is intended for data that requires more than single precision, for example vertex coordinates of very large parts with fine details. The decoded value is the stored binary64 value. The first two values of the example in 2.4.1.3, consuming 16 bytes, correspond to the following hexadecimal data:
+
+_00 00 00 00 00 84 8F 40 66 66 66 66 66 30 91 40_
+
+### 2.4.2. Binary Data Part
+
+A _binary data part_ is an OPC part that contains the binary arrays of a 3MF Document. It consists of one or more _chunks_. A chunk is a contiguous range of bytes in the binary data part. Each chunk is decoded independently into a block of _uncompressed chunk data_, which contains one or more binary arrays as described in [2.4.1. Array Encoding and Quantization](#241-array-encoding-and-quantization). The layout of chunks and arrays is described by exactly one binary index part (see [2.4.3. Binary Index Part and OPC Structure](#243-binary-index-part-and-opc-structure)).
+
+Chunks MUST NOT overlap. A binary array MUST lie entirely within the uncompressed chunk data of one chunk, and the binary arrays of one chunk MUST NOT overlap. The byte offset of a binary array within the uncompressed chunk data MUST be a multiple of 4 for 32 bit array types and a multiple of 8 for the array type "float64". Bytes in the uncompressed chunk data that do not belong to any binary array (for example for alignment) SHOULD be zero and MUST be ignored by consumers.
+
+Because every chunk is compressed independently, consumers can decode chunks in parallel and only need to decode the chunks that contain the arrays they need. Producers SHOULD limit the uncompressed size of each chunk accordingly, rather than storing all arrays in one large chunk.
+
+The ZIP archive (see [1.1. Package](#11-package)) already allows each part to be compressed with Deflate. If the compression method of a binary data part is not "none", the binary data part SHOULD be stored uncompressed in the ZIP archive, as compressing the data twice wastes processing time and prevents random access to the chunks. If the compression method is "none", the producer MAY rely on the Deflate compression of the ZIP archive instead.
+
+All chunks of a binary data part MUST use the same _compression method_, which is given by the compression attribute of the \<bin:binaryindex> element. This specification defines the following compression methods:
+
+| **Compression method** | **Section** | **Format** | **Trained dictionary** |
+| --- | --- | --- | --- |
+| none | | The uncompressed chunk data is identical to the bytes of the chunk. | not allowed |
+| zlib | 2.4.2.1 | zlib data stream (RFC 1950) with Deflate (RFC 1951) | allowed |
+| lz4 | 2.4.2.2 | LZ4 frame (LZ4 Frame Format Description) | allowed |
+| zstd | 2.4.2.3 | Zstandard frame (RFC 8878) | allowed |
+| lzma | 2.4.2.4 | XZ stream with the LZMA2 filter (The .xz File Format) | not allowed |
+
+A consumer that supports the core binary extension MUST support all compression methods and trained dictionaries (see [2.4.2.5. Trained Dictionaries](#2425-trained-dictionaries)) defined in this section. A producer MAY use any of them.
+
+Every compressed chunk carries a checksum of its data, which a consumer MUST verify. If a compressed format stores the uncompressed size, that size MUST be equal to the uncompressedsize attribute of the chunk.
+
+#### 2.4.2.1. zlib
+
+A chunk with the compression method "zlib" MUST be exactly one complete zlib data stream as defined in RFC 1950, using the Deflate compression method (CM = 8) defined in RFC 1951. The Adler-32 checksum of the stream MUST be verified.
+
+If the binary index part references a trained dictionary, the FDICT flag of every chunk MUST be set, and DICTID MUST be the Adler-32 checksum of the complete content of the binary dictionary part. The content of the binary dictionary part is the preset dictionary. Only its last 32 KiB affect decompression, so producers SHOULD NOT use larger dictionaries with this method. If no trained dictionary is referenced, the FDICT flag MUST NOT be set.
+
+#### 2.4.2.2. LZ4
+
+A chunk with the compression method "lz4" MUST be exactly one LZ4 frame as defined in the LZ4 Frame Format Description, starting with the magic number 0x184D2204. Skippable frames and the legacy frame format MUST NOT be used. The Content Checksum flag MUST be set, and the content checksum MUST be verified. Block checksums MAY be used and, if present, MUST be verified.
+
+If the binary index part references a trained dictionary, every chunk is compressed with the content of the binary dictionary part as its dictionary, which acts as a prefix of the first block. Only its last 64 KiB affect decompression, so producers SHOULD NOT use larger dictionaries with this method. The Dictionary ID field of the frame descriptor SHOULD NOT be present and MUST be ignored by consumers.
+
+>**Note:** LZ4 has the highest decompression speed of the Lempel-Ziv based compression methods in this specification, at the cost of a lower compression ratio.
+
+#### 2.4.2.3. Zstandard
+
+A chunk with the compression method "zstd" MUST be exactly one Zstandard frame as defined in RFC 8878, starting with the magic number 0xFD2FB528. Skippable frames MUST NOT be used. The Content\_Checksum\_flag MUST be set, and the content checksum MUST be verified. The Window\_Size of the frame MUST NOT exceed 128 MiB. The Frame\_Content\_Size field SHOULD be present.
+
+If the binary index part references a trained dictionary, every chunk is compressed with the content of the binary dictionary part as its dictionary. The content is either a Zstandard dictionary as defined in Section 5 of RFC 8878 (starting with the magic number 0xEC30A437) or, otherwise, a raw content dictionary. If the content is a Zstandard dictionary and the Dictionary\_ID field of a frame is present and not 0, it MUST be equal to the Dictionary\_ID of the dictionary.
+
+#### 2.4.2.4. LZMA
+
+A chunk with the compression method "lzma" MUST be exactly one stream in the .xz file format as defined in The .xz File Format, without stream padding. The filter chain of every block MUST consist of exactly one LZMA2 filter (filter ID 0x21). The check type of the stream MUST be CRC32 (0x01), CRC64 (0x04) or SHA-256 (0x0A), and the check MUST be verified. The dictionary size of the LZMA2 filter MUST NOT exceed 64 MiB.
+
+>**Note:** LZMA typically achieves the highest compression ratio of the methods in this specification, at the cost of slower compression and decompression.
+
+#### 2.4.2.5. Trained Dictionaries
+
+Many small chunks, for example of a build plate with many small objects, compress poorly because each chunk is compressed independently. A _trained dictionary_ contains byte sequences that are typical for the data, so that the compressor can refer to them from every chunk. A _binary dictionary part_ is an OPC part that contains a trained dictionary.
+
+A binary index part MAY reference one binary dictionary part with its dictionary attribute. The binary index part MUST then have exactly one relationship of type BinaryDictionary to the binary dictionary part. The dictionary applies to all chunks of the binary data part. A binary dictionary part MAY be referenced by more than one binary index part, which is RECOMMENDED, as the dictionary is only stored once. The size of a binary dictionary part MUST NOT exceed 4 MiB.
+
+A trained dictionary MUST only be referenced if the compression method is "zlib", "lz4" or "zstd". How the dictionary is applied is defined in the section of the respective compression method. How a producer creates the dictionary (for example with the training function of the Zstandard reference library) is not defined by this specification.
+
+>**Note:** A dictionary only pays off if it saves more than its own size across all chunks that use it. It mainly helps chunks smaller than about 100 KiB.
+
+#### 2.4.2.6. Choosing a Compression Method
+
+This section is informative. The best compression method depends on the data and on the use case, which only the producer knows. The following table gives general guidance:
+
+| **Compression method** | **Decompression speed** | **Compression ratio** | **Typical use** |
+| --- | --- | --- | --- |
+| none | highest | none | Data that is compressed by the ZIP archive, or that is not compressible |
+| lz4 | very high | moderate | Files that are loaded often and fast, for example by a printer |
+| zlib | moderate | good | Maximum compatibility, as zlib is available on every platform |
+| zstd | high | very good | General purpose default, in particular with trained dictionaries |
+| lzma | low | highest | Archiving and transfer of very large files |
+
+The compression ratio strongly depends on the chosen array types. Delta and quantized delta array types produce many small values, which all compression methods compress better than raw values.
+
+### 2.4.3. Binary Index Part and OPC Structure
+
+A _binary index part_ is an XML part that describes the layout of exactly one binary data part. The 3D Model part references binary index parts, and each binary index part references its binary data part, as shown in figure 2-2.
+
+_Figure 2-2. OPC structure of binary encoded data_
+
+![figure 2-2](images/binary_opc_structure.png)
+
+The following rules apply:
+
+- A 3D Model part that references a binary index part MUST have a relationship of type BinaryIndex to that part. A binary index part MAY be referenced by more than one 3D Model part, each with its own relationship.
+- A binary index part MUST have exactly one relationship of type BinaryData to the binary data part it describes. A binary data part MUST be described by exactly one binary index part.
+- A binary index part that references a binary dictionary part MUST have exactly one relationship of type BinaryDictionary to that part (see [2.4.2.5. Trained Dictionaries](#2425-trained-dictionaries)).
+- The content types and relationship types are defined in [Appendix C. Standard Namespaces and Content Types](#appendix-c-standard-namespaces-and-content-types).
+- Binary index parts, binary data parts and binary dictionary parts MUST be included in the 3MF Document. Consumers MUST generate an error if a referenced binary index part, binary data part or binary dictionary part is missing.
+
+The root element of a binary index part is the \<bin:binaryindex> element. All elements of a binary index part are in the core binary namespace.
+
+#### 2.4.3.1. Binary Index
+
+Element **\<bin:binaryindex>**
+
+##### Attributes
+| Name | Type | Use | Default | Annotation |
+| --- | --- | --- | --- | --- |
+| data | **ST\_UriReference** | required | | Path to the binary data part that is described by this binary index part. |
+| compression | **ST\_Compression** | | none | Compression method of all chunks in the binary data part. Valid values are "none", "zlib", "lz4", "zstd" and "lzma". |
+| dictionary | **ST\_UriReference** | | | Path to a binary dictionary part with a trained dictionary that is used for all chunks. Only allowed if the compression method is "zlib", "lz4" or "zstd". |
+| @anyAttribute | | | | |
+
+##### Elements
+| Name | Type | Use | Default | Annotation |
+| --- | --- | --- | --- | --- |
+| chunk | **CT\_Chunk** | required | | One or more chunks of the binary data part. |
+
+#### 2.4.3.2. Chunk
+
+Element **\<bin:chunk>**
+
+##### Attributes
+| Name | Type | Use | Default | Annotation |
+| --- | --- | --- | --- | --- |
+| offset | **xs:unsignedLong** | required | | Byte offset of the chunk from the beginning of the binary data part. |
+| size | **xs:unsignedLong** | required | | Number of bytes of the chunk in the binary data part. |
+| uncompressedsize | **xs:unsignedLong** | required | | Number of bytes of the uncompressed chunk data. If the compression method is "none", it MUST be equal to size. |
+| @anyAttribute | | | | |
+
+##### Elements
+| Name | Type | Use | Default | Annotation |
+| --- | --- | --- | --- | --- |
+| array | **CT\_Array** | required | | One or more binary arrays contained in the uncompressed chunk data. |
+
+The range from offset to offset + size MUST lie within the binary data part. The uncompressedsize attribute allows a consumer to allocate memory before decompressing, and to detect corrupt data.
+
+#### 2.4.3.3. Array
+
+Element **\<bin:array>**
+
+##### Attributes
+| Name | Type | Use | Default | Annotation |
+| --- | --- | --- | --- | --- |
+| id | **ST\_ArrayID** | required | | Identifier of the binary array. MUST be unique within the binary index part. |
+| type | **ST\_ArrayType** | required | | Array type as defined in [2.4.1. Array Encoding and Quantization](#241-array-encoding-and-quantization). Valid values are "int32", "int32delta", "float32", "float32quantized", "float32quantizeddelta" and "float64". |
+| offset | **xs:unsignedLong** | required | | Byte offset of the binary array from the beginning of the uncompressed chunk data. |
+| count | **ST\_ArrayCount** | required | | Number of values N of the binary array. The byte length of the array follows from count and type. |
+| omitvalue | **xs:long** | | | Optional leave-out value. Elements whose value is equal to it are treated as omitted, see [2.4.4.1. Leave-Out Values](#2441-leave-out-values). Only allowed for the array types "int32", "int32delta", "float32quantized" and "float32quantizeddelta". |
+| @anyAttribute | | | | |
+
+Binary arrays are referenced from the 3D Model part by the combination of the path to the binary index part and the array id. A binary array MAY be referenced more than once, for example by several attributes or by several meshes. Consumers MUST ignore binary arrays that are not referenced. Producers SHOULD NOT write binary arrays that are not referenced.
+
+The following example describes a binary data part with one chunk that is compressed from 240 to 76 bytes and contains six arrays:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<binaryindex xmlns="http://schemas.microsoft.com/3dmanufacturing/corebinary/2023/05"
+    data="/3D/Binary/cube.bin" compression="zlib">
+  <chunk offset="0" size="76" uncompressedsize="240">
+    <array id="1" type="float32" offset="0" count="8" />
+    <array id="2" type="float32" offset="32" count="8" />
+    <array id="3" type="float32" offset="64" count="8" />
+    <array id="4" type="int32delta" offset="96" count="12" />
+    <array id="5" type="int32delta" offset="144" count="12" />
+    <array id="6" type="int32delta" offset="192" count="12" />
+  </chunk>
+</binaryindex>
+```
+
+### 2.4.4. Embedding into XML Elements
+
+A _binary array element_ replaces the sequence of ASCII child elements of a container element in the 3D Model part. For example, a \<bin:vertexarray> element replaces all \<vertex> elements of a \<vertices> element. The following rules apply to all binary array elements, including those defined by extensions:
+
+- A binary array element MUST have an index attribute of type **ST\_UriReference** with the path to a binary index part.
+- For every attribute of the replaced ASCII element that is encoded, the binary array element has an attribute with the same name. The value of this attribute is the id of a binary array in the referenced binary index part.
+- All binary arrays referenced by one binary array element MUST have the same count N. The container element is equivalent to N ASCII child elements. The attribute values of the i-th ASCII element are the decoded i-th values of the referenced binary arrays, in the same order.
+- If an optional attribute of the replaced ASCII element is not referenced by the binary array element, the attribute is omitted on all N equivalent ASCII elements.
+- If a binary array declares a leave-out value, the attribute is omitted on every equivalent ASCII element whose value is equal to the leave-out value, see [2.4.4.1. Leave-Out Values](#2441-leave-out-values).
+- A container element that contains a binary array element MUST contain exactly one binary array element and MUST NOT contain any of the ASCII child elements it replaces. Mixing ASCII and binary encoding within one container element is not allowed. Different container elements, even within the same mesh, MAY use different encodings.
+- All rules that apply to the equivalent ASCII elements apply to the decoded values as well. A value that would not be valid for the attribute of the equivalent ASCII element (for example a negative vertex index, or the value 0 for an attribute of type **ST\_ResourceID**) makes the document invalid.
+
+The binary array elements defined by this Core Specification are \<bin:vertexarray> (see [4.1.3.2. Binary Vertex Array](#4132-binary-vertex-array)) and \<bin:trianglearray> (see [4.1.4.2. Binary Triangle Array](#4142-binary-triangle-array)).
+
+An extension that defines a derived binary namespace MAY allow binary encoding for its own elements by defining additional binary array elements in its derived binary namespace, following the rules above. An extension that adds attributes to an element that has a binary array element defined in another specification (for example attributes on \<triangle> elements) MAY define attributes in its derived binary namespace on that binary array element, whose values reference binary arrays in the same binary index part. If an ASCII element carries attributes from an extension namespace for which no binary encoding is defined, its container element MUST NOT be binary encoded.
+
+The following example shows a cube with an edge length of 10 millimeters with binary encoded vertices and triangles, using the binary index part from section 2.4.3:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<model unit="millimeter" xml:lang="en-US"
+    xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"
+    xmlns:bin="http://schemas.microsoft.com/3dmanufacturing/corebinary/2023/05"
+    requiredextensions="bin">
+  <resources>
+    <object id="1" type="model">
+      <mesh>
+        <vertices>
+          <bin:vertexarray index="/3D/Binary/cube.binindex" x="1" y="2" z="3" />
+        </vertices>
+        <triangles>
+          <bin:trianglearray index="/3D/Binary/cube.binindex" v1="4" v2="5" v3="6" />
+        </triangles>
+      </mesh>
+    </object>
+  </resources>
+  <build>
+    <item objectid="1" />
+  </build>
+</model>
+```
+
+The arrays 1, 2 and 3 contain the x, y and z coordinates of 8 vertices: x = 0, 10, 10, 0, 0, 10, 10, 0; y = 0, 0, 10, 10, 0, 0, 10, 10; z = 0, 0, 0, 0, 10, 10, 10, 10. The arrays 4, 5 and 6 contain the v1, v2 and v3 indices of 12 triangles. For example, the decoded values of array 4 are 3, 1, 4, 6, 0, 5, 1, 6, 2, 7, 3, 4, which are stored as the base value 3 followed by the deltas -2, 3, 2, -6, 5, -4, 5, -4, 5, -4, 1. The 3D Model part has the following relationships part "/3D/\_rels/3dmodel.model.rels":
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Target="/3D/Binary/cube.binindex" Id="rel-1"
+      Type="http://schemas.microsoft.com/3dmanufacturing/2023/05/binaryindex" />
+</Relationships>
+```
+
+The binary index part has the following relationships part "/3D/Binary/\_rels/cube.binindex.rels":
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Target="/3D/Binary/cube.bin" Id="rel-1"
+      Type="http://schemas.microsoft.com/3dmanufacturing/2023/05/binarydata" />
+</Relationships>
+```
+
+#### 2.4.4.1. Leave-Out Values
+
+Many optional attributes, such as the per-vertex properties of triangles, are specified for some elements and omitted for others. A binary array therefore MAY declare a _leave-out value_ with the omitvalue attribute of the \<bin:array> element. An element of the array whose value is equal to the leave-out value does not carry a value: the attribute that references the array is omitted on the respective equivalent ASCII element.
+
+The value that is compared with the leave-out value depends on the array type:
+
+| **Array type** | **Compared value** | **Valid range of omitvalue** |
+| --- | --- | --- |
+| int32 | the stored signed 32 bit integer | -2147483648 to 2147483647 |
+| int32delta | the decoded value, after adding the deltas | -2147483648 to 2147483647 |
+| float32quantized | the stored quantized value, before scaling | 0 to 4294967295 |
+| float32quantizeddelta | the quantized value after adding the deltas, before scaling | 0 to 4294967295 |
+| float32, float64 | leave-out values are not allowed. An optional attribute that references such an array is specified on all equivalent elements. | |
+
+The following rules apply:
+
+- If a binary array does not declare a leave-out value, every element of the array carries a value.
+- A binary array that declares a leave-out value MUST only be referenced by optional attributes. Required attributes, such as v1, v2 and v3 of \<bin:trianglearray> or x, y and z of \<bin:vertexarray>, MUST NOT reference it.
+- For delta array types, an element that is equal to the leave-out value remains part of the delta sequence: the next element is computed by adding its delta to the leave-out value.
+- For quantized array types, a quantized value that is equal to the leave-out value is exempt from the range check against _QuantizationSteps_. Producers SHOULD choose a leave-out value greater than _QuantizationSteps_, so that it cannot be confused with a real value.
+- Producers SHOULD choose a leave-out value that is not a valid value of the referencing attribute, for example -1 for attributes of type **ST\_ResourceIndex** or **ST\_ResourceID**.
+
+>**Note:** In delta arrays, omitted elements cause two large deltas, one to the leave-out value and one back. Producers that omit values frequently SHOULD prefer the raw array types for those arrays.
+
+The following example declares -1 as leave-out value for an array of per-triangle property indices:
+
+```xml
+<array id="7" type="int32" offset="240" count="12" omitvalue="-1" />
+```
+
+### 2.4.5. Error Handling
+
+A consumer that supports the binary extension MUST consider a 3MF Document invalid and MUST NOT substitute values if any of the following conditions occur:
+
+- A referenced binary index part, binary data part, binary dictionary part or binary array does not exist, or a required relationship is missing.
+- A compression method or array type is not defined in this specification or in a supported extension.
+- A chunk lies outside the binary data part, chunks overlap, or a chunk cannot be decompressed.
+- A chunk violates the format constraints of its compression method (for example a missing checksum, a skippable frame, a disallowed filter, or a window or dictionary size above the limit).
+- A trained dictionary is referenced for a compression method that does not allow it, exceeds 4 MiB, or does not match the dictionary identifier stored in a chunk.
+- The decompressed size of a chunk differs from its uncompressedsize attribute, or the checksum of a compressed chunk does not match.
+- A binary array lies outside its uncompressed chunk data, is not aligned, or overlaps another binary array.
+- The binary arrays referenced by one binary array element have different counts, or an array type does not match the type of the attribute that references it.
+- A decoded value violates the constraints of its array type (for example a quantized value greater than _QuantizationSteps_ that is not the leave-out value, or a non-finite float) or is not valid for the attribute of the equivalent ASCII element.
+- A leave-out value is declared for a raw float array type, is out of range for its array type, or is declared by a binary array that is referenced by a required attribute.
+
+Binary data is a potential attack surface. Consumers MUST NOT read or write outside the bounds of the parts and buffers defined above. Consumers SHOULD check that the declared sizes are plausible before allocating memory, and SHOULD limit the ratio between uncompressed and compressed size in order to protect against decompression bombs.
+
+An editor that modifies an element that is binary encoded MUST either encode the modified data again or convert the container element to ASCII encoding. An editor MUST remove binary index parts and binary data parts, together with their relationships, that are no longer referenced, and MUST remove the binary extension from the requiredextensions attribute if no binary array element remains in the 3D Model part.
+
+### 2.4.6. Versioning
+
+The core binary namespace is versioned independently from the core namespace, as described in [2.3.1. Support for Versioning and Extensibility](#231-support-for-versioning-and-extensibility). New array types, compression methods or binary array elements are introduced with a new version of the core binary namespace. A consumer MUST NOT guess the meaning of an unknown array type or compression method. As the binary extension is always marked as required, a consumer that does not support the version used in a document fails to process it, rather than misinterpreting it.
 
 # Chapter 3. 3D Models
 
@@ -619,7 +1053,7 @@ Element **\<vertices>**
 
 ![element vertices](images/element_vertices.png)
 
-The vertices element contains all the \<vertex> elements for this object. The vertices represent the corners of each triangle in the mesh. The order of these elements defines an implicit 0-based index that is referenced by other elements, such as the \<triangle> element. The producer SHOULD NOT include duplicate vertices unless coalescing duplicates would create non-manifold edges. Furthermore, a producer SHOULD collapse vertices that are very closely proximal with a single vertex whenever appropriate. In order to avoid integer overflows, a vertex array MUST contain less than 2^31 vertices.
+The vertices element contains all the \<vertex> elements for this object, or exactly one \<bin:vertexarray> element that encodes them in binary form (see [4.1.3.2. Binary Vertex Array](#4132-binary-vertex-array)). The vertices represent the corners of each triangle in the mesh. The order of these elements defines an implicit 0-based index that is referenced by other elements, such as the \<triangle> element. The producer SHOULD NOT include duplicate vertices unless coalescing duplicates would create non-manifold edges. Furthermore, a producer SHOULD collapse vertices that are very closely proximal with a single vertex whenever appropriate. In order to avoid integer overflows, a vertex array MUST contain less than 2^31 vertices.
 
 
 #### 4.1.3.1. Vertex
@@ -636,7 +1070,27 @@ Element **\<vertex>**
 | z | **ST\_Number** | required | | The position of the vertex along the Z axis. |
 | @anyAttribute | | | | |
 
-A \<vertex> element represents a point in 3-dimensional space that is referenced by a triangle in the mesh. The decimal values representing the coordinates can be recorded to arbitrary precision. Producers SHOULD NOT use more precision than the error generated in their calculations, or the anticipated resolution of their consumer. The variable-precision nature of ASCII encoding is a significant advantage over fixed-width binary formats, and helps make up the difference in storage efficiency.
+A \<vertex> element represents a point in 3-dimensional space that is referenced by a triangle in the mesh. The decimal values representing the coordinates can be recorded to arbitrary precision. Producers SHOULD NOT use more precision than the error generated in their calculations, or the anticipated resolution of their consumer. The variable-precision nature of ASCII encoding is a significant advantage over fixed-width binary formats, and helps make up the difference in storage efficiency. Where storage efficiency or parsing performance of large meshes is nevertheless a bottleneck, a producer MAY use the binary vertex array described in the next section.
+
+
+#### 4.1.3.2. Binary Vertex Array
+
+Element **\<bin:vertexarray>**
+
+##### Attributes
+| Name | Type | Use | Default | Annotation |
+| --- | --- | --- | --- | --- |
+| index | **ST\_UriReference** | required | | Path to the binary index part that contains the referenced binary arrays. |
+| x | **ST\_ArrayID** | required | | Id of a floating point binary array with the positions of the vertices along the X axis. |
+| y | **ST\_ArrayID** | required | | Id of a floating point binary array with the positions of the vertices along the Y axis. |
+| z | **ST\_ArrayID** | required | | Id of a floating point binary array with the positions of the vertices along the Z axis. |
+| @anyAttribute | | | | |
+
+A \<bin:vertexarray> element is a binary array element as defined in [2.4.4. Embedding into XML Elements](#244-embedding-into-xml-elements). It MUST be in the core binary namespace and MUST be the only child element of its \<vertices> element. A \<vertices> element that contains a \<bin:vertexarray> element MUST NOT contain any \<vertex> elements.
+
+The binary arrays referenced by x, y and z MUST be of a floating point array type and MUST have the same count N. The \<vertices> element is equivalent to N \<vertex> elements, where the i-th \<vertex> element has the decoded i-th values of the arrays x, y and z as its attributes. The order of the binary arrays therefore defines the implicit 0-based vertex index. All rules of [4.1.3. Vertices](#413-vertices) apply to the equivalent \<vertex> elements, in particular N MUST be at least 3 and less than 2^31.
+
+The three coordinate arrays MAY use different array types, for example a quantized array type with a smaller interval for a flat dimension.
 
 
 ### 4.1.4. Triangles
@@ -645,7 +1099,7 @@ Element **\<triangles>**
 
 ![element triangles](images/element_triangles.png)
 
-The \<triangles> element contains a set of 1 or more \<triangle> elements to describe a full 3D object mesh. If the object type is "model", the mesh has to contain at least 4 triangles to form a solid body. In order to avoid integer overflows, a triangle array MUST contain less than 2^31 triangles.
+The \<triangles> element contains a set of 1 or more \<triangle> elements, or exactly one \<bin:trianglearray> element that encodes them in binary form (see [4.1.4.2. Binary Triangle Array](#4142-binary-triangle-array)), to describe a full 3D object mesh. If the object type is "model", the mesh has to contain at least 4 triangles to form a solid body. In order to avoid integer overflows, a triangle array MUST contain less than 2^31 triangles.
 
 These limitations can be superceded by another required 3MF extension.
 
@@ -677,6 +1131,30 @@ The property group is specified by the pid attribute, if different than the prop
 If the properties defined on the triangle are from a \<basematerials> group (see [Chapter 5](#chapter-5-material-resources)), they MUST NOT form gradients, as interpolation of base materials is not defined in this core specification. Therefore p1, p2 and p3 MUST be equal or unspecified. Material gradients and interpolation methods are defined in extension specifications.
 
 >**Note:** The triangle orientation is affected by the sign of the determinant of the transformation as described in Section 4.1.
+
+
+#### 4.1.4.2. Binary Triangle Array
+
+Element **\<bin:trianglearray>**
+
+##### Attributes
+| Name | Type | Use | Default | Annotation |
+| --- | --- | --- | --- | --- |
+| index | **ST\_UriReference** | required | | Path to the binary index part that contains the referenced binary arrays. |
+| v1 | **ST\_ArrayID** | required | | Id of an integer binary array with the first vertex index of each triangle. |
+| v2 | **ST\_ArrayID** | required | | Id of an integer binary array with the second vertex index of each triangle. |
+| v3 | **ST\_ArrayID** | required | | Id of an integer binary array with the third vertex index of each triangle. |
+| p1 | **ST\_ArrayID** | | | Id of an integer binary array with the p1 value of each triangle. |
+| p2 | **ST\_ArrayID** | | | Id of an integer binary array with the p2 value of each triangle. |
+| p3 | **ST\_ArrayID** | | | Id of an integer binary array with the p3 value of each triangle. |
+| pid | **ST\_ArrayID** | | | Id of an integer binary array with the pid value of each triangle. |
+| @anyAttribute | | | | |
+
+A \<bin:trianglearray> element is a binary array element as defined in [2.4.4. Embedding into XML Elements](#244-embedding-into-xml-elements). It MUST be in the core binary namespace and MUST be the only child element of its \<triangles> element. A \<triangles> element that contains a \<bin:trianglearray> element MUST NOT contain any \<triangle> elements.
+
+The binary arrays referenced by v1, v2, v3, p1, p2, p3 and pid MUST be of an integer array type and MUST have the same count N. The \<triangles> element is equivalent to N \<triangle> elements, where the i-th \<triangle> element has the decoded i-th values of the referenced arrays as its attributes. An attribute is omitted on the i-th \<triangle> element if the attribute is not present on the \<bin:trianglearray> element, or if the decoded i-th value of its array is equal to the leave-out value of that array (see [2.4.4.1. Leave-Out Values](#2441-leave-out-values)). The arrays referenced by v1, v2 and v3 MUST NOT declare a leave-out value. All rules of [4.1.4. Triangles](#414-triangles) and [4.1.4.1. Triangle](#4141-triangle) apply to the equivalent \<triangle> elements. In particular, every value of v1, v2 and v3 MUST be a valid index into the vertices of the mesh, and every value of pid that is not omitted MUST be a valid **ST\_ResourceID**.
+
+The same binary array MAY be referenced by more than one attribute. For example, a mesh that assigns one property per triangle can reference the same array by p1, p2 and p3.
 
 
 ### 4.1.5. Triangle Sets
@@ -920,7 +1398,19 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 **Back.** The maximum printable XZ plane of the print area or the correspondent maximum plane of a model bounding box, once transformed to the output coordinate space.
 
+**Binary array.** A sequence of values of one array type, stored in a chunk of a binary data part, that encodes the values of one attribute of a sequence of XML elements.
+
+**Binary array element.** An element in a binary namespace that replaces the ASCII child elements of a container element by references to binary arrays.
+
+**Binary data part.** The OPC part that contains one or more chunks with binary arrays.
+
+**Binary dictionary part.** The OPC part that contains a trained dictionary, which is used for the compression of all chunks of the binary data parts that reference it.
+
+**Binary index part.** The XML part that describes the chunks and binary arrays of one binary data part.
+
 **Bottom.** The minimum printable XY plane of the print area or the correspondent minimum plane of a model bounding box, once transformed to the output coordinate space.
+
+**Chunk.** A contiguous range of bytes in a binary data part that is decompressed independently and contains one or more binary arrays.
 
 **Components** A model that contains two or more independently-defined objects that are connected or interlocked either during or after the 3D manufacturing process is complete. A component might be able to be reversed or the individual parts may be inseparably interlocked.
 
@@ -1085,9 +1575,10 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Vertices">
-		<xs:sequence>
+		<xs:choice>
 			<xs:element ref="vertex" minOccurs="3" maxOccurs="2147483647"/>
-		</xs:sequence>
+			<xs:any namespace="##other" processContents="lax" minOccurs="1" maxOccurs="1"/>
+		</xs:choice>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Vertex">
@@ -1097,9 +1588,10 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Triangles">
-		<xs:sequence>
+		<xs:choice>
 			<xs:element ref="triangle" minOccurs="1" maxOccurs="2147483647"/>
-		</xs:sequence>
+			<xs:any namespace="##other" processContents="lax" minOccurs="1" maxOccurs="1"/>
+		</xs:choice>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<xs:complexType name="CT_Triangle">
@@ -1292,6 +1784,123 @@ A consumer that is authorized to un-protect content by reversing the above steps
 </xs:schema>
 ```
 
+### B.1.3 Binary encoding schema
+
+The extension points in CT\_Vertices and CT\_Triangles of the core schema allow exactly one element from another namespace instead of the ASCII child elements. They MUST only be used by binary array elements of a required extension, see [2.4.4. Embedding into XML Elements](#244-embedding-into-xml-elements). The following schema defines the binary array elements of the 3D Model part as well as the elements of the binary index part.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/corebinary/2023/05"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
+  targetNamespace="http://schemas.microsoft.com/3dmanufacturing/corebinary/2023/05"
+  elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+  <xs:annotation>
+    <xs:documentation>
+      <![CDATA[
+    Schema notes:
+ 
+    Items within this schema follow a simple naming convention of appending a prefix indicating the type of element for references:
+ 
+    Unprefixed: Element names
+    CT_: Complex types
+    ST_: Simple types
+   
+    ]]>
+    </xs:documentation>
+  </xs:annotation>
+  <!-- Complex Types: 3D Model part -->
+  <xs:complexType name="CT_VertexArray">
+    <xs:attribute name="index" type="ST_UriReference" use="required"/>
+    <xs:attribute name="x" type="ST_ArrayID" use="required"/>
+    <xs:attribute name="y" type="ST_ArrayID" use="required"/>
+    <xs:attribute name="z" type="ST_ArrayID" use="required"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="CT_TriangleArray">
+    <xs:attribute name="index" type="ST_UriReference" use="required"/>
+    <xs:attribute name="v1" type="ST_ArrayID" use="required"/>
+    <xs:attribute name="v2" type="ST_ArrayID" use="required"/>
+    <xs:attribute name="v3" type="ST_ArrayID" use="required"/>
+    <xs:attribute name="p1" type="ST_ArrayID"/>
+    <xs:attribute name="p2" type="ST_ArrayID"/>
+    <xs:attribute name="p3" type="ST_ArrayID"/>
+    <xs:attribute name="pid" type="ST_ArrayID"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <!-- Complex Types: Binary Index part -->
+  <xs:complexType name="CT_BinaryIndex">
+    <xs:sequence>
+      <xs:element ref="chunk" minOccurs="1" maxOccurs="2147483647"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
+    </xs:sequence>
+    <xs:attribute name="data" type="ST_UriReference" use="required"/>
+    <xs:attribute name="compression" type="ST_Compression" default="none"/>
+    <xs:attribute name="dictionary" type="ST_UriReference"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="CT_Chunk">
+    <xs:sequence>
+      <xs:element ref="array" minOccurs="1" maxOccurs="2147483647"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="2147483647"/>
+    </xs:sequence>
+    <xs:attribute name="offset" type="xs:unsignedLong" use="required"/>
+    <xs:attribute name="size" type="xs:unsignedLong" use="required"/>
+    <xs:attribute name="uncompressedsize" type="xs:unsignedLong" use="required"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="CT_Array">
+    <xs:attribute name="id" type="ST_ArrayID" use="required"/>
+    <xs:attribute name="type" type="ST_ArrayType" use="required"/>
+    <xs:attribute name="offset" type="xs:unsignedLong" use="required"/>
+    <xs:attribute name="count" type="ST_ArrayCount" use="required"/>
+    <xs:attribute name="omitvalue" type="xs:long"/>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <!-- Simple Types -->
+  <xs:simpleType name="ST_UriReference">
+    <xs:restriction base="xs:anyURI">
+      <xs:pattern value="/.*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ST_ArrayID">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:maxExclusive value="2147483648"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ST_ArrayCount">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:maxExclusive value="2147483648"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ST_ArrayType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="int32"/>
+      <xs:enumeration value="int32delta"/>
+      <xs:enumeration value="float32"/>
+      <xs:enumeration value="float32quantized"/>
+      <xs:enumeration value="float32quantizeddelta"/>
+      <xs:enumeration value="float64"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ST_Compression">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="none"/>
+      <xs:enumeration value="zlib"/>
+      <xs:enumeration value="lz4"/>
+      <xs:enumeration value="zstd"/>
+      <xs:enumeration value="lzma"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- Elements -->
+  <xs:element name="vertexarray" type="CT_VertexArray"/>
+  <xs:element name="trianglearray" type="CT_TriangleArray"/>
+  <xs:element name="binaryindex" type="CT_BinaryIndex"/>
+  <xs:element name="chunk" type="CT_Chunk"/>
+  <xs:element name="array" type="CT_Array"/>
+</xs:schema>
+```
+
 ## Appendix B.2. 3MF Metadata Example
 
 ```xml
@@ -1367,6 +1976,12 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 PrintTicket part application/vnd.ms-printing.printticket+xml
 
+Binary Index application/vnd.ms-package.3dmanufacturing-binaryindex+xml
+
+Binary Data application/vnd.ms-package.3dmanufacturing-binarydata
+
+Binary Dictionary application/vnd.ms-package.3dmanufacturing-binarydictionary
+
 ### C.2 Relationship Types
 
 StartPart http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel
@@ -1377,11 +1992,20 @@ PrintTicket http://schemas.microsoft.com/3dmanufacturing/2013/01/printticket
 
 MustPreserve http://schemas.openxmlformats.org/package/2006/relationships/mustpreserve
 
+BinaryIndex http://schemas.microsoft.com/3dmanufacturing/2023/05/binaryindex
+
+BinaryData http://schemas.microsoft.com/3dmanufacturing/2023/05/binarydata
+
+BinaryDictionary http://schemas.microsoft.com/3dmanufacturing/2023/05/binarydictionary
+
 ### C.3 Namespaces
 
 3D Model http://schemas.microsoft.com/3dmanufacturing/core/2015/02
 
 Triangle Sets http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07
+
+Binary Encoding http://schemas.microsoft.com/3dmanufacturing/corebinary/2023/05
+
 
 # References
 
@@ -1389,9 +2013,17 @@ Triangle Sets http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07
 
 "BNF of Generic URI Syntax." World Wide Web Consortium. http://www.w3.org/Addressing/URL/5\_URI\_BNF.html
 
+**IEEE 754**
+
+IEEE Computer Society. "IEEE Standard for Floating-Point Arithmetic." IEEE Std 754-2019. 2019. https://standards.ieee.org/ieee/754/6210/
+
 **JPEG**
 
 Hamilton, Eric. "JPEG File Interchange Format, Version 1.02." World Wide Web Consortium. 1992. http://www.w3.org/Graphics/JPEG/jfif3.pdf
+
+**LZ4 Frame Format**
+
+Collet, Yann. "LZ4 Frame Format Description." https://github.com/lz4/lz4/blob/dev/doc/lz4_Frame_format.md
 
 **Open Packaging Conventions**
 
@@ -1404,6 +2036,18 @@ Duce, David (editor). "Portable Network Graphics (PNG) Specification," Second Ed
 **Print Schema**
 
 Microsoft Corporation. "Print Schema." 2006. http://windowssdk.msdn.microsoft.com/en-us/library/default.aspx
+
+**RFC 1950**
+
+Deutsch, P. and J-L. Gailly. "ZLIB Compressed Data Format Specification version 3.3." The Internet Society. 1996. http://www.rfc-editor.org
+
+**RFC 1951**
+
+Deutsch, P. "DEFLATE Compressed Data Format Specification version 1.3." The Internet Society. 1996. http://www.rfc-editor.org
+
+**RFC 8878**
+
+Collet, Y. and M. Kucherawy (editors). "Zstandard Compression and the 'application/zstd' Media Type." Internet Engineering Task Force. 2021. https://www.rfc-editor.org/rfc/rfc8878
 
 **RFC 2119**
 
@@ -1438,5 +2082,9 @@ Bray, Tim, Dave Hollander, Andrew Layman, and Richard Tobin (editors). "Namespac
 Beech, David, Murray Maloney, Noah Mendelsohn, and Henry S. Thompson (editors). "XML Schema Part 1: Structures," Second Edition. World Wide Web Consortium. 2004. http://www.w3.org/TR/2004/REC-xmlschema-1-20041028/
 
 Biron, Paul V. and Ashok Malhotra (editors). "XML Schema Part 2: Datatypes," Second Edition. World Wide Web Consortium. 2004. http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/
+
+**XZ File Format**
+
+Collin, Lasse and Igor Pavlov. "The .xz File Format." https://tukaani.org/xz/xz-file-format.txt
 
 Copyright 3MF Consortium 2018.
