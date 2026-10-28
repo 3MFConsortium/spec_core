@@ -72,7 +72,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
 | 1.2.3 | Clarification on content types | March 12, 2019 |
 | 1.3.0 | Added triangle sets and mirror. Clarification of ambiguities | October 7, 2021 |
 | 1.4.0 | Removed deprecated mirror. Clarification on shapes and composition. Document naming conventions  | February 6, 2025 |
-| 1.5.0 | Introduced binary encoding mechanism with proper namespace, model purpose wording, and introduction of optional item name | October 28, 2026 |
+| 1.5.0 | Introduced binary encoding mechanism with proper namespace, model purpose wording, Document Purpose relationships, and introduction of optional item name and rotation and translation constraint hints | October 28, 2026 |
 
 
 # Preface
@@ -180,7 +180,7 @@ Parts included to the 3D payload are explicitly linked to the 3D payload root by
 
 Parts in the 3D payload MUST use one of the appropriate relationships described below to establish that relationship between two parts in the payload. There MUST NOT be more than one relationship of a given relationship type from one part to a second part. Relationship types are defined in Appendix C, "Standard Namespaces and Content Types."
 
-Producers that generate a relationship MUST include the target part in the 3MF Document for any of the following relationship types: PrintTicket, StartPart, and Thumbnail. Consumers that access the target part of any relationship with one of these relationship types MUST generate an error if the part is not included in the 3MF Document.
+Producers that generate a relationship MUST include the target part in the 3MF Document for any of the following relationship types: PrintTicket, StartPart, Document Purpose, and Thumbnail. Consumers that access the target part of any relationship with one of these relationship types MUST generate an error if the part is not included in the 3MF Document.
 
 _Table 2-1. 3MF Document parts_
 
@@ -203,6 +203,50 @@ _Table 2-1. 3MF Document parts_
 _Figure 2-1. A typical 3MF Document_
 
 ![figure 2-1](images/figure_2-1.png)
+
+In addition to the 3MF Document StartPart relationship, a 3MF Document MAY declare its use case through one or more _Document Purpose relationships_. A Document Purpose relationship is a package relationship whose relationship type identifies a purpose of the 3MF Document, as listed in Table 2-2. The Document Purpose relationship types correspond to the document names described in [2.2.1. Document Naming Recommendation](#221-document-naming-recommendation). Unlike a file name, Document Purpose relationships are part of the package and are retained when the 3MF Document is renamed or transferred.
+
+Every Document Purpose relationship MUST target the primary 3D payload root, that is, the same 3D Model part that is targeted by the 3MF Document StartPart relationship. A 3MF Document MUST NOT contain more than one Document Purpose relationship of the same type. More than one Document Purpose relationship MAY be present if the 3MF Document serves several purposes at the same time, for example a project file that also contains a complete build prepared for a specific printer. Document Purpose relationships do not replace the 3MF Document StartPart relationship. The StartPart relationship remains REQUIRED, and consumers MUST use it to locate the primary 3D payload.
+
+_Table 2-2. Document Purpose relationships_
+
+| **Purpose** | **Description** | **Corresponding extension** |
+| --- | --- | --- |
+| Model Data | The 3MF Document primarily contains design models. | `.model.3mf` |
+| Build Instructions | The 3MF Document represents a complete build plate or tray of models, prepared for a specific printer. | `.build.3mf` |
+| Project Files | The 3MF Document contains a complete project, such as multiple models, settings, and metadata. | `.project.3mf` |
+| Toolpath Data | The 3MF Document contains machine-specific toolpath data. | `.toolpath.3mf` |
+| Slice Data | The 3MF Document represents polygonal slice data. | `.slices.3mf` |
+
+The relationship type of each purpose is defined in Appendix C, "Standard Namespaces and Content Types."
+
+Document Purpose relationships are a hint to the consumer on how to process the 3MF Document. The consumer decides how to load the 3MF Document. Consumers MAY use the Document Purpose relationships to select a default loading behavior, for example:
+
+- **Model Data**: add the contained objects to the currently open project or build.
+- **Build Instructions**: open the 3MF Document as a new project, preserving the build as is.
+- **Project Files**: open the 3MF Document as a new project, including all settings and metadata.
+- **Toolpath Data**: open the 3MF Document for preview or execution on the targeted machine, without merging it into an existing project.
+- **Slice Data**: open the 3MF Document for preview or processing of the slice data, without merging it into an existing project.
+
+The purpose also affects how strictly the \<build> element is interpreted (see [3.4.3. Build Instructions](#343-build-instructions)).
+
+If more than one Document Purpose relationship is present, consumers MAY choose the purpose that best fits their capabilities or ask the user. Consumers MAY ask the user to confirm or override the default behavior. Consumers MUST ignore Document Purpose relationship types they do not recognize. If no Document Purpose relationship is present, consumers MAY derive the purpose from the file name extension. If the file name extension conflicts with the Document Purpose relationships, the Document Purpose relationships take precedence.
+
+Producers SHOULD NOT send conflicting information to the consumer. The double extension of the file name SHOULD correspond to one of the declared Document Purpose relationships, and producers SHOULD only declare purposes that apply to the 3MF Document at the same time.
+
+Editors that change the purpose of a 3MF Document, for example by arranging design models on a build plate for a specific printer, SHOULD update the Document Purpose relationships accordingly and remove those that no longer apply.
+
+The following example shows the package relationships of a project file that also contains a complete build:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>
+<Relationship Target="/3D/3dmodel.model" Id="rel1" Type="http://schemas.3mf.io/3dmanufacturing/2026/10/purpose/project"/>
+<Relationship Target="/3D/3dmodel.model" Id="rel2" Type="http://schemas.3mf.io/3dmanufacturing/2026/10/purpose/build"/>
+<Relationship Target="/Metadata/thumbnail.png" Id="rel3" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail"/>
+</Relationships>
+```
 
 
 ### 2.1.2. 3D Model Part
@@ -263,6 +307,8 @@ The double extension SHOULD follow this structure:
 - **Toolpath Data**: Files containing machine-specific toolpath data SHOULD use the extension ".toolpath.3mf", for example, `example.toolpath.3mf`.
 - **Slice Data**: Files representing polygonal slice data SHOULD use the extension ".slices.3mf", for example, `example.slices.3mf`.
 
+The double extension is a naming recommendation and is not retained when a file is renamed. To declare the purpose of a 3MF Document in a binding, machine-readable way, producers SHOULD additionally add the corresponding Document Purpose relationship to the package (see [2.1.1. 3D Parts and Payload Relationships](#211-3d-parts-and-payload-relationships)). If Document Purpose relationships are present, the double extension of the file name SHOULD correspond to one of them, typically the primary purpose of the 3MF Document. For example, a file named `example.model.3mf` SHOULD NOT carry only a Build Instructions relationship.
+
 For proprietary use cases, where machine software or specific workflows require unique handling or metadata, it is RECOMMENDED that vendors use a custom extension naming convention. Vendor-specific 3MF files SHOULD follow the format `.vendor.3mf`, where "vendor" is replaced by the vendor's name or product identifier. For example, a proprietary file for a specific machine or process could be named `example.vendor.3mf`.
 
 This naming convention allows both users and systems to quickly identify the purpose and structure of a 3MF file without needing to inspect its internal contents. It also supports customization for vendor-specific needs while maintaining clarity in the overall ecosystem of 3MF file types.
@@ -289,6 +335,8 @@ To maintain consistency across the 3MF ecosystem, certain names are RESERVED for
 - `.other.3mf` – Reserved for non-standard or miscellaneous content not fitting into the above categories.
 
 These reserved names help ensure that the intent and structure of 3MF files remain clear and unambiguous across different software and hardware implementations.
+
+Document Purpose relationship types (see [2.1.1. 3D Parts and Payload Relationships](#211-3d-parts-and-payload-relationships)) are currently defined only for `.model.3mf`, `.build.3mf`, `.project.3mf`, `.toolpath.3mf` and `.slices.3mf`. Relationship types for the remaining reserved names MAY be defined in future versions of this specification or in extensions.
 
 ### 2.2.3 Part Naming Recommendations
 
@@ -1012,9 +1060,12 @@ Element **\<item>**
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
-| objectid | **ST\_ResourceID** | required | | Reference to the \<object> element with the matching id attribute value |
+| objectid | **ST\_ResourceID** | required | | Reference to the \<object> element with the matching id attribute value. |
 | transform | **ST\_Matrix3D** | | | A matrix transform (see [3.3. 3D Matrices](#33-3d-matrices)) applied to the item to be outputted. |
 | partnumber | **xs:string** | | | A unique identifier for the item. SHOULD be maintained by an editor if only the transformation is changed. |
+| name | **xs:string** | | | A display label for the item. If omitted, the consumer SHOULD fall back to the name attribute of the referenced object. |
+| rotationconstraint | **ST\_RotationConstraint** | | none | A hint about how a consumer can change the orientation of the item without departing from its design intent. Valid values are none, fixed, and zfixed. |
+| translationconstraint | **ST\_TranslationConstraint** | | none | A hint about how a consumer can change the position of the item without departing from its design intent. Valid values are none, fixed, and zfixed. |
 | @anyAttribute | | | | |
 
 ##### Elements
@@ -1027,6 +1078,32 @@ The \<item> element identifies one object resource to be output by the 3D manufa
 The \<item> element may contain a \<metadatagroup> element containing one or more vendor-supplied \<metadata> elements.
 
 A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see [4.2. Components](#42-components)), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
+
+The optional rotationconstraint attribute is a hint from the producer whether the orientation that the item transform defines is part of the design intent. It informs consumers that rearrange items how they can change the orientation of an item:
+
+- **none**: The orientation of the item is not part of the design intent. Consumers MAY rotate the item about any axis. This is the default.
+- **fixed**: The orientation of the item is part of the design intent, for example because the design is made for a specific print orientation. Consumers SHOULD NOT change the orientation of the item.
+- **zfixed**: The top and bottom of the item are part of the design intent, for example because the item has a defined base face. Consumers SHOULD only rotate the item about an axis parallel to the z-axis.
+
+The optional translationconstraint attribute is a hint from the producer whether the position that the item transform defines is part of the design intent. It informs consumers that rearrange items how they can change the position of an item:
+
+- **none**: The position of the item is not part of the design intent. Consumers MAY move the item in any direction. This is the default.
+- **fixed**: The position of the item is part of the design intent, for example because the item is aligned to a feature of the build platform. Consumers SHOULD NOT change the position of the item.
+- **zfixed**: The height of the item is part of the design intent, for example because the item is intentionally placed above the bottom of the coordinate space. Consumers SHOULD only move the item parallel to the XY plane.
+
+The rotationconstraint and translationconstraint attributes are independent of each other, and they do not permit a change of orientation or position where this specification otherwise forbids it.
+
+>The interpretation of the \<build> element depends on the purpose of the 3MF Document (see [2.1.1. 3D Parts and Payload Relationships](#211-3d-parts-and-payload-relationships)):
+>
+
+- If the 3MF Document declares the Build Instructions purpose, the \<build> element describes a build plate that the producer prepared for a specific printer. The item transforms represent this prepared layout and are interpreted as specified in this section.
+
+- If the 3MF Document declares the Model Data purpose, consumers SHOULD treat the \<build> element as a pointer to the design intent, that is, which objects make up the design and how they are oriented, scaled, and mirrored. 
+Consumers MAY change the position of the items, for example to place them on the build plate of the currently open project, but SHOULD preserve the scaling and mirroring that the item transforms define. Consumers MAY also change the orientation of the items, because whether the orientation is part of the design intent depends on the use case, for example when a design is made for a specific print orientation. The rotationconstraint and translationconstraint attributes of an item indicate this intent, and consumers SHOULD respect them.
+
+- If the 3MF Document declares the Model Data purpose, producers SHOULD only expose one build item. Multi-body designs SHOULD be created with component objects, which have a clearer notion of relative positioning.
+
+- If the 3MF Document declares the Toolpath Data or Slice Data purpose, the toolpath or slice data is derived from the \<build> element as given. Consumers MUST NOT rearrange the items or change their transforms, regardless of the rotationconstraint and translationconstraint attributes and overriding the permission to rearrange items above, because any change would make the \<build> element inconsistent with that data.
 
 Items SHOULD NOT overlap, but if they do, 3D manufacturing devices MUST unite the final geometry. If any of the overlapped items has a property defined, the resulting property on the overlapped geometry is taken from the properties of the last overlapped item. If the last item element has no properties defined in the overlapped geometry, properties MUST NOT be applied.
 
@@ -1740,6 +1817,9 @@ A consumer that is authorized to un-protect content by reversing the above steps
 		<xs:attribute name="objectid" type="ST_ResourceID" use="required"/>
 		<xs:attribute name="transform" type="ST_Matrix3D"/>
 		<xs:attribute name="partnumber" type="xs:string"/>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="rotationconstraint" type="ST_RotationConstraint" default="none"/>
+		<xs:attribute name="translationconstraint" type="ST_TranslationConstraint" default="none"/>
 		<xs:anyAttribute namespace="##other" processContents="lax"/>
 	</xs:complexType>
 	<!-- Simple Types -->
@@ -1792,6 +1872,20 @@ A consumer that is authorized to un-protect content by reversing the above steps
 			<xs:enumeration value="support"/>
 			<xs:enumeration value="surface"/>
 			<xs:enumeration value="other"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ST_RotationConstraint">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="none"/>
+			<xs:enumeration value="fixed"/>
+			<xs:enumeration value="zfixed"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ST_TranslationConstraint">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="none"/>
+			<xs:enumeration value="fixed"/>
+			<xs:enumeration value="zfixed"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<!-- Elements -->
@@ -2134,6 +2228,16 @@ BinaryIndex http://schemas.3mf.io/3dmanufacturing/2026/10/binaryindex
 BinaryData http://schemas.3mf.io/3dmanufacturing/2026/10/binarydata
 
 BinaryDictionary http://schemas.3mf.io/3dmanufacturing/2026/10/binarydictionary
+
+DocumentPurposeModel http://schemas.3mf.io/3dmanufacturing/2026/10/purpose/model
+
+DocumentPurposeBuild http://schemas.3mf.io/3dmanufacturing/2026/10/purpose/build
+
+DocumentPurposeProject http://schemas.3mf.io/3dmanufacturing/2026/10/purpose/project
+
+DocumentPurposeToolpath http://schemas.3mf.io/3dmanufacturing/2026/10/purpose/toolpath
+
+DocumentPurposeSlices http://schemas.3mf.io/3dmanufacturing/2026/10/purpose/slices
 
 ### C.3 Namespaces
 
