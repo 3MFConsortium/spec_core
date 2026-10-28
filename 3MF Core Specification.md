@@ -72,6 +72,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
 | 1.2.3 | Clarification on content types | March 12, 2019 |
 | 1.3.0 | Added triangle sets and mirror. Clarification of ambiguities | October 7, 2021 |
 | 1.4.0 | Removed deprecated mirror. Clarification on shapes and composition. Document naming conventions  | February 6, 2025 |
+| 1.5.0 | Introduced binary encoding mechanism with proper namespace, model purpose wording, and introduction of optional item name | October 28, 2026 |
 
 
 # Preface
