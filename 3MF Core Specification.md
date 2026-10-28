@@ -2112,11 +2112,11 @@ The core schema (see [B.1.1 Core specification schema](#b11-core-specification-s
 
 PrintTicket part application/vnd.ms-printing.printticket+xml
 
-Binary Index application/vnd.ms-package.3dmanufacturing-binaryindex+xml
+Binary Index application/vnd.3mf.3dmanufacturing-binaryindex+xml
 
-Binary Data application/vnd.ms-package.3dmanufacturing-binarydata
+Binary Data application/vnd.3mf.3dmanufacturing-binarydata
 
-Binary Dictionary application/vnd.ms-package.3dmanufacturing-binarydictionary
+Binary Dictionary application/vnd.3mf.3dmanufacturing-binarydictionary
 
 ### C.2 Relationship Types
 
