@@ -94,7 +94,7 @@ Part II, "Appendices," contains additional technical details and schemas too ext
 
 The information contained in this specification is subject to change. Every effort has been made to ensure its accuracy at the time of publication.
 
-This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07", defined in version 1.3. The prefix "bin" maps to the xml namespace "http://schemas.microsoft.com/3dmanufacturing/core/binary/2026/10" of the optional binary encoding (see [2.4. Binary Encoding](#24-binary-encoding)). See [Appendix C.3 Namespaces](#c3-namespaces)
+This core specification is extended with additions. As an example, the prefix "t" maps to the xml-namespace "http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07", defined in version 1.3. The prefix "bin" maps to the xml namespace "http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10" of the optional binary encoding (see [2.4. Binary Encoding](#24-binary-encoding)). See [Appendix C.3 Namespaces](#c3-namespaces)
 
 ## Document Conventions
 
@@ -370,7 +370,7 @@ The language of the contents of a 3MF Document (typically useful for content pro
 
 While the ASCII XML encoding offers extensibility and human readability, certain use cases benefit from a more compact, binary representation of data. Large datasets, such as vertex positions or triangle indices, are particularly easier to handle when stored in fixed-size arrays on disk.
 
-The _3MF Binary Extension_ is an OPTIONAL addition to the Core Specification that allows to store array data (float or integer) similar to a thumbnail image or 2D Texture in a referenced external part in the 3MF OPC Package. All XML elements MUST be prefixed with their according namespace, which is *http://schemas.microsoft.com/3dmanufacturing/core/binary/2026/10* for the Core Specification. Throughout this specification, the prefix "bin" is used for this namespace. In order to make use of this mechanism in a 3MF Extension, each extension specification MUST define its own binary extension namespace, derived from its original namespace in a similar form (for example *http://schemas.microsoft.com/3dmanufacturing/beamlattice/binary/YYYY/MM* for the Beam Lattice Extension).
+The _3MF Binary Extension_ is an OPTIONAL addition to the Core Specification that allows to store array data (float or integer) similar to a thumbnail image or 2D Texture in a referenced external part in the 3MF OPC Package. All XML elements MUST be prefixed with their according namespace, which is *http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10* for the Core Specification. Throughout this specification, the prefix "bin" is used for this namespace. In order to make use of this mechanism in a 3MF Extension, each extension specification MUST define its own binary extension namespace, derived from its original namespace in a similar form (for example *http://schemas.3mf.io/3dmanufacturing/beamlattice/binary/YYYY/MM* for the Beam Lattice Extension).
 
 >Any 3MF Model that contains any binary extension element MUST have the core binary extension marked as required, as well as any referenced derived binary extension.
 
@@ -380,13 +380,13 @@ As a required extension, the core binary extension supersedes the requirements o
 
 The use of binary data in general should be used only deliberately and with care. Therefore it MUST follow the following guidelines:
 
-- Using a binary array element MUST only change the actual encoding on disk and not the underlying XML data model. This means that it MUST be possible at any time to losslessly convert a binary encoded 3MF file into a uniquely defined ASCII specification element. Equally, any standard ASCII 3MF file can be converted into a binary 3MF package with only syntactical understanding of its content.
+- Using a binary array element is just a change of the actual encoding on disk and not the underlying data model. This means that it MUST be possible at any time to losslessly convert a binary encoded 3MF file into a uniquely defined ASCII specification element. Equally, any standard ASCII 3MF file can be converted into a binary 3MF package with only syntactical understanding of its content.
 
 - Any 3MF specification MUST explicitly allow the use of binary encoding for specific XML elements, including instructions and guardrails how to interpret them uniquely in their context. They MUST NOT be used for any other elements in the 3MF Model. This Core Specification allows binary encoding for the \<vertices> element (see [4.1.3.2. Binary Vertex Array](#4132-binary-vertex-array)), the \<triangles> element (see [4.1.4.2. Binary Triangle Array](#4142-binary-triangle-array)) and the \<t:triangleset> element (see [4.1.5.4 Binary Triangle Set References](#4154-binary-triangle-set-references)).
 
-Binary encoding reduces human readability and excludes consumers that do not implement this extension. Producers SHOULD therefore only use it where the ASCII representation is a measurable bottleneck for file size, loading or writing time, as is typically the case for meshes with a large number of vertices and triangles.
+Binary encoding reduces human readability and excludes consumers that do not implement this extension. Producers SHOULD therefore only use it in applications where the ASCII representation is a measurable bottleneck for file size, loading or writing time, as is typically the case for meshes with a large number of vertices and triangles.
 
->**Note:** Only a Producer has the full contextual information on how to choose an encoding strategy, and there are many valid options to choose from. This document therefore only prescribes how a Consumer MUST Decode binary data uniquely into the right form. A Producer MUST ensure that any consumer will interpret its encoding correctly by this mechanism.
+>**Note:** Only a Producer has the full contextual information on how to choose an encoding strategy, and there are many valid options to choose from. This document therefore only prescribes how a Consumer MUST Decode binary data uniquely into the right form.
 
 ### 2.4.1. Array Encoding and Quantization
 
@@ -415,9 +415,9 @@ The following rules apply to all array types:
 - Integer array types MUST only be referenced by attributes of integer type (for example **ST\_ResourceIndex** or **ST\_ResourceID**). Floating point array types MUST only be referenced by attributes of type **ST\_Number**.
 - The binary data part contains only the values of an array. All parameters that are needed to decode an array, such as the number of runs of a run-length encoded array type or the quantization parameters of a quantized array type, are attributes of its \<bin:array> element in the binary index part.
 
-The _decoded value_ of an array element is the value that is assigned to the attribute of the equivalent ASCII element. For integer array types, it is the exact integer. For floating point array types, it is the IEEE 754 binary64 number that results from the computation described in the respective section. All computations MUST be performed in IEEE 754 binary64 arithmetic with round-to-nearest-ties-to-even, in exactly the order given by the formula, and without fused multiply-add operations. A binary32 value is converted to binary64 exactly. This guarantees that every consumer decodes bit-identical values.
+The _decoded value_ of an array element is the value that is assigned to the attribute of the equivalent ASCII element. For integer array types, it is the exact integer. For floating point array types, it is the IEEE 754 binary64 number that results from the computation described in the respective section. All computations MUST be performed in IEEE 754 binary64 arithmetic with round-to-nearest-ties-to-even, in exactly the order given by the formula. A binary32 value is converted to binary64 exactly. This guarantees that every consumer decodes bit-identical values.
 
-When converting a binary array into its equivalent ASCII elements, a producer MUST write each decoded floating point value as a decimal string that parses back to the identical binary64 value (for example the shortest round-trip representation). The conversion from binary to ASCII is therefore lossless.
+When converting a binary array into its equivalent ASCII elements, a producer SHOULD write each decoded floating point value as a decimal string that parses back to the identical binary64 value (for example the shortest round-trip representation). Then the conversion from binary to ASCII is lossless.
 
 #### 2.4.1.1 Raw Integer Array
 
@@ -514,6 +514,8 @@ This process comes of course with a loss of accuracy. The decoded values MUST be
 
 _value = min + (quantizedvalue / steps) * (max - min)_
 
+The formula MUST be evaluated without fused multiply-add (FMA) operations: the product MUST be rounded to binary64 before min is added. Otherwise, consumers with and without FMA support would decode different values.
+
 Here is the above example with the first 5 values, the quantization parameters min = 1000, max = 2000 and steps = 10000, and consuming 20 bytes:
 
 | **Value 1** | **Value 2** | **Value 3** | **Value 4** | **Value 5** |
@@ -548,6 +550,8 @@ Every quantized value MUST be in the range from 0 to steps, unless it is equal t
 
 _value<sub>i</sub> = min + (quantizedvalue<sub>i</sub> / steps) * (max - min)_
 
+As in 2.4.1.7, the formula MUST be evaluated without fused multiply-add (FMA) operations.
+
 Here is the above example with the first 5 values and the same quantization parameters, consuming 20 bytes:
 
 | **Base Value** | **Delta 2** | **Delta 3** | **Delta 4** | **Delta 5** |
@@ -564,7 +568,7 @@ The decoded values are identical to the example in 2.4.1.7.
 
 The _Run-Length Encoded Quantized Float_ option (array type "float48rlequantized") combines [2.4.1.5 Run-Length Encoded Integer Array](#2415-run-length-encoded-integer-array) and [2.4.1.7 Quantized Float Array](#2417-quantized-float-array). It stores run records and requires the runs attribute exactly as the array type "int48rle", but bits 0 to 47 of a run record contain the quantized value of the run as unsigned 48 bit integer. The quantization parameters and their constraints are identical to 2.4.1.7, except that steps MUST NOT exceed 281474976710655 (2<sup>48</sup> - 1). Every quantized value MUST be less than or equal to steps, unless it is equal to the leave-out value of the array.
 
-The decoded value of every run record is computed from its quantized value with the formula in 2.4.1.7 and repeated as often as its run length. Every quantized value up to 2<sup>48</sup> - 1 is exactly representable in binary64, so the formula applies unchanged.
+The decoded value of every run record is computed from its quantized value with the formula in 2.4.1.7, without fused multiply-add (FMA) operations, and repeated as often as its run length. Every quantized value up to 2<sup>48</sup> - 1 is exactly representable in binary64, so the formula applies unchanged.
 
 Here is an example with the values 0.5, 0.5, 0.5 and 0.75, the quantization parameters min = 0, max = 1 and steps = 1000, 2 run records and consuming 16 bytes:
 
@@ -592,7 +596,7 @@ _00 00 00 00 00 84 8F 40 66 66 66 66 66 30 91 40_
 
 A _binary data part_ is an OPC part that contains the binary arrays of a 3MF Document. It consists of one or more _chunks_. A chunk is a contiguous range of bytes in the binary data part. Each chunk is decoded independently into a block of _uncompressed chunk data_, which contains one or more binary arrays as described in [2.4.1. Array Encoding and Quantization](#241-array-encoding-and-quantization). The layout of chunks and arrays is described by exactly one binary index part (see [2.4.3. Binary Index Part and OPC Structure](#243-binary-index-part-and-opc-structure)).
 
-Chunks MUST NOT overlap. A binary array MUST lie entirely within the uncompressed chunk data of one chunk, and the binary arrays of one chunk MUST NOT overlap. The byte offset of a binary array within the uncompressed chunk data MUST be a multiple of 4 for the array types "int32", "int32delta", "float32", "float32quantized" and "float32quantizeddelta", and a multiple of 8 for the array types "int64", "int64delta", "int48rle", "float48rlequantized" and "float64". Bytes in the uncompressed chunk data that do not belong to any binary array (for example for alignment) SHOULD be zero and MUST be ignored by consumers.
+Chunks MUST NOT overlap. A binary array MUST lie entirely within the uncompressed chunk data of one chunk, and the binary arrays of one chunk MUST NOT overlap. Bytes in the uncompressed chunk data that do not belong to any binary array SHOULD be zero and MUST be ignored by consumers.
 
 Because every chunk is compressed independently, consumers can decode chunks in parallel and only need to decode the chunks that contain the arrays they need. Producers SHOULD limit the uncompressed size of each chunk accordingly, rather than storing all arrays in one large chunk.
 
@@ -729,7 +733,7 @@ The following example describes a binary data part with one uncompressed chunk o
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<binaryindex xmlns="http://schemas.microsoft.com/3dmanufacturing/core/binary/2026/10"
+<binaryindex xmlns="http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10"
     data="/3D/Binary/cube.bin" compression="none">
   <chunk offset="0" size="240" uncompressedsize="240" crc64="16A6CD7D9E10ADA4">
     <array id="1" type="float32" offset="0" count="8" />
@@ -764,7 +768,7 @@ The following example shows a cube with an edge length of 10 millimeters with bi
 <?xml version="1.0" encoding="UTF-8"?>
 <model unit="millimeter" xml:lang="en-US"
     xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"
-    xmlns:bin="http://schemas.microsoft.com/3dmanufacturing/core/binary/2026/10"
+    xmlns:bin="http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10"
     requiredextensions="bin">
   <resources>
     <object id="1" type="model">
@@ -790,7 +794,7 @@ The arrays 1, 2 and 3 contain the x, y and z coordinates of 8 vertices: x = 0, 1
 <?xml version="1.0" encoding="UTF-8"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Target="/3D/Binary/cube.binindex" Id="rel-1"
-      Type="http://schemas.microsoft.com/3dmanufacturing/2026/10/binaryindex" />
+      Type="http://schemas.3mf.io/3dmanufacturing/2026/10/binaryindex" />
 </Relationships>
 ```
 
@@ -800,7 +804,7 @@ The binary index part has the following relationships part "/3D/Binary/\_rels/cu
 <?xml version="1.0" encoding="UTF-8"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Target="/3D/Binary/cube.bin" Id="rel-1"
-      Type="http://schemas.microsoft.com/3dmanufacturing/2026/10/binarydata" />
+      Type="http://schemas.3mf.io/3dmanufacturing/2026/10/binarydata" />
 </Relationships>
 ```
 
@@ -849,7 +853,7 @@ A consumer that supports the binary extension MUST consider a 3MF Document inval
 - A chunk violates the format constraints of its compression method (for example a missing checksum, a skippable frame, a disallowed filter, or a window or dictionary size above the limit).
 - A trained dictionary is referenced for a compression method other than "zstd", exceeds 4 MiB, or does not match the dictionary identifier stored in a chunk.
 - The decompressed size of a chunk differs from its uncompressedsize attribute, the checksum of a compressed chunk does not match, or the crc64 attribute of a chunk does not match its uncompressed chunk data.
-- A binary array lies outside its uncompressed chunk data, is not aligned, or overlaps another binary array.
+- A binary array lies outside its uncompressed chunk data, or overlaps another binary array.
 - The runs attribute is missing for a run-length encoded array type or present for another array type, or the run lengths of the run records do not add up to the count of the array.
 - The quantization parameters min, max and steps are missing for a quantized array type or present for another array type, min is greater than max, or steps exceeds the limit of its array type.
 - The binary arrays referenced by one binary array element have different counts, or an array type does not match the type of the attribute that references it.
@@ -1893,9 +1897,9 @@ The core schema (see [B.1.1 Core specification schema](#b11-core-specification-s
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns="http://schemas.microsoft.com/3dmanufacturing/core/binary/2026/10"
+<xs:schema xmlns="http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10"
   xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace"
-  targetNamespace="http://schemas.microsoft.com/3dmanufacturing/core/binary/2026/10"
+  targetNamespace="http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10"
   elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all">
   <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
   <xs:annotation>
@@ -2124,11 +2128,11 @@ PrintTicket http://schemas.microsoft.com/3dmanufacturing/2013/01/printticket
 
 MustPreserve http://schemas.openxmlformats.org/package/2006/relationships/mustpreserve
 
-BinaryIndex http://schemas.microsoft.com/3dmanufacturing/2026/10/binaryindex
+BinaryIndex http://schemas.3mf.io/3dmanufacturing/2026/10/binaryindex
 
-BinaryData http://schemas.microsoft.com/3dmanufacturing/2026/10/binarydata
+BinaryData http://schemas.3mf.io/3dmanufacturing/2026/10/binarydata
 
-BinaryDictionary http://schemas.microsoft.com/3dmanufacturing/2026/10/binarydictionary
+BinaryDictionary http://schemas.3mf.io/3dmanufacturing/2026/10/binarydictionary
 
 ### C.3 Namespaces
 
@@ -2136,7 +2140,7 @@ BinaryDictionary http://schemas.microsoft.com/3dmanufacturing/2026/10/binarydict
 
 Triangle Sets http://schemas.microsoft.com/3dmanufacturing/trianglesets/2021/07
 
-Binary Encoding http://schemas.microsoft.com/3dmanufacturing/core/binary/2026/10
+Binary Encoding http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10
 
 
 # References
