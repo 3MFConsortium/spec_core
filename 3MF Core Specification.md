@@ -72,7 +72,7 @@ THESE MATERIALS ARE PROVIDED "AS IS." The contributors expressly disclaim any wa
 | 1.2.3 | Clarification on content types | March 12, 2019 |
 | 1.3.0 | Added triangle sets and mirror. Clarification of ambiguities | October 7, 2021 |
 | 1.4.0 | Removed deprecated mirror. Clarification on shapes and composition. Document naming conventions  | February 6, 2025 |
-| 1.5.0 | Introduced binary encoding mechanism with proper namespace, model purpose wording, Document Purpose relationships, and introduction of optional item name and rotation and translation constraint hints | October 28, 2026 |
+| 1.5.0 | Introduced binary encoding mechanism with proper namespace, model purpose wording, Document Purpose relationships, and introduction of optional item name, rotation and translation constraint hints, and part metadata | October 28, 2026 |
 
 
 # Preface
@@ -419,19 +419,19 @@ The language of the contents of a 3MF Document (typically useful for content pro
 
 While the ASCII XML encoding offers extensibility and human readability, certain use cases benefit from a more compact, binary representation of data. Large datasets, such as vertex positions or triangle indices, are particularly easier to handle when stored in fixed-size arrays on disk.
 
-The _3MF Binary Extension_ is an OPTIONAL addition to the Core Specification that allows to store array data (float or integer) similar to a thumbnail image or 2D Texture in a referenced external part in the 3MF OPC Package. All XML elements MUST be prefixed with their according namespace, which is *http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10* for the Core Specification. Throughout this specification, the prefix "bin" is used for this namespace. In order to make use of this mechanism in a 3MF Extension, each extension specification MUST define its own binary extension namespace, derived from its original namespace in a similar form (for example *http://schemas.3mf.io/3dmanufacturing/beamlattice/binary/YYYY/MM* for the Beam Lattice Extension).
+_Binary encoding_ is an OPTIONAL part of the Core Specification that allows to store array data (float or integer) similar to a thumbnail image or 2D Texture in a referenced external part in the 3MF OPC Package. Its XML elements are defined in a separate namespace, the _core binary namespace_ *http://schemas.3mf.io/3dmanufacturing/core/binary/2026/10*, and MUST be prefixed accordingly. Throughout this specification, the prefix "bin" is used for this namespace. In order to make use of this mechanism in a 3MF Extension, each extension specification MUST define its own _derived binary namespace_, derived from its original namespace in a similar form (for example *http://schemas.3mf.io/3dmanufacturing/beamlattice/binary/YYYY/MM* for the Beam Lattice Extension).
 
->Any 3MF Model that contains any binary extension element MUST have the core binary extension marked as required, as well as any referenced derived binary extension.
+>Any 3MF Model that contains any element of the core binary namespace MUST mark the core binary namespace as required, as well as any referenced derived binary namespace.
 
-This means that the namespace prefix of the core binary extension MUST be listed in the requiredextensions attribute of the \<model> element of every 3D Model part that contains a binary extension element. A consumer that does not support the binary extension therefore MUST fail to edit or manufacture the document as described in [2.3.1. Support for Versioning and Extensibility](#231-support-for-versioning-and-extensibility), instead of misinterpreting a mesh without vertices or triangles. Producers and consumers MAY choose not to support binary encoding at all. A producer that does not use binary extension elements MUST NOT mark the binary extension as required.
+This means that the namespace prefix of the core binary namespace MUST be listed in the requiredextensions attribute of the \<model> element of every 3D Model part that contains a binary array element. A consumer that does not support binary encoding therefore MUST fail to edit or manufacture the document as described in [2.3.1. Support for Versioning and Extensibility](#231-support-for-versioning-and-extensibility), instead of misinterpreting a mesh without vertices or triangles. Producers and consumers MAY choose not to support binary encoding at all. A producer that does not use binary array elements MUST NOT mark the core binary namespace as required.
 
-As a required extension, the core binary extension supersedes the requirements of the Core Specification where this specification explicitly says so (see [3.4. Model](#34-model)). It supersedes exactly one requirement: a \<vertices> element or a \<triangles> element MAY contain exactly one binary array element instead of its ASCII child elements, although the core schema (see [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)) requires at least three \<vertex> elements and at least one \<triangle> element. The core schema itself is not changed, and documents that do not use binary encoding are validated against it as before.
+As the core binary namespace is always marked as required, binary encoding supersedes the requirements of the Core Specification where this specification explicitly says so (see [3.4. Model](#34-model)). It supersedes exactly one requirement: a \<vertices> element or a \<triangles> element MAY contain exactly one binary array element instead of its ASCII child elements, although the core schema (see [Appendix B.1. 3MF XSD Schema](#appendix-b1-3mf-xsd-schema)) requires at least three \<vertex> elements and at least one \<triangle> element. The core schema itself is not changed, and documents that do not use binary encoding are validated against it as before.
 
 The use of binary data in general should be used only deliberately and with care. Therefore it MUST follow the following guidelines:
 
 - Using a binary array element is just a change of the actual encoding on disk and not the underlying data model. This means that it MUST be possible at any time to losslessly convert a binary encoded 3MF file into a uniquely defined ASCII specification element. Equally, any standard ASCII 3MF file can be converted into a binary 3MF package with only syntactical understanding of its content.
 
-- Any 3MF specification MUST explicitly allow the use of binary encoding for specific XML elements, including instructions and guardrails how to interpret them uniquely in their context. They MUST NOT be used for any other elements in the 3MF Model. This Core Specification allows binary encoding for the \<vertices> element (see [4.1.3.2. Binary Vertex Array](#4132-binary-vertex-array)), the \<triangles> element (see [4.1.4.2. Binary Triangle Array](#4142-binary-triangle-array)) and the \<t:triangleset> element (see [4.1.5.4 Binary Triangle Set References](#4154-binary-triangle-set-references)).
+- Any 3MF extension specification MUST explicitly allow the use of binary encoding for specific XML elements, including instructions and guardrails how to interpret them uniquely in their context. They MUST NOT be used for any other elements in the 3MF Model. This Core Specification allows binary encoding for the \<vertices> element (see [4.1.3.2. Binary Vertex Array](#4132-binary-vertex-array)), the \<triangles> element (see [4.1.4.2. Binary Triangle Array](#4142-binary-triangle-array)) and the \<t:triangleset> element (see [4.1.5.4 Binary Triangle Set References](#4154-binary-triangle-set-references)).
 
 Binary encoding reduces human readability and excludes consumers that do not implement this extension. Producers SHOULD therefore only use it in applications where the ASCII representation is a measurable bottleneck for file size, loading or writing time, as is typically the case for meshes with a large number of vertices and triangles.
 
@@ -439,7 +439,7 @@ Binary encoding reduces human readability and excludes consumers that do not imp
 
 ### 2.4.1. Array Encoding and Quantization
 
-Efficiently storing large arrays of values in a binary form is its own science. There are many domain-specific ways to encode for example mesh connectivity data, all with their advantages and associated costs. The 3MF Binary Extension tries to follow a compromise between implementation complexity, performance and file size.
+Efficiently storing large arrays of values in a binary form is its own science. There are many domain-specific ways to encode for example mesh connectivity data, all with their advantages and associated costs. Binary encoding in 3MF tries to follow a compromise between implementation complexity, performance and file size.
 
 A _binary array_ is a sequence of N values of a single _array type_. This specification defines the following ten array types, which are identified by the type attribute of the \<bin:array> element (see [2.4.3. Binary Index Part and OPC Structure](#243-binary-index-part-and-opc-structure)):
 
@@ -659,7 +659,7 @@ All chunks of a binary data part MUST use the same _compression method_, which i
 | zstd | 2.4.2.1 | Zstandard frame (RFC 8878) | allowed |
 | lzma | 2.4.2.2 | XZ stream with the LZMA2 filter (The .xz File Format) | not allowed |
 
-A consumer that supports the core binary extension MUST support all compression methods and trained dictionaries (see [2.4.2.3. Trained Dictionaries](#2423-trained-dictionaries)) defined in this section, within the limits defined in the respective section. A producer MAY use any of them.
+A consumer that supports binary encoding MUST support all compression methods and trained dictionaries (see [2.4.2.3. Trained Dictionaries](#2423-trained-dictionaries)) defined in this section, within the limits defined in the respective section. A producer MAY use any of them.
 
 Every compressed chunk carries a checksum of its data, which a consumer MUST verify. If a compressed format stores the uncompressed size, that size MUST be equal to the uncompressedsize attribute of the chunk. In addition, a chunk MAY carry a checksum of its uncompressed chunk data in the binary index part, which also protects chunks with the compression method "none" (see [2.4.3.2. Chunk](#2432-chunk)).
 
@@ -799,8 +799,8 @@ The following example describes a binary data part with one uncompressed chunk o
 
 A _binary array element_ replaces the sequence of ASCII child elements of a container element in the 3D Model part. For example, a \<bin:vertexarray> element replaces all \<vertex> elements of a \<vertices> element. The following rules apply to all binary array elements, including those defined by extensions:
 
-- A binary array element MUST have an index attribute of type **ST\_UriReference** with the path to a binary index part.
-- For every attribute of the replaced ASCII element that is encoded, the binary array element has an attribute with the same name. The value of this attribute is the id of a binary array in the referenced binary index part. If the name of the attribute is "index", it collides with the index attribute of the binary array element, and the specification that defines the binary array element MUST define a different name (for example refindex, see [4.1.5.4 Binary Triangle Set References](#4154-binary-triangle-set-references)).
+- A binary array element MUST have a binindex attribute of type **ST\_UriReference** with the path to a binary index part.
+- For every attribute of the replaced ASCII element that is encoded, the binary array element has an attribute with the same name. The value of this attribute is the id of a binary array in the referenced binary index part.
 - All binary arrays referenced by one binary array element MUST have the same count N. The container element is equivalent to N ASCII child elements. The attribute values of the i-th ASCII element are the decoded i-th values of the referenced binary arrays, in the same order.
 - If an optional attribute of the replaced ASCII element is not referenced by the binary array element, the attribute is omitted on all N equivalent ASCII elements.
 - If a binary array declares a leave-out value, the attribute is omitted on every equivalent ASCII element whose value is equal to the leave-out value, see [2.4.4.1. Leave-Out Values](#2441-leave-out-values).
@@ -823,10 +823,10 @@ The following example shows a cube with an edge length of 10 millimeters with bi
     <object id="1" type="model">
       <mesh>
         <vertices>
-          <bin:vertexarray index="/3D/Binary/cube.binindex" x="1" y="2" z="3" />
+          <bin:vertexarray binindex="/3D/Binary/cube.binindex" x="1" y="2" z="3" />
         </vertices>
         <triangles>
-          <bin:trianglearray index="/3D/Binary/cube.binindex" v1="4" v2="5" v3="6" />
+          <bin:trianglearray binindex="/3D/Binary/cube.binindex" v1="4" v2="5" v3="6" />
         </triangles>
       </mesh>
     </object>
@@ -865,20 +865,20 @@ The value that is compared with the leave-out value depends on the array type. T
 
 | **Array type** | **Compared value** | **Valid range of omitvalue** |
 | --- | --- | --- |
-| int32 | the stored signed 32 bit integer | -2147483648 to 2147483647 |
-| int32delta | the decoded value, after adding the deltas | -2147483648 to 2147483647 |
-| int64 | the stored signed 64 bit integer | -9223372036854775808 to 9223372036854775807 |
-| int64delta | the decoded value, after adding the deltas | -9223372036854775808 to 9223372036854775807 |
-| int48rle | the signed 48 bit value of the run record | -140737488355328 to 140737488355327 |
-| float32quantized | the stored quantized value, before scaling | 0 to 4294967295 |
-| float32quantizeddelta | the quantized value after adding the deltas, before scaling | 0 to 4294967295 |
-| float48rlequantized | the unsigned 48 bit quantized value of the run record, before scaling | 0 to 281474976710655 |
+| int32 | the stored signed 32 bit integer | -2<sup>31</sup> to 2<sup>31</sup> - 1 |
+| int32delta | the decoded value, after adding the deltas | -2<sup>31</sup> to 2<sup>31</sup> - 1 |
+| int64 | the stored signed 64 bit integer | -2<sup>63</sup> to 2<sup>63</sup> - 1 |
+| int64delta | the decoded value, after adding the deltas | -2<sup>63</sup> to 2<sup>63</sup> - 1 |
+| int48rle | the signed 48 bit value of the run record | -2<sup>47</sup> to 2<sup>47</sup> - 1 |
+| float32quantized | the stored quantized value, before before applying the range scaling of the quantization | 0 to 2<sup>32</sup> - 1 |
+| float32quantizeddelta | the quantized value after adding the deltas, before before applying the range scaling of the quantization | 0 to 2<sup>32</sup> - 1 |
+| float48rlequantized | the unsigned 48 bit quantized value of the run record, before applying the range scaling of the quantization | 0 to 2<sup>48</sup> - 1 |
 | float32, float64 | leave-out values are not allowed. An optional attribute that references such an array is specified on all equivalent elements. | |
 
 The following rules apply:
 
 - If a binary array does not declare a leave-out value, every element of the array carries a value.
-- A binary array that declares a leave-out value MUST only be referenced by optional attributes. Required attributes, such as v1, v2 and v3 of \<bin:trianglearray>, x, y and z of \<bin:vertexarray> or refindex of \<bin:refarray>, MUST NOT reference it.
+- A binary array that declares a leave-out value MUST only be referenced by optional attributes. Required attributes, such as v1, v2 and v3 of \<bin:trianglearray>, x, y and z of \<bin:vertexarray> or index of \<bin:refarray>, MUST NOT reference it.
 - For delta array types, an element that is equal to the leave-out value remains part of the delta sequence: the next element is computed by adding its delta to the leave-out value.
 - For run-length encoded array types, the leave-out value applies to all elements of a run record with that value.
 - For quantized array types, a quantized value that is equal to the leave-out value is exempt from the range check against steps. Producers SHOULD choose a leave-out value greater than steps, so that it cannot be confused with a real value.
@@ -894,7 +894,7 @@ The following example declares -1 as leave-out value for an array of per-triangl
 
 ### 2.4.5. Error Handling
 
-A consumer that supports the binary extension MUST consider a 3MF Document invalid and MUST NOT substitute values if any of the following conditions occur:
+A consumer that supports binary encoding MUST consider a 3MF Document invalid and MUST NOT substitute values if any of the following conditions occur:
 
 - A referenced binary index part, binary data part, binary dictionary part or binary array does not exist, or a required relationship is missing.
 - A compression method or array type is not defined in this specification or in a supported extension.
@@ -911,11 +911,11 @@ A consumer that supports the binary extension MUST consider a 3MF Document inval
 
 Binary data is a potential attack surface. Consumers MUST NOT read or write outside the bounds of the parts and buffers defined above. Consumers SHOULD check that the declared sizes are plausible before allocating memory, and SHOULD limit the ratio between uncompressed and compressed size in order to protect against decompression bombs. For run-length encoded array types, the count of the array, and not the byte length, determines the size of the decoded data.
 
-An editor that modifies an element that is binary encoded MUST either encode the modified data again or convert the container element to ASCII encoding. An editor MUST remove binary index parts, binary data parts and binary dictionary parts, together with their relationships, that are no longer referenced, and MUST remove the binary extension from the requiredextensions attribute if no binary array element remains in the 3D Model part.
+An editor that modifies an element that is binary encoded MUST either encode the modified data again or convert the container element to ASCII encoding. An editor MUST remove binary index parts, binary data parts and binary dictionary parts, together with their relationships, that are no longer referenced, and MUST remove the core binary namespace from the requiredextensions attribute if no binary array element remains in the 3D Model part.
 
 ### 2.4.6. Versioning
 
-The core binary namespace is versioned independently from the core namespace, as described in [2.3.1. Support for Versioning and Extensibility](#231-support-for-versioning-and-extensibility). New array types, compression methods or binary array elements are introduced with a new version of the core binary namespace. A consumer MUST NOT guess the meaning of an unknown array type or compression method. As the binary extension is always marked as required, a consumer that does not support the version used in a document fails to process it, rather than misinterpreting it.
+The core binary namespace is versioned independently from the core namespace, as described in [2.3.1. Support for Versioning and Extensibility](#231-support-for-versioning-and-extensibility). New array types, compression methods or binary array elements are introduced with a new version of the core binary namespace. A consumer MUST NOT guess the meaning of an unknown array type or compression method. As the core binary namespace is always marked as required, a consumer that does not support the version used in a document fails to process it, rather than misinterpreting it.
 
 # Chapter 3. 3D Models
 
@@ -1012,6 +1012,11 @@ _Table 3-1. Metadata values_
 | | CreationDate | The date this documented was created by a source app |
 | | ModificationDate | The date this document was last modified |
 | | Application | The name of the source application that originally created this document |
+| Object, Item | PartCategory | A category of the part, for example its product family or the kind of part. The values are defined by the producer |
+| | PartGroup | The name of a group of parts that belong together, for example the parts of one assembly or of one order position |
+| | OrderID | An identifier of the order or job that the part is manufactured for, for example a customer order number |
+
+The well-known metadata of the Object and Item context are OPTIONAL and MAY be specified in the \<metadatagroup> element of an \<object> or an \<item> element. If a name is specified both for an \<item> element and for the object that it references, the value of the \<item> element takes precedence for that item. These values are informative and do not change how the part is manufactured.
 
 
 The optional "type" attribute allows for the value to be any data. The default value for type is assumed to be "xs:string". If type is not present, The value of the \<metadata> value is assumed to be be any string. However, if type is specified, it MUST contain the name of a built-in Simple XML type representing the data contained in the value.
@@ -1075,7 +1080,7 @@ Element **\<item>**
 
 The \<item> element identifies one object resource to be output by the 3D manufacturing device. A consumer MUST apply the transform prior to outputting the object.
 
-The \<item> element may contain a \<metadatagroup> element containing one or more vendor-supplied \<metadata> elements.
+The \<item> element may contain a \<metadatagroup> element containing one or more vendor-supplied \<metadata> elements or well-known metadata of the Item context (see [3.4.1. Metadata](#341-metadata)).
 
 A 3MF Document may include multiple objects to manufacture at the same time. The arrangement of these items in the build is considered a default; consumers MAY rearrange the items for manufacturing in order to better pack the build volume. Sometimes objects are arranged in the coordinate space so as to be manufactured in an interlocking fashion; producers of these objects SHOULD collect them as components (see [4.2. Components](#42-components)), as 3D manufacturing devices MUST NOT transform components of an object relative to each other.
 
@@ -1231,7 +1236,7 @@ Element **\<bin:vertexarray>**
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
-| index | **ST\_UriReference** | required | | Path to the binary index part that contains the referenced binary arrays. |
+| binindex | **ST\_UriReference** | required | | Path to the binary index part that contains the referenced binary arrays. |
 | x | **ST\_ArrayID** | required | | Id of a floating point binary array with the positions of the vertices along the X axis. |
 | y | **ST\_ArrayID** | required | | Id of a floating point binary array with the positions of the vertices along the Y axis. |
 | z | **ST\_ArrayID** | required | | Id of a floating point binary array with the positions of the vertices along the Z axis. |
@@ -1243,7 +1248,7 @@ The binary arrays referenced by x, y and z MUST be of a floating point array typ
 
 The three coordinate arrays MAY use different array types, for example a quantized array type with a smaller interval for a flat dimension.
 
-The core schema requires at least three \<vertex> elements in a \<vertices> element. The core binary extension supersedes this requirement for a \<vertices> element that contains a \<bin:vertexarray> element, see [2.4. Binary Encoding](#24-binary-encoding).
+The core schema requires at least three \<vertex> elements in a \<vertices> element. Binary encoding supersedes this requirement for a \<vertices> element that contains a \<bin:vertexarray> element, see [2.4. Binary Encoding](#24-binary-encoding).
 
 
 ### 4.1.4. Triangles
@@ -1293,7 +1298,7 @@ Element **\<bin:trianglearray>**
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
-| index | **ST\_UriReference** | required | | Path to the binary index part that contains the referenced binary arrays. |
+| binindex | **ST\_UriReference** | required | | Path to the binary index part that contains the referenced binary arrays. |
 | v1 | **ST\_ArrayID** | required | | Id of an integer binary array with the first vertex index of each triangle. |
 | v2 | **ST\_ArrayID** | required | | Id of an integer binary array with the second vertex index of each triangle. |
 | v3 | **ST\_ArrayID** | required | | Id of an integer binary array with the third vertex index of each triangle. |
@@ -1309,7 +1314,7 @@ The binary arrays referenced by v1, v2, v3, p1, p2, p3 and pid MUST be of an int
 
 The same binary array MAY be referenced by more than one attribute. For example, a mesh that assigns one property per triangle can reference the same array by p1, p2 and p3.
 
-The core schema requires at least one \<triangle> element in a \<triangles> element. The core binary extension supersedes this requirement for a \<triangles> element that contains a \<bin:trianglearray> element, see [2.4. Binary Encoding](#24-binary-encoding).
+The core schema requires at least one \<triangle> element in a \<triangles> element. Binary encoding supersedes this requirement for a \<triangles> element that contains a \<bin:trianglearray> element, see [2.4. Binary Encoding](#24-binary-encoding).
 
 
 ### 4.1.5. Triangle Sets
@@ -1379,13 +1384,13 @@ Element **\<bin:refarray>**
 ##### Attributes
 | Name | Type | Use | Default | Annotation |
 | --- | --- | --- | --- | --- |
-| index | **ST\_UriReference** | required | | Path to the binary index part that contains the referenced binary array. |
-| refindex | **ST\_ArrayID** | required | | Id of an integer binary array with the triangle indices of the triangle set. |
+| binindex | **ST\_UriReference** | required | | Path to the binary index part that contains the referenced binary array. |
+| index | **ST\_ArrayID** | required | | Id of an integer binary array with the triangle indices of the triangle set. |
 | @anyAttribute | | | | |
 
 A \<bin:refarray> element is a binary array element as defined in [2.4.4. Embedding into XML Elements](#244-embedding-into-xml-elements). It MUST be in the core binary namespace and MUST be the only child element of its \<t:triangleset> element. A \<t:triangleset> element that contains a \<bin:refarray> element MUST NOT contain any \<t:ref> or \<t:refrange> elements.
 
-The binary array referenced by refindex MUST be of an integer array type and MUST NOT declare a leave-out value. If its count is N, the \<t:triangleset> element is equivalent to N \<t:ref> elements, where the i-th \<t:ref> element has the decoded i-th value of the array as its index attribute. The attribute is named refindex instead of index, because the index attribute of a binary array element contains the path to the binary index part. All rules of [4.1.5.1 Triangle Set Elements](#4151-triangle-set-elements) and [4.1.5.2 Triangle Set References](#4152-triangle-set-references) apply to the equivalent \<t:ref> elements. In particular, every value MUST be a valid index into the triangles of the mesh, and a consumer MUST ignore duplicate references to the same triangle.
+The binary array referenced by the index attribute MUST be of an integer array type and MUST NOT declare a leave-out value. If its count is N, the \<t:triangleset> element is equivalent to N \<t:ref> elements, where the i-th \<t:ref> element has the decoded i-th value of the array as its index attribute. All rules of [4.1.5.1 Triangle Set Elements](#4151-triangle-set-elements) and [4.1.5.2 Triangle Set References](#4152-triangle-set-references) apply to the equivalent \<t:ref> elements. In particular, every value MUST be a valid index into the triangles of the mesh, and a consumer MUST ignore duplicate references to the same triangle.
 
 A \<t:refrange> element has no binary equivalent. A range is encoded by listing every triangle index of the range, which describes the same triangle set. For triangle sets that contain ranges, the array type "int32delta" is RECOMMENDED, as a range then becomes a sequence of deltas of 1 that compresses very well.
 
@@ -1395,7 +1400,7 @@ The following example shows a triangle set whose triangle indices are stored in 
 
 ```xml
 <t:triangleset name="Top" identifier="v:top">
-  <bin:refarray index="/3D/Binary/mesh.binindex" refindex="9" />
+  <bin:refarray binindex="/3D/Binary/mesh.binindex" index="9" />
 </t:triangleset>
 ```
 
@@ -1988,7 +1993,7 @@ A consumer that is authorized to un-protect content by reversing the above steps
 
 ### B.1.3 Binary encoding schema
 
-The core schema (see [B.1.1 Core specification schema](#b11-core-specification-schema)) is not changed by the binary encoding. As a required extension, the core binary extension supersedes the requirement of the core schema that \<vertices> and \<triangles> elements contain ASCII child elements: they MAY contain exactly one binary array element instead, see [2.4. Binary Encoding](#24-binary-encoding). The \<bin:refarray> element uses the existing extension point of CT\_TriangleSet in the triangle set schema. The following schema defines the binary array elements of the 3D Model part as well as the elements of the binary index part.
+The core schema (see [B.1.1 Core specification schema](#b11-core-specification-schema)) is not changed by the binary encoding. As the core binary namespace is always marked as required, binary encoding supersedes the requirement of the core schema that \<vertices> and \<triangles> elements contain ASCII child elements: they MAY contain exactly one binary array element instead, see [2.4. Binary Encoding](#24-binary-encoding). The \<bin:refarray> element uses the existing extension point of CT\_TriangleSet in the triangle set schema. The following schema defines the binary array elements of the 3D Model part as well as the elements of the binary index part.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2013,14 +2018,14 @@ The core schema (see [B.1.1 Core specification schema](#b11-core-specification-s
   </xs:annotation>
   <!-- Complex Types: 3D Model part -->
   <xs:complexType name="CT_VertexArray">
-    <xs:attribute name="index" type="ST_UriReference" use="required"/>
+    <xs:attribute name="binindex" type="ST_UriReference" use="required"/>
     <xs:attribute name="x" type="ST_ArrayID" use="required"/>
     <xs:attribute name="y" type="ST_ArrayID" use="required"/>
     <xs:attribute name="z" type="ST_ArrayID" use="required"/>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_TriangleArray">
-    <xs:attribute name="index" type="ST_UriReference" use="required"/>
+    <xs:attribute name="binindex" type="ST_UriReference" use="required"/>
     <xs:attribute name="v1" type="ST_ArrayID" use="required"/>
     <xs:attribute name="v2" type="ST_ArrayID" use="required"/>
     <xs:attribute name="v3" type="ST_ArrayID" use="required"/>
@@ -2031,8 +2036,8 @@ The core schema (see [B.1.1 Core specification schema](#b11-core-specification-s
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="CT_RefArray">
-    <xs:attribute name="index" type="ST_UriReference" use="required"/>
-    <xs:attribute name="refindex" type="ST_ArrayID" use="required"/>
+    <xs:attribute name="binindex" type="ST_UriReference" use="required"/>
+    <xs:attribute name="index" type="ST_ArrayID" use="required"/>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
   <!-- Complex Types: Binary Index part -->
